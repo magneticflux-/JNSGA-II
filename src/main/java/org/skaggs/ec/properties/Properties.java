@@ -11,6 +11,7 @@ import java.util.Map;
  * Created by Mitchell on 11/25/2015.
  */
 public class Properties {
+
     private static final Map<Key, Object> defaultValues;
 
     static {
@@ -36,6 +37,10 @@ public class Properties {
     public Properties lock() {
         this.locked = true;
         return this;
+    }
+
+    public void testKey(Key key) {
+        this.getValue(key);
     }
 
     public boolean locked() {

@@ -9,6 +9,7 @@ import java.util.Map;
  * Created by Mitchell on 11/25/2015.
  */
 public class EvaluatedIndividual<E> {
+
     private final E individual;
     private final Map<Class<? extends OptimizationFunction<E>>, Double> scores;
 

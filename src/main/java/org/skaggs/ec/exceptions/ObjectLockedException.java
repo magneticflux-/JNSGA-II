@@ -4,6 +4,7 @@ package org.skaggs.ec.exceptions;
  * Created by Mitchell on 11/25/2015.
  */
 public class ObjectLockedException extends RuntimeException {
+
     public ObjectLockedException() {
     }
 

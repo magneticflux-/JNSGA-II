@@ -8,5 +8,6 @@ import java.util.List;
  * TODO Add stats about the population. Mean, min, max, standard deviation
  */
 public class PopulationData<E> {
+
     private List<EvaluatedIndividual<? extends E>> population;
 }
