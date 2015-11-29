@@ -1,6 +1,6 @@
 package org.skaggs.ec.population;
 
-import java.util.List;
+import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -8,6 +8,9 @@ import java.util.List;
  * TODO Add stats about the population. Mean, min, max, standard deviation
  */
 public class PopulationData<E> {
+    private final FrontedPopulation<E> frontedPopulation;
 
-    private List<EvaluatedIndividual<? extends E>> population;
+    public PopulationData(FrontedPopulation<E> frontedPopulation) {
+        this.frontedPopulation = frontedPopulation;
+    }
 }

@@ -1,12 +1,12 @@
 package org.skaggs.ec.example;
 
 import org.apache.commons.math3.util.FastMath;
+import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;
-import org.skaggs.ec.population.Individual;
+import org.skaggs.ec.population.Population;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -39,12 +39,12 @@ public class DoubleCrossoverOperator implements Operator<Double> {
     }
 
     @Override
-    public List<Individual<Double>> apply(List<Individual<Double>> population, Properties properties) {
+    public Population<Double> apply(FrontedPopulation<Double> population, Properties properties) {
         return null;
     }
 
     @Override
     public Key[] requestProperties() {
-        return new Key[0];
+        return new Key[]{Key.DoubleKey.CROSSOVER_DISTRIBUTION_INDEX, Key.DoubleKey.CROSSOVER_PROBABILITY};
     }
 }

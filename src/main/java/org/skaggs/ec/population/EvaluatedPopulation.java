@@ -2,6 +2,7 @@ package org.skaggs.ec.population;
 
 import org.skaggs.ec.OptimizationFunction;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,5 +24,15 @@ public class EvaluatedPopulation<E> extends Population<E> {
             this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toList());
 
         // *throws salt over shoulder*
+    }
+
+    protected EvaluatedPopulation() {
+    }
+
+    @Override
+    public List<? extends EvaluatedIndividual<E>> getPopulation() {
+        // This SHOULD work, since the only constructor fills the List<> with EvaluatedIndividual<>s
+        //noinspection unchecked
+        return Collections.unmodifiableList((List<EvaluatedIndividual<E>>) population);
     }
 }

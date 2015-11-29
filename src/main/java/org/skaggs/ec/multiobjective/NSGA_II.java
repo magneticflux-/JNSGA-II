@@ -3,8 +3,9 @@ package org.skaggs.ec.multiobjective;
 import org.skaggs.ec.EvolutionObserver;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.exceptions.NoValueSetException;
+import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;
-import org.skaggs.ec.population.Individual;
+import org.skaggs.ec.population.EvaluatedPopulation;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.PopulationData;
 import org.skaggs.ec.population.PopulationGenerator;
@@ -23,34 +24,66 @@ import java.util.List;
 public class NSGA_II<E> implements HasPropertyRequirements {
 
     private final List<EvolutionObserver<E>> observers;
-    private final List<OptimizationFunction<E>> functions;
+    private final List<OptimizationFunction<E>> optimizationFunctions;
     private final Operator<E> operator;
-    private final PopulationGenerator<E> populationGenerator;
     private final Properties properties;
-    private Population<E> population;
+    private FrontedPopulation<E> population;
 
-    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> functions, PopulationGenerator<E> populationGenerator) {
-        if (functions.size() < 1)
+    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
+        if (optimizationFunctions.size() < 1)
             throw new IllegalArgumentException("There must be at least one optimization function!");
 
         if (!properties.locked())
             properties.lock();
 
         this.observers = new LinkedList<>();
-        this.functions = new LinkedList<>(functions);
+        this.optimizationFunctions = new LinkedList<>(optimizationFunctions);
         this.operator = operator;
-        this.populationGenerator = populationGenerator;
         this.properties = properties;
 
         checkKeyAvailability();
 
-        population = new Population<>(properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator);
+        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator);
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
+        //noinspection UnnecessaryLocalVariable
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
+        this.population = frontedPopulation;
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public void runGeneration() {
-        Population<E> children;
-        List<Individual<E>> newIndividuals = operator.apply(population.getPopulation(), properties);
-        //TODO Implement rest of generation cycle
+        /*
+        TODO Check all da boxes!
+
+        The plan:
+
+        In constructor:
+        [X] 1. Generate random Population
+        [X] 2. Evaluate it into an EvaluatedPopulation
+        [X] 3. Turn it into a FrontedPopulation
+        [X] 4. Assign the new FrontedPopulation to the instance's population
+
+        In this method:
+        [X] 1. Generate offspring
+        [X] 2. Merge into a 2x-sized Population
+        [X] 3. Evaluate it into an EvaluatedPopulation
+        [X] 4. Turn it into a FrontedPopulation
+        [X] 5. Cut off the bottom 50% of the FrontedPopulation into a new FrontedPopulation
+        [X] 6. Assign the .5x-sized FrontedPopulation to the instance's population
+
+        Everywhere else:
+        [ ] 1. Finish FrontedPopulation class
+        [ ] 2. Write Population.merge() method
+        [ ] 3.
+         */
+
+        Population<E> offspring = operator.apply(this.population, properties);
+        Population<E> merged = Population.merge(population, offspring);
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, optimizationFunctions, properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.INT_POPULATION));
+        this.population = truncatedPopulation;
+        this.update(new PopulationData<>(this.population));
     }
 
     private void checkKeyAvailability() {

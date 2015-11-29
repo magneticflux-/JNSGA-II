@@ -8,7 +8,7 @@ import java.util.List;
  * Created by Mitchell on 11/28/2015.
  */
 public class Population<E> {
-    protected List<? extends Individual<E>> population;
+    public List<? extends Individual<E>> population;
 
     protected Population() {
     }
@@ -25,7 +25,11 @@ public class Population<E> {
         population = new ArrayList<>(individuals);
     }
 
-    public List<Individual<E>> getPopulation() {
+    public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
+        return null;
+    }
+
+    public List<? extends Individual<E>> getPopulation() {
         return Collections.unmodifiableList(population);
     }
 }
