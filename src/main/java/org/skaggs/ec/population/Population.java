@@ -10,6 +10,9 @@ import java.util.List;
 public class Population<E> {
     protected List<? extends Individual<E>> population;
 
+    protected Population() {
+    }
+
     public Population(int size, PopulationGenerator<E> populationGenerator) {
         population = populationGenerator.generatePopulation(size);
     }

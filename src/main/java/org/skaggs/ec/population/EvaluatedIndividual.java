@@ -10,14 +10,14 @@ import java.util.Map;
  */
 public class EvaluatedIndividual<E> extends Individual<E> {
 
-    protected final Map<Class<? extends OptimizationFunction<E>>, Double> scores;
+    protected final Map<? extends OptimizationFunction<E>, Double> scores;
 
-    public EvaluatedIndividual(Individual<E> individual, Map<Class<? extends OptimizationFunction<E>>, Double> scores) {
+    public EvaluatedIndividual(Individual<E> individual, Map<? extends OptimizationFunction<E>, Double> scores) {
         super(individual.getIndividual());
         this.scores = Collections.unmodifiableMap(scores);
     }
 
-    public Map<Class<? extends OptimizationFunction<E>>, Double> getScores() {
+    public Map<? extends OptimizationFunction<E>, Double> getScores() {
         return scores;
     }
 }

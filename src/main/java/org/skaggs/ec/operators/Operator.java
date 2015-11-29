@@ -1,5 +1,6 @@
 package org.skaggs.ec.operators;
 
+import org.skaggs.ec.population.EvaluatedPopulation;
 import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Properties;
@@ -17,5 +18,5 @@ public interface Operator<E> extends HasPropertyRequirements {
      * @param population the population to be operated on
      * @return a new population with the changes applied
      */
-    List<Individual<E>> apply(List<Individual<E>> population, Properties properties);
+    List<Individual<E>> apply(EvaluatedPopulation<E> population, Properties properties);
 }
