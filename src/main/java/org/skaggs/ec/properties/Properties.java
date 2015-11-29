@@ -14,14 +14,16 @@ public class Properties {
 
     private static final Map<Key, Object> defaultValues;
 
-    static {
+    static { //Default value initialization
         Map<Key, Object> v = new HashMap<>();
+
+        //Examples
 
         v.put(Key.IntKey.INT_POPULATION, null);
 
         v.put(Key.BooleanKey.BOOLEAN_THREADED, true);
 
-        v.put(Key.DoubleKey.DOUBLE_ELITE_FRACTION, 0);
+        v.put(Key.DoubleKey.DOUBLE_ELITE_FRACTION, null);
 
         defaultValues = Collections.unmodifiableMap(v);
     }

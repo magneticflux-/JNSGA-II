@@ -1,6 +1,10 @@
 package org.skaggs.ec.operators;
 
+import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.properties.HasPropertyRequirements;
+import org.skaggs.ec.properties.Properties;
+
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -8,10 +12,10 @@ import org.skaggs.ec.properties.HasPropertyRequirements;
 public interface Operator<E> extends HasPropertyRequirements {
 
     /**
-     * This method applied the operation to an array of appropriate size. The appropriate size is determined by any implementors of this.
+     * This method applies the operation to the entire population and returns a new collection of individuals.
      *
-     * @param objects the objects to be modified
-     * @return an array of modified objects
+     * @param population the population to be operated on
+     * @return a new population with the changes applied
      */
-    E[] apply(E... objects);
+    List<Individual<E>> apply(List<Individual<E>> population, Properties properties);
 }

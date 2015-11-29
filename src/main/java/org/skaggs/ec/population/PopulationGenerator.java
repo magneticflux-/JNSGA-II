@@ -7,5 +7,5 @@ import java.util.List;
  */
 public interface PopulationGenerator<E> {
 
-    List<? extends E> generatePopulation();
+    List<Individual<E>> generatePopulation(int num);
 }
