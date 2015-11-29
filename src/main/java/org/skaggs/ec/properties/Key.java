@@ -14,6 +14,12 @@ public interface Key {
     }
 
     enum DoubleKey implements Key {
-        DOUBLE_ELITE_FRACTION
+        DOUBLE_ELITE_FRACTION,
+
+        CROSSOVER_DISTRIBUTION_INDEX,
+        MUTATION_DISTRIBUTION_INDEX,
+
+        CROSSOVER_PROBABILITY,
+        MUTATION_PROBABILITY
     }
 }

@@ -24,6 +24,10 @@ public class Properties {
         v.put(Key.BooleanKey.BOOLEAN_THREADED, true);
 
         v.put(Key.DoubleKey.DOUBLE_ELITE_FRACTION, null);
+        v.put(Key.DoubleKey.CROSSOVER_DISTRIBUTION_INDEX, null);
+        v.put(Key.DoubleKey.MUTATION_DISTRIBUTION_INDEX, null);
+        v.put(Key.DoubleKey.CROSSOVER_PROBABILITY, null);
+        v.put(Key.DoubleKey.MUTATION_PROBABILITY, null);
 
         defaultValues = Collections.unmodifiableMap(v);
     }
