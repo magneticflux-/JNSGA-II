@@ -1,6 +1,8 @@
 package org.skaggs.ec.population;
 
 import org.skaggs.ec.OptimizationFunction;
+import org.skaggs.ec.properties.Key;
+import org.skaggs.ec.properties.Properties;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,9 +20,9 @@ public class EvaluatedPopulation<E> extends Population<E> {
      * @param population            the population to be evaluated
      * @param optimizationFunctions the functions to use to evaluate the population
      */
-    public EvaluatedPopulation(Population<E> population, Collection<OptimizationFunction<E>> optimizationFunctions, boolean threaded) {
+    public EvaluatedPopulation(Population<E> population, Collection<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
-        if (threaded)
+        if (properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED))
             this.population = population.population.parallelStream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toList());
         else
             this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toList());

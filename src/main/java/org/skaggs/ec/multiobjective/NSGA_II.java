@@ -44,7 +44,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.checkKeyAvailability();
 
         Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator);
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
         this.population = frontedPopulation;
@@ -79,7 +79,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         Population<E> offspring = this.operator.apply(this.population, this.properties);
         Population<E> merged = Population.merge(this.population, offspring);
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
         FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.INT_POPULATION));
         this.population = truncatedPopulation;
