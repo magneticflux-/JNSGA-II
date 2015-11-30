@@ -18,6 +18,6 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     }
 
     public Map<? extends OptimizationFunction<E>, Double> getScores() {
-        return scores;
+        return this.scores;
     }
 }

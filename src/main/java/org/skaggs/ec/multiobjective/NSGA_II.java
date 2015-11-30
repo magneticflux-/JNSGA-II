@@ -41,7 +41,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.operator = operator;
         this.properties = properties;
 
-        checkKeyAvailability();
+        this.checkKeyAvailability();
 
         Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
@@ -77,11 +77,11 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         [ ] 3.
          */
 
-        Population<E> offspring = operator.apply(this.population, properties);
-        Population<E> merged = Population.merge(population, offspring);
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, optimizationFunctions, properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
+        Population<E> offspring = this.operator.apply(this.population, this.properties);
+        Population<E> merged = Population.merge(this.population, offspring);
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED));
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.INT_POPULATION));
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.INT_POPULATION));
         this.population = truncatedPopulation;
         this.update(new PopulationData<>(this.population));
     }
@@ -89,12 +89,12 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private void checkKeyAvailability() {
         Collection<Key> missingKeys = new HashSet<>();
 
-        HasPropertyRequirements[] hasPropertyRequirementses = new HasPropertyRequirements[]{operator, this};
+        HasPropertyRequirements[] hasPropertyRequirementses = new HasPropertyRequirements[]{this.operator, this};
 
         for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses)
             for (Key key : hasPropertyRequirements.requestProperties())
                 try {
-                    properties.testKey(key);
+                    this.properties.testKey(key);
                 } catch (NoValueSetException e) {
                     missingKeys.add(key);
                 }

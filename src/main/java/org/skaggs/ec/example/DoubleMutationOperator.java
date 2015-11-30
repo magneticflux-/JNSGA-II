@@ -21,7 +21,7 @@ public class DoubleMutationOperator implements Operator<Double> {
     }
 
     private Individual<Double> mutate(Individual<Double> d) {
-        return new Individual<>(d.getIndividual() + random.get().nextDouble() - .5);
+        return new Individual<>((d.getIndividual() + this.random.get().nextDouble()) - .5);
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.Random;
  * Created by Mitchell on 11/27/2015.
  */
 public class DoublePopulationGenerator implements PopulationGenerator<Double> {
+
     private final double min;
     private final double max;
     private final double difference;
@@ -21,7 +22,7 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
         this.min = min;
         this.max = max;
-        difference = max - min;
+        this.difference = max - min;
     }
 
     @Override
@@ -29,7 +30,7 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
         Random r = new Random();
         List<Individual<Double>> pop = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            pop.add(new Individual<>((r.nextDouble() * difference) + min));
+            pop.add(new Individual<>((r.nextDouble() * this.difference) + this.min));
         }
         return pop;
     }

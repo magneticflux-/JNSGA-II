@@ -23,19 +23,19 @@ public class DoubleCrossoverOperator implements Operator<Double> {
     }
 
     private double[] crossover(double p1, double p2) {
-        double u = random.nextDouble();
+        double u = this.random.nextDouble();
         double betaPrime = 0;
-        while (probabilityFunctionIntegral(betaPrime) < u) // Computes the inverse of the function
+        while (this.probabilityFunctionIntegral(betaPrime) < u) // Computes the inverse of the function
             betaPrime += .01;
 
-        return new double[]{p1 + p2 - betaPrime * FastMath.abs(p2 - p1), p1 + p2 + betaPrime * FastMath.abs(p2 - p1)};
+        return new double[]{(p1 + p2) - (betaPrime * FastMath.abs(p2 - p1)), p1 + p2 + (betaPrime * FastMath.abs(p2 - p1))};
     }
 
     private double probabilityFunctionIntegral(double x) {
         if (x <= 1)
-            return FastMath.pow(x, n + 1) / 2;
+            return FastMath.pow(x, this.n + 1) / 2;
         else
-            return -FastMath.pow(x, -n - 1) / 2 + 1;
+            return (-FastMath.pow(x, -this.n - 1) / 2) + 1;
     }
 
     @Override

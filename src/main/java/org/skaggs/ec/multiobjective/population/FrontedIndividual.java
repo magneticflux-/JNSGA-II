@@ -9,6 +9,7 @@ import java.util.List;
  * Created by Mitchell on 11/28/2015.
  */
 public class FrontedIndividual<E> extends EvaluatedIndividual<E> {
+
     private Front<E> front;
     private List<? extends Individual<E>> dominatedIndividuals;
     private double crowdingDistance;
@@ -21,10 +22,10 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> {
     }
 
     public Front<E> getFront() {
-        return front;
+        return this.front;
     }
 
     public double getCrowdingDistance() {
-        return crowdingDistance;
+        return this.crowdingDistance;
     }
 }

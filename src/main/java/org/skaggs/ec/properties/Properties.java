@@ -3,6 +3,7 @@ package org.skaggs.ec.properties;
 import org.skaggs.ec.exceptions.NoValueSetException;
 import org.skaggs.ec.exceptions.ObjectLockedException;
 
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +33,12 @@ public class Properties {
         defaultValues = Collections.unmodifiableMap(v);
     }
 
-    private final HashMap<Key, Object> values;
+    private final AbstractMap<Key, Object> values;
     private boolean locked;
 
     public Properties() {
-        values = new HashMap<>();
-        locked = false;
+        this.values = new HashMap<>();
+        this.locked = false;
     }
 
     public Properties lock() {
@@ -54,26 +55,26 @@ public class Properties {
     }
 
     private Properties setValue(Key key, Object object) {
-        if (locked)
+        if (this.locked)
             throw new ObjectLockedException("This Properties object is already locked!");
-        values.put(key, object);
+        this.values.put(key, object);
         return this;
     }
 
     public int getInt(Key.IntKey key) {
-        return (int) getValue(key);
+        return (int) this.getValue(key);
     }
 
     public boolean getBoolean(Key.BooleanKey key) {
-        return (boolean) getValue(key);
+        return (boolean) this.getValue(key);
     }
 
     public double getDouble(Key.DoubleKey key) {
-        return (double) getValue(key);
+        return (double) this.getValue(key);
     }
 
     private Object getValue(Key key) {
-        Object value = values.get(key);
+        Object value = this.values.get(key);
         if (value == null) {
             value = defaultValues.get(key);
         }
@@ -84,18 +85,18 @@ public class Properties {
     }
 
     public Properties setInt(Key.IntKey key, int value) {
-        return setValue(key, value);
+        return this.setValue(key, value);
     }
 
     public Properties setBoolean(Key.BooleanKey key, boolean value) {
-        return setValue(key, value);
+        return this.setValue(key, value);
     }
 
     public Properties setDouble(Key.DoubleKey key, double value) {
-        return setValue(key, value);
+        return this.setValue(key, value);
     }
 
     public String toString() {
-        return "Set values: " + this.values.toString();
+        return "Set values: " + this.values;
     }
 }
