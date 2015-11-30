@@ -73,7 +73,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         Everywhere else:
         [ ] 1. Finish FrontedPopulation class
-        [ ] 2. Write Population.merge() method
+        [X] 2. Write Population.merge() method
         [ ] 3.
          */
 
