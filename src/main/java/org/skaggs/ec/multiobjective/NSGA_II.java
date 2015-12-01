@@ -74,7 +74,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         Everywhere else:
         [ ] 1. Finish FrontedPopulation class
         [X] 2. Write Population.merge() method
-        [ ] 3.
+        [ ] 3. Write proper Double classes
          */
 
         Population<E> offspring = this.operator.apply(this.population, this.properties);

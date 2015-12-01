@@ -1,4 +1,4 @@
-package org.skaggs.ec.example;
+package org.skaggs.ec.examples;
 
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;

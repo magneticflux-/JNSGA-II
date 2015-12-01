@@ -1,4 +1,4 @@
-package org.skaggs.ec.example;
+package org.skaggs.ec.examples;
 
 import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.population.PopulationGenerator;

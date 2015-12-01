@@ -1,7 +1,9 @@
 package org.skaggs.ec.multiobjective.population;
 
+import org.skaggs.ec.population.EvaluatedIndividual;
 import org.skaggs.ec.population.EvaluatedPopulation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,9 +14,18 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
     protected List<Front<E>> fronts;
 
-    public FrontedPopulation(EvaluatedPopulation<E> population) {
+    public FrontedPopulation(EvaluatedPopulation<E> population) { // TODO make code to transform an EvaluatedPopulation<E> into a FrontedPopulation<E>
         super();
-        this.population = null; // TODO make code to transform an EvaluatedPopulation<E> into a FrontedPopulation<E>
+
+        for (EvaluatedIndividual<E> evaluatedIndividual : population.getPopulation()) {
+            FrontedIndividual<E> newIndividual = new FrontedIndividual<>(evaluatedIndividual);
+            newIndividual.dominationCount = 0;
+            newIndividual.dominatedIndividuals = new ArrayList<>();
+            for (EvaluatedIndividual<E> other : population.getPopulation()) {
+            }
+        }
+
+        this.population = null;
         this.fronts = null;
     }
 

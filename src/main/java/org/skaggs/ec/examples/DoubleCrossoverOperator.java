@@ -1,4 +1,4 @@
-package org.skaggs.ec.example;
+package org.skaggs.ec.examples;
 
 import org.apache.commons.math3.util.FastMath;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
