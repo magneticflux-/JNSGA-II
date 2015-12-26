@@ -14,4 +14,9 @@ public class Individual<E> {
     public E getIndividual() {
         return this.individual;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Individual && ((Individual) obj).getIndividual().equals(this.getIndividual());
+    }
 }

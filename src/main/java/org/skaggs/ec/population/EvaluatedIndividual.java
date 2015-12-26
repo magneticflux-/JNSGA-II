@@ -21,6 +21,15 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         return this.scores;
     }
 
+    public Double getScore(OptimizationFunction<E> optimizationFunction) {
+        return this.scores.get(optimizationFunction);
+    }
+
+
+    /**
+     * @param o the individual to be compared with
+     * @return <code>true</code> if the provided individual is dominated by the recipient of the call
+     */
     public boolean dominates(EvaluatedIndividual<E> o) {
         boolean isAtLeastEqualToForAll = true;
         boolean greaterThanAtLeastOne = false;
@@ -42,5 +51,10 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         }
 
         return greaterThanAtLeastOne && isAtLeastEqualToForAll;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EvaluatedIndividual && ((EvaluatedIndividual) obj).getIndividual().equals(this.getIndividual()) && ((EvaluatedIndividual) obj).getScores().equals(this.getScores());
     }
 }

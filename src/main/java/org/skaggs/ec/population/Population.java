@@ -1,5 +1,7 @@
 package org.skaggs.ec.population;
 
+import org.skaggs.ec.properties.Properties;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,8 +18,8 @@ public class Population<E> {
     protected Population() {
     }
 
-    public Population(int size, PopulationGenerator<E> populationGenerator) {
-        this.population = populationGenerator.generatePopulation(size);
+    public Population(int size, PopulationGenerator<E> populationGenerator, Properties properties) {
+        this.population = populationGenerator.generatePopulation(size, properties);
     }
 
     public Population(Population<E> population) {
@@ -29,7 +31,7 @@ public class Population<E> {
     }
 
     public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
-        return new Population<E>(Stream.concat(population1.population.stream(), population2.population.stream()).collect(Collectors.toList()));
+        return new Population<>((ArrayList<Individual<E>>) Stream.concat(population1.population.stream(), population2.population.stream()).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public List<? extends Individual<E>> getPopulation() {

@@ -4,6 +4,7 @@ import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,9 +24,10 @@ public class EvaluatedPopulation<E> extends Population<E> {
     public EvaluatedPopulation(Population<E> population, Collection<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
         if (properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED))
-            this.population = population.population.parallelStream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toList());
+            this.population = population.population.parallelStream().map(individual -> new EvaluatedIndividual<>(individual,
+                    optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toCollection(ArrayList::new));
         else
-            this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toList());
+            this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toCollection(ArrayList::new));
 
         // *throws salt over shoulder*
     }

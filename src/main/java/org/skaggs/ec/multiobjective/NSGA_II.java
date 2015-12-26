@@ -27,6 +27,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private final List<OptimizationFunction<E>> optimizationFunctions;
     private final Operator<E> operator;
     private final Properties properties;
+    private final PopulationGenerator<E> populationGenerator;
     private FrontedPopulation<E> population;
 
     public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
@@ -40,20 +41,22 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.optimizationFunctions = new LinkedList<>(optimizationFunctions);
         this.operator = operator;
         this.properties = properties;
+        this.populationGenerator = populationGenerator;
 
         this.checkKeyAvailability();
 
-        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator);
+        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator, properties);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions);
         this.population = frontedPopulation;
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     public void runGeneration() {
         /*
-        TODO Check all da boxes!
+
+        DONE!
 
         The plan:
 
@@ -72,24 +75,24 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         [X] 6. Assign the .5x-sized FrontedPopulation to the instance's population
 
         Everywhere else:
-        [ ] 1. Finish FrontedPopulation class
+        [X] 1. Finish FrontedPopulation class
         [X] 2. Write Population.merge() method
-        [ ] 3. Write proper Double classes
+        [X] 3. Write proper Double classes
          */
 
         Population<E> offspring = this.operator.apply(this.population, this.properties);
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation);
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions);
         FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.INT_POPULATION));
         this.population = truncatedPopulation;
-        this.update(new PopulationData<>(this.population));
+        this.update(new PopulationData<>(frontedPopulation, truncatedPopulation));
     }
 
     private void checkKeyAvailability() {
         Collection<Key> missingKeys = new HashSet<>();
 
-        HasPropertyRequirements[] hasPropertyRequirementses = new HasPropertyRequirements[]{this.operator, this};
+        HasPropertyRequirements[] hasPropertyRequirementses = new HasPropertyRequirements[]{this.operator, this, this.populationGenerator};
 
         for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses)
             for (Key key : hasPropertyRequirements.requestProperties())
@@ -108,11 +111,18 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.observers.forEach(observer -> observer.update(populationData));
     }
 
+    public void addObserver(EvolutionObserver<E> observer) {
+        this.observers.add(observer);
+    }
+
+    public void removeObserver(EvolutionObserver<E> observer) {
+        this.observers.remove(observer);
+    }
+
     @Override
     public Key[] requestProperties() {
         return new Key[]{
                 Key.IntKey.INT_POPULATION,
-                Key.DoubleKey.DOUBLE_ELITE_FRACTION,
                 Key.BooleanKey.BOOLEAN_THREADED
         };
     }

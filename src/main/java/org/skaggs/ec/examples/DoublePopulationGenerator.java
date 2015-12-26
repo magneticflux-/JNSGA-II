@@ -2,6 +2,8 @@ package org.skaggs.ec.examples;
 
 import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.population.PopulationGenerator;
+import org.skaggs.ec.properties.Key;
+import org.skaggs.ec.properties.Properties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,26 +14,25 @@ import java.util.Random;
  */
 public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
-    private final double min;
-    private final double max;
-    private final double difference;
+    @Override
+    public List<Individual<Double>> generatePopulation(int num, Properties properties) {
+        final double min = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
+        final double max = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
+        final double difference = max - min;
 
-    public DoublePopulationGenerator(double min, double max) {
         if (max <= min)
             throw new IllegalArgumentException("Maximum must be greater than minimum!");
 
-        this.min = min;
-        this.max = max;
-        this.difference = max - min;
-    }
-
-    @Override
-    public List<Individual<Double>> generatePopulation(int num) {
         Random r = new Random();
         List<Individual<Double>> pop = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            pop.add(new Individual<>((r.nextDouble() * this.difference) + this.min));
+            pop.add(new Individual<>((r.nextDouble() * difference) + min));
         }
         return pop;
+    }
+
+    @Override
+    public Key[] requestProperties() {
+        return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM};
     }
 }
