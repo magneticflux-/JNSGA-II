@@ -44,24 +44,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         Front<E> firstFront = new Front<>(new TreeSet<>(), 0);
         this.fronts.add(0, firstFront);
 
-        // Start ranking individuals
-
-        for (FrontedIndividual<E> individual : castPopulationView) {
-            for (FrontedIndividual<E> other : castPopulationView) {
-                if (other == individual) continue;
-                if (individual.dominates(other)) {
-                    individual.dominatedIndividuals.add(other);
-                } else if (other.dominates(individual)) {
-                    individual.dominationCount++;
-                }
-            }
-            if (individual.dominationCount == 0) { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0
-                individual.rank = 0;
-                this.fronts.get(0).members.add(individual);
-                //System.out.println("Adding " + individual + " to " + this.fronts.get(0).members);
-            }
-        }
-
         // Start computing the crowding distance
 
         for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
@@ -79,11 +61,22 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             }
         }
 
-        // The first front was created before information was given about the crowding, so the TreeSet inside it needs to be recreated
+        // Start ranking individuals
 
-        TreeSet<FrontedIndividual<E>> temp = new TreeSet<>(this.fronts.get(0).members);
-        this.fronts.get(0).members.clear();
-        temp.forEach(individual -> this.fronts.get(0).members.add(individual));
+        for (FrontedIndividual<E> individual : castPopulationView) {
+            for (FrontedIndividual<E> other : castPopulationView) {
+                if (other == individual) continue;
+                if (individual.dominates(other)) {
+                    individual.dominatedIndividuals.add(other);
+                } else if (other.dominates(individual)) {
+                    individual.dominationCount++;
+                }
+            }
+            if (individual.dominationCount == 0) { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0
+                individual.rank = 0;
+                this.fronts.get(0).members.add(individual);
+            }
+        }
 
         // Start establishing Fronts from ranked individuals
 
