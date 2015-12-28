@@ -13,6 +13,7 @@ import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -48,8 +49,27 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator, properties);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions);
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
         this.population = frontedPopulation;
+    }
+
+    private void checkKeyAvailability() {
+        Collection<Key> missingKeys = new HashSet<>();
+
+        Collection<HasPropertyRequirements> hasPropertyRequirementses = new LinkedList<>(Arrays.asList(this.operator, this, this.populationGenerator)); // Hobbitses...
+        hasPropertyRequirementses.addAll(this.optimizationFunctions);
+
+        for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses)
+            for (Key key : hasPropertyRequirements.requestProperties())
+                try {
+                    this.properties.testKey(key);
+                } catch (NoValueSetException e) {
+                    missingKeys.add(key);
+                }
+
+        if (!missingKeys.isEmpty()) {
+            throw new NoValueSetException("These required keys have no default value. Please provide a value. " + missingKeys);
+        }
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -83,28 +103,10 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         Population<E> offspring = this.operator.apply(this.population, this.properties);
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions);
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
         FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.INT_POPULATION));
         this.population = truncatedPopulation;
         this.update(new PopulationData<>(frontedPopulation, truncatedPopulation));
-    }
-
-    private void checkKeyAvailability() {
-        Collection<Key> missingKeys = new HashSet<>();
-
-        HasPropertyRequirements[] hasPropertyRequirementses = new HasPropertyRequirements[]{this.operator, this, this.populationGenerator};
-
-        for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses)
-            for (Key key : hasPropertyRequirements.requestProperties())
-                try {
-                    this.properties.testKey(key);
-                } catch (NoValueSetException e) {
-                    missingKeys.add(key);
-                }
-
-        if (!missingKeys.isEmpty()) {
-            throw new NoValueSetException("These required keys have no default value. Please provide a value. " + missingKeys);
-        }
     }
 
     private void update(PopulationData<E> populationData) {

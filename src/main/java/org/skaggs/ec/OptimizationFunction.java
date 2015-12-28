@@ -1,27 +1,32 @@
 package org.skaggs.ec;
 
+import org.skaggs.ec.properties.HasPropertyRequirements;
+import org.skaggs.ec.properties.Properties;
+
 import java.util.Comparator;
 
 /**
  * Created by Mitchell on 11/25/2015.
- *
+ * <p>
  * This class is a comparator on its own function. It decides which score bests which other score, which affects the algorithm's choices.
  * <p>
  * NOTE: An implementor must also implement the <code>equals</code> method.
  *
  * @see java.util.Comparator
  */
-public interface OptimizationFunction<E> extends Comparator<Double> {
+public interface OptimizationFunction<E> extends Comparator<Double>, HasPropertyRequirements {
 
-    double evaluate(E object);
+    double evaluate(E object, Properties properties);
 
     /**
+     * @param properties the evolutionary algorithm's properties
      * @return the minimum value this function can return
      */
-    double min();
+    double min(Properties properties);
 
     /**
+     * @param properties the evolutionary algorithm's properties
      * @return the maximum value this function can return
      */
-    double max();
+    double max(Properties properties);
 }

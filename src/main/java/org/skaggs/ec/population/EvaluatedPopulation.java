@@ -25,9 +25,9 @@ public class EvaluatedPopulation<E> extends Population<E> {
         super();
         if (properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED))
             this.population = population.population.parallelStream().map(individual -> new EvaluatedIndividual<>(individual,
-                    optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toCollection(ArrayList::new));
+                    optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual(), properties))))).collect(Collectors.toCollection(ArrayList::new));
         else
-            this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual()))))).collect(Collectors.toCollection(ArrayList::new));
+            this.population = population.population.stream().map(individual -> new EvaluatedIndividual<>(individual, optimizationFunctions.stream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual(), properties))))).collect(Collectors.toCollection(ArrayList::new));
 
         // *throws salt over shoulder*
     }

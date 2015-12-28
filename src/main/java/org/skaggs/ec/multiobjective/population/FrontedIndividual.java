@@ -1,6 +1,7 @@
 package org.skaggs.ec.multiobjective.population;
 
 import org.skaggs.ec.population.EvaluatedIndividual;
+import org.skaggs.ec.population.Individual;
 
 import java.util.List;
 
@@ -37,19 +38,6 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     }
 
     @Override
-    public String toString() {
-        return this.individual.toString() + " " + this.crowdingScore;
-    }
-
-    public Front<E> getFront() {
-        return this.front;
-    }
-
-    public double getCrowdingScore() {
-        return this.crowdingScore;
-    }
-
-    @Override
     public int compareTo(FrontedIndividual<E> o) {
         //Negative if THIS object is LESS THAN o
         if (this.rank != o.rank) {
@@ -62,14 +50,31 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     }
 
     @Override
+    public String toString() {
+        return this.individual.toString() + " " + this.crowdingScore;
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        return obj instanceof FrontedIndividual
-                && ((FrontedIndividual) obj).getIndividual().equals(this.getIndividual())
-                && ((FrontedIndividual) obj).getScores().equals(this.getScores())
-                && ((FrontedIndividual) obj).getFront().equals(this.getFront())
-                && ((FrontedIndividual) obj).getCrowdingScore() == this.getCrowdingScore()
-                && ((FrontedIndividual) obj).dominatedIndividuals.equals(this.dominatedIndividuals)
-                && ((FrontedIndividual) obj).dominationCount == this.dominationCount
-                && ((FrontedIndividual) obj).rank == this.rank;
+        try {
+            return (obj instanceof FrontedIndividual)
+                    && ((Individual) obj).getIndividual().equals(this.getIndividual())
+                    && ((EvaluatedIndividual) obj).getScores().equals(this.getScores())
+                    && ((FrontedIndividual) obj).getFront().equals(this.getFront())
+                    && (((FrontedIndividual) obj).getCrowdingScore() == this.getCrowdingScore())
+                    && ((FrontedIndividual) obj).dominatedIndividuals.equals(this.dominatedIndividuals)
+                    && (((FrontedIndividual) obj).dominationCount == this.dominationCount)
+                    && (((FrontedIndividual) obj).rank == this.rank);
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
+
+    public Front<E> getFront() {
+        return this.front;
+    }
+
+    public double getCrowdingScore() {
+        return this.crowdingScore;
     }
 }

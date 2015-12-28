@@ -3,8 +3,13 @@ package org.skaggs.ec.multiobjective.population;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.population.EvaluatedIndividual;
 import org.skaggs.ec.population.EvaluatedPopulation;
+import org.skaggs.ec.properties.Properties;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -18,7 +23,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.population = population;
     }
 
-    public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions) {
+    public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
 
         this.fronts = new ArrayList<>();
@@ -53,8 +58,8 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             castPopulationView.get(0).crowdingScore = Double.POSITIVE_INFINITY;
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;
 
-            for (int i = 1; i < castPopulationView.size() - 1; i++) { // Don't check the outside ones
-                double toAdd = (castPopulationView.get(i + 1).getScore(optimizationFunction) - castPopulationView.get(i - 1).getScore(optimizationFunction)) / (optimizationFunction.max() - optimizationFunction.min());
+            for (int i = 1; i < (castPopulationView.size() - 1); i++) { // Don't check the outside ones
+                double toAdd = (castPopulationView.get(i + 1).getScore(optimizationFunction) - castPopulationView.get(i - 1).getScore(optimizationFunction)) / (optimizationFunction.max(properties) - optimizationFunction.min(properties));
                 if (toAdd < 0)
                     System.out.println("Negative score with " + castPopulationView.get(i) + " ");
                 castPopulationView.get(i).crowdingScore += toAdd;
@@ -102,11 +107,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         return Collections.unmodifiableList(fronts);
     }
 
-    public void sort() {
-        //noinspection unchecked
-        Collections.sort(((List<FrontedIndividual<E>>) this.population));
-    }
-
     @Override
     public String toString() {
         return this.population.toString();
@@ -145,5 +145,10 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             newFronts.add(currentFront, new Front<>(individuals, currentFront));
         }
         return new FrontedPopulation<>(newPopulation, newFronts);
+    }
+
+    public void sort() {
+        //noinspection unchecked
+        Collections.sort(((List<FrontedIndividual<E>>) this.population));
     }
 }

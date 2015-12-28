@@ -6,7 +6,8 @@ package org.skaggs.ec.properties;
 public interface Key {
 
     enum IntKey implements Key {
-        INT_POPULATION
+        INT_POPULATION,
+        DOUBLE_ARRAY_GENERATION_LENGTH
     }
 
     enum BooleanKey implements Key {
@@ -23,6 +24,8 @@ public interface Key {
         MUTATION_PROBABILITY,
 
         RANDOM_DOUBLE_GENERATION_MINIMUM,
-        RANDOM_DOUBLE_GENERATION_MAXIMUM
+        RANDOM_DOUBLE_GENERATION_MAXIMUM,
+
+        DOUBLE_MUTATION_RANGE
     }
 }
