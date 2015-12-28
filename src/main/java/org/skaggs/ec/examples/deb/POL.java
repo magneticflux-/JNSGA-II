@@ -31,8 +31,10 @@ import javax.swing.WindowConstants;
 public class POL {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
-        JFreeChart chart = ChartFactory.createScatterPlot("Title", "X Axis", "Y Axis", collection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart chart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
+        //noinspection MagicNumber
         chart.getXYPlot().getDomainAxis().setRange(0, 20);
+        //noinspection MagicNumber
         chart.getXYPlot().getRangeAxis().setRange(0, 30);
         ChartPanel panel = new ChartPanel(chart);
         JFrame frame = new JFrame();
@@ -78,6 +80,7 @@ public class POL {
 
             for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
                 accepted.add(individual.getIndividual()[0], individual.getIndividual()[1]);
+            //noinspection Convert2streamapi
             for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
                 if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
                     rejected.add(individual.getIndividual()[0], individual.getIndividual()[1]);
@@ -86,10 +89,10 @@ public class POL {
             //System.out.println(populationData.getFrontedPopulation().getPopulation().stream().map(individual -> Arrays.toString(individual.getIndividual())).collect(Collectors.joining(", ")));
         });
 
-        for (int i = 0; i < 100000; i++) {
+        //noinspection MagicNumber
+        for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            //System.out.println("Ran generation");
-            //Thread.sleep(50);
+            Thread.sleep(16);
         }
     }
 
@@ -111,15 +114,17 @@ public class POL {
         }
 
         @Override
-        public double min(Properties properties) {
-            return 0;
-        }
-
-        @Override
         public Key[] requestProperties() {
             return new Key[0];
         }
 
+        @Override
+        public double min(Properties properties) {
+            return 0;
+        }
+
+
+        @SuppressWarnings("MagicNumber")
         @Override
         public double max(Properties properties) {
             return 30;

@@ -31,7 +31,7 @@ import javax.swing.WindowConstants;
 public class FON {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
-        JFreeChart chart = ChartFactory.createScatterPlot("Title", "X Axis", "Y Axis", collection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart chart = ChartFactory.createScatterPlot("FON", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
         chart.getXYPlot().getDomainAxis().setRange(0, 1);
         chart.getXYPlot().getRangeAxis().setRange(0, 1);
         ChartPanel panel = new ChartPanel(chart);
@@ -75,9 +75,10 @@ public class FON {
             //System.out.println(populationData.getFrontedPopulation().getPopulation().stream().map(individual -> Arrays.toString(individual.getIndividual())).collect(Collectors.joining(", ")));
         });
 
-        for (int i = 0; i < 1000; i++) {
+        //noinspection MagicNumber
+        for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(50);
+            Thread.sleep(16);
         }
     }
 
@@ -98,14 +99,15 @@ public class FON {
         }
 
         @Override
+        public Key[] requestProperties() {
+            return new Key[0];
+        }
+
+        @Override
         public double min(Properties properties) {
             return 0;
         }
 
-        @Override
-        public Key[] requestProperties() {
-            return new Key[0];
-        }
 
         @Override
         public double max(Properties properties) {

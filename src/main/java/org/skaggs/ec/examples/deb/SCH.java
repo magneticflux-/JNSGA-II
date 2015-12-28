@@ -31,7 +31,7 @@ import javax.swing.WindowConstants;
 public class SCH {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
-        JFreeChart chart = ChartFactory.createScatterPlot("Title", "X Axis", "Y Axis", collection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart chart = ChartFactory.createScatterPlot("SCH", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
         chart.getXYPlot().getDomainAxis().setRange(0, 10);
         chart.getXYPlot().getRangeAxis().setRange(0, 10);
         ChartPanel panel = new ChartPanel(chart);
@@ -42,13 +42,13 @@ public class SCH {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
+        @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
                 .setInt(Key.IntKey.INT_POPULATION, 100)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY, 1)
-                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .25);
+                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .125);
 
         Operator<Double> operator = new SimpleDoubleMutationOperator();
         OptimizationFunction<Double> function1 = new Function1();
@@ -73,9 +73,9 @@ public class SCH {
             //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
         });
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(50);
+            Thread.sleep(16);
         }
     }
 
@@ -86,14 +86,15 @@ public class SCH {
         }
 
         @Override
+        public Key[] requestProperties() {
+            return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
+        }
+
+        @Override
         public double evaluate(Double object, Properties properties) {
             return FastMath.pow(object, 2);
         }
 
-        @Override
-        public Key[] requestProperties() {
-            return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
-        }
 
         @Override
         public double min(Properties properties) {
