@@ -13,11 +13,7 @@ import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -113,12 +109,12 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.observers.forEach(observer -> observer.update(populationData));
     }
 
-    public void addObserver(EvolutionObserver<E> observer) {
-        this.observers.add(observer);
+    public boolean addObserver(EvolutionObserver<E> observer) {
+        return this.observers.add(observer);
     }
 
-    public void removeObserver(EvolutionObserver<E> observer) {
-        this.observers.remove(observer);
+    public boolean removeObserver(EvolutionObserver<E> observer) {
+        return this.observers.remove(observer);
     }
 
     @Override
