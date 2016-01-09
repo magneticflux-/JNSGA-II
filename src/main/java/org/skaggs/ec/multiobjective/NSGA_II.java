@@ -13,7 +13,11 @@ import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -42,7 +46,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         this.checkKeyAvailability();
 
-        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.INT_POPULATION), populationGenerator, properties);
+        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.POPULATION), populationGenerator, properties);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
@@ -100,7 +104,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.INT_POPULATION));
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.POPULATION));
         this.population = truncatedPopulation;
         this.update(new PopulationData<>(frontedPopulation, truncatedPopulation));
     }
@@ -120,8 +124,8 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.IntKey.INT_POPULATION,
-                Key.BooleanKey.BOOLEAN_THREADED
+                Key.IntKey.POPULATION,
+                Key.BooleanKey.THREADED
         };
     }
 }

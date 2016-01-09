@@ -19,9 +19,9 @@ public class DoubleDefaultOperator implements Operator<Double> {
     public Key[] requestProperties() {
         return new Key[]{
                 Key.DoubleKey.INITIAL_MUTATION_PROBABILITY,
-                Key.DoubleKey.MUTATION_DISTRIBUTION_INDEX,
+                Key.DoubleKey.INITIAL_DOUBLE_MUTATION_DISTRIBUTION_INDEX,
                 Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY,
-                Key.DoubleKey.CROSSOVER_DISTRIBUTION_INDEX
+                Key.DoubleKey.INITIAL_DOUBLE_CROSSOVER_DISTRIBUTION_INDEX
         };
     }
 }

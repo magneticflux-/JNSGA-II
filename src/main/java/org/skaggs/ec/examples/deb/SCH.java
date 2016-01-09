@@ -47,11 +47,11 @@ public class SCH {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
-                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .125);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
 
         Operator<Double> operator = new SimpleDoubleMutationOperator();
         OptimizationFunction<Double> function1 = new Function1();

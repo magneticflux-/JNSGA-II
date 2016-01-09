@@ -47,12 +47,12 @@ public class FON {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1. / 3)
-                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .125 / 2);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125 / 2);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();

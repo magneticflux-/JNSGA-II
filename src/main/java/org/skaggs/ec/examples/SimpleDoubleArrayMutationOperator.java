@@ -22,7 +22,7 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
         List<Individual<double[]>> individuals = new ArrayList<>(population.getPopulation().size());
         Random r = new Random();
         double probability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
-        double range = properties.getDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE);
+        double range = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
 
         for (FrontedIndividual<double[]> d : population.getPopulation()) {
             double[] newIndividual = Arrays.stream(d.getIndividual()).map(value -> (r.nextDouble() < probability) ? this.mutate(value, r, range) : value).toArray();
@@ -38,6 +38,6 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.DoubleKey.DOUBLE_MUTATION_RANGE};
+        return new Key[]{Key.DoubleKey.INITIAL_MUTATION_STRENGTH};
     }
 }

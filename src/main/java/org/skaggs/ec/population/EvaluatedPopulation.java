@@ -23,7 +23,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
      */
     public EvaluatedPopulation(Population<E> population, Collection<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
-        if (properties.getBoolean(Key.BooleanKey.BOOLEAN_THREADED))
+        if (properties.getBoolean(Key.BooleanKey.THREADED))
             this.population = population.population.parallelStream().map(individual -> new EvaluatedIndividual<>(individual,
                     optimizationFunctions.parallelStream().collect(Collectors.toMap(optimizationFunction -> optimizationFunction, (OptimizationFunction<E> optimizationFunction) -> optimizationFunction.evaluate(individual.getIndividual(), properties))))).collect(Collectors.toCollection(ArrayList::new));
         else

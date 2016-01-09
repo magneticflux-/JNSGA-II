@@ -45,7 +45,7 @@ public class Main {
 
 
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 1000)
+                .setInt(Key.IntKey.POPULATION, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 1000)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1);

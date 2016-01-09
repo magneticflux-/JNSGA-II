@@ -49,12 +49,12 @@ public class POL {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1. / 2)
-                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .0625 / 4);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .0625 / 4);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
