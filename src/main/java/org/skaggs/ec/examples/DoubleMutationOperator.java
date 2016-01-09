@@ -26,7 +26,7 @@ public class DoubleMutationOperator implements Operator<Double> {
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.DoubleKey.MUTATION_PROBABILITY, Key.DoubleKey.MUTATION_DISTRIBUTION_INDEX};
+        return new Key[]{Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DoubleKey.MUTATION_DISTRIBUTION_INDEX};
     }
 
     @Override

@@ -21,7 +21,7 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
         List<Individual<double[]>> individuals = new ArrayList<>(population.getPopulation().size());
         Random r = new Random();
-        double probability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY);
+        double probability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
         double range = properties.getDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE);
 
         for (FrontedIndividual<double[]> d : population.getPopulation()) {

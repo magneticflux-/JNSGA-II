@@ -5,12 +5,14 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.DoublePopulationGenerator;
 import org.skaggs.ec.examples.SimpleDoubleMutationOperator;
 import org.skaggs.ec.multiobjective.NSGA_II;
+import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.operators.Operator;
 import org.skaggs.ec.population.PopulationGenerator;
@@ -32,6 +34,7 @@ public class SCH {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
         JFreeChart chart = ChartFactory.createScatterPlot("SCH", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
+        chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         chart.getXYPlot().getDomainAxis().setRange(0, 10);
         chart.getXYPlot().getRangeAxis().setRange(0, 10);
         ChartPanel panel = new ChartPanel(chart);
@@ -44,10 +47,10 @@ public class SCH {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 100)
+                .setInt(Key.IntKey.INT_POPULATION, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
                 .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .125);
 
         Operator<Double> operator = new SimpleDoubleMutationOperator();
@@ -61,21 +64,38 @@ public class SCH {
         collection.addSeries(new XYSeries("Accepted"));
         collection.addSeries(new XYSeries("Rejected"));
 
-        nsga_ii.addObserver(populationData -> {
-            XYSeries accepted = collection.getSeries("Accepted");
-            XYSeries rejected = collection.getSeries("Rejected");
-            accepted.clear();
-            rejected.clear();
+        //noinspection ConstantConditions,ConstantIfStatement
+        if (false) {
+            nsga_ii.addObserver(populationData -> {
+                XYSeries accepted = collection.getSeries("Accepted");
+                XYSeries rejected = collection.getSeries("Rejected");
+                accepted.clear();
+                rejected.clear();
 
-            for (FrontedIndividual<Double> individual : populationData.getTruncatedPopulation().getPopulation())
-                accepted.add(individual.getScore(function1), individual.getScore(function2));
-            populationData.getFrontedPopulation().getPopulation().stream().filter(doubleFrontedIndividual -> !populationData.getTruncatedPopulation().getPopulation().contains(doubleFrontedIndividual)).forEachOrdered(individual -> rejected.add(individual.getScore(function1), individual.getScore(function2)));
-            //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
-        });
+                for (FrontedIndividual<Double> individual : populationData.getTruncatedPopulation().getPopulation())
+                    accepted.add(individual.getScore(function1), individual.getScore(function2));
+                //noinspection Convert2streamapi
+                for (FrontedIndividual<Double> individual : populationData.getFrontedPopulation().getPopulation())
+                    if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
+                        rejected.add(individual.getScore(function1), individual.getScore(function2));
+                //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
+            });
+        } else {
+            nsga_ii.addObserver(populationData -> {
+                collection.removeAllSeries();
+                for (Front<Double> front : populationData.getTruncatedPopulation().getFronts()) {
+                    XYSeries frontSeries = new XYSeries(front.toString());
+                    for (FrontedIndividual<Double> individual : front.getMembers()) {
+                        frontSeries.add(individual.getScore(function1), individual.getScore(function2));
+                    }
+                    collection.addSeries(frontSeries);
+                }
+            });
+        }
 
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(16);
+            Thread.sleep(1000);
         }
     }
 

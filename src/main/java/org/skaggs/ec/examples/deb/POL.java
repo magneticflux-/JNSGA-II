@@ -5,12 +5,14 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.DoubleArrayPopulationGenerator;
 import org.skaggs.ec.examples.SimpleDoubleArrayMutationOperator;
 import org.skaggs.ec.multiobjective.NSGA_II;
+import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.operators.Operator;
 import org.skaggs.ec.population.PopulationGenerator;
@@ -32,10 +34,11 @@ public class POL {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
         JFreeChart chart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
+        chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         //noinspection MagicNumber
-        chart.getXYPlot().getDomainAxis().setRange(0, 20);
+        chart.getXYPlot().getDomainAxis().setRange(0, 15);
         //noinspection MagicNumber
-        chart.getXYPlot().getRangeAxis().setRange(0, 30);
+        chart.getXYPlot().getRangeAxis().setRange(0, 5);
         ChartPanel panel = new ChartPanel(chart);
         JFrame frame = new JFrame();
         frame.add(panel);
@@ -46,12 +49,12 @@ public class POL {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.INT_POPULATION, 200)
+                .setInt(Key.IntKey.INT_POPULATION, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY, 1. / 2)
-                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .125);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1. / 2)
+                .setDouble(Key.DoubleKey.DOUBLE_MUTATION_RANGE, .0625 / 4);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -64,35 +67,39 @@ public class POL {
         collection.addSeries(new XYSeries("Accepted"));
         collection.addSeries(new XYSeries("Rejected"));
 
-        nsga_ii.addObserver(populationData -> {
-            XYSeries accepted = collection.getSeries("Accepted");
-            XYSeries rejected = collection.getSeries("Rejected");
-            accepted.clear();
-            rejected.clear();
+        //noinspection ConstantConditions,ConstantIfStatement
+        if (false) {
+            nsga_ii.addObserver(populationData -> {
+                XYSeries accepted = collection.getSeries("Accepted");
+                XYSeries rejected = collection.getSeries("Rejected");
+                accepted.clear();
+                rejected.clear();
 
-            /*
-            for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
-                accepted.add(individual.getScore(function1), individual.getScore(function2));
-            for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
-                if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
-                    rejected.add(individual.getScore(function1), individual.getScore(function2));
-                    */
-
-            for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
-                accepted.add(individual.getIndividual()[0], individual.getIndividual()[1]);
-            //noinspection Convert2streamapi
-            for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
-                if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
-                    rejected.add(individual.getIndividual()[0], individual.getIndividual()[1]);
-
-            //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
-            //System.out.println(populationData.getFrontedPopulation().getPopulation().stream().map(individual -> Arrays.toString(individual.getIndividual())).collect(Collectors.joining(", ")));
-        });
+                for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
+                    accepted.add(individual.getScore(function1), individual.getScore(function2));
+                //noinspection Convert2streamapi
+                for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
+                    if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
+                        rejected.add(individual.getScore(function1), individual.getScore(function2));
+                //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
+            });
+        } else {
+            nsga_ii.addObserver(populationData -> {
+                collection.removeAllSeries();
+                for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+                    XYSeries frontSeries = new XYSeries(front.toString());
+                    for (FrontedIndividual<double[]> individual : front.getMembers()) {
+                        frontSeries.add(individual.getScore(function1), individual.getScore(function2));
+                    }
+                    collection.addSeries(frontSeries);
+                }
+            });
+        }
 
         //noinspection MagicNumber
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(16);
+            Thread.sleep(500);
         }
     }
 

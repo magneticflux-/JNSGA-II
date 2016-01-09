@@ -27,8 +27,8 @@ public class Properties {
         v.put(Key.DoubleKey.DOUBLE_ELITE_FRACTION, null);
         v.put(Key.DoubleKey.CROSSOVER_DISTRIBUTION_INDEX, null);
         v.put(Key.DoubleKey.MUTATION_DISTRIBUTION_INDEX, null);
-        v.put(Key.DoubleKey.CROSSOVER_PROBABILITY, null);
-        v.put(Key.DoubleKey.MUTATION_PROBABILITY, null);
+        v.put(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, null);
+        v.put(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, null);
 
         defaultValues = Collections.unmodifiableMap(v);
     }
@@ -50,15 +50,19 @@ public class Properties {
         this.getValue(key);
     }
 
-    public boolean locked() {
-        return this.locked;
+    private Object getValue(Key key) {
+        Object value = this.values.get(key);
+        if (value == null) {
+            value = defaultValues.get(key);
+        }
+        if (value == null) {
+            throw new NoValueSetException("There is no default value set for the given key, and a value was not provided!");
+        }
+        return value;
     }
 
-    private Properties setValue(Key key, Object object) {
-        if (this.locked)
-            throw new ObjectLockedException("This Properties object is already locked!");
-        this.values.put(key, object);
-        return this;
+    public boolean locked() {
+        return this.locked;
     }
 
     public int getInt(Key.IntKey key) {
@@ -73,19 +77,15 @@ public class Properties {
         return (double) this.getValue(key);
     }
 
-    private Object getValue(Key key) {
-        Object value = this.values.get(key);
-        if (value == null) {
-            value = defaultValues.get(key);
-        }
-        if (value == null) {
-            throw new NoValueSetException("There is no default value set for the given key, and a value was not provided!");
-        }
-        return value;
-    }
-
     public Properties setInt(Key.IntKey key, int value) {
         return this.setValue(key, value);
+    }
+
+    private Properties setValue(Key key, Object object) {
+        if (this.locked)
+            throw new ObjectLockedException("This Properties object is already locked!");
+        this.values.put(key, object);
+        return this;
     }
 
     public Properties setBoolean(Key.BooleanKey key, boolean value) {
