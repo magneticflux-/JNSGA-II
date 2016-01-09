@@ -48,13 +48,13 @@ public class Main {
                 .setInt(Key.IntKey.INT_POPULATION, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 1000)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY, 1);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1);
 
         Operator<Double> operator = new Operator<Double>() {
             @Override
             public Population<Double> apply(FrontedPopulation<Double> population, Properties properties) {
                 Random r = new Random();
-                double probability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY);
+                double probability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
                 List<Individual<Double>> individuals = new ArrayList<>(population.getPopulation().size());
 
                 for (FrontedIndividual<Double> d : population.getPopulation()) {
@@ -76,7 +76,7 @@ public class Main {
 
             @Override
             public Key[] requestProperties() {
-                return new Key[]{Key.DoubleKey.MUTATION_PROBABILITY};
+                return new Key[]{Key.DoubleKey.INITIAL_MUTATION_PROBABILITY};
             }
         };
         OptimizationFunction<Double> function1 = new OptimizationFunction<Double>() {
