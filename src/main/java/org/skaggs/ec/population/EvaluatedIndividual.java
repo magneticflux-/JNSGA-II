@@ -13,18 +13,13 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     protected final Map<? extends OptimizationFunction<E>, Double> scores;
 
     public EvaluatedIndividual(Individual<E> individual, Map<? extends OptimizationFunction<E>, Double> scores) {
-        super(individual.getIndividual());
+        super(individual.getIndividual(), individual.mutationProbability, individual.crossoverProbability);
         this.scores = Collections.unmodifiableMap(scores);
-    }
-
-    public Map<? extends OptimizationFunction<E>, Double> getScores() {
-        return this.scores;
     }
 
     public Double getScore(OptimizationFunction<E> optimizationFunction) {
         return this.scores.get(optimizationFunction);
     }
-
 
     /**
      * @param o the individual to be compared with
@@ -53,8 +48,35 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         return greaterThanAtLeastOne && isAtLeastEqualToForAll;
     }
 
+    public Map<? extends OptimizationFunction<E>, Double> getScores() {
+        return this.scores;
+    }
+
+    //Old method just in case
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public boolean equals(Object obj) {
+    public boolean oldEquals(Object obj) {
         return obj instanceof EvaluatedIndividual && ((EvaluatedIndividual) obj).getIndividual().equals(this.getIndividual()) && ((EvaluatedIndividual) obj).getScores().equals(this.getScores());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + scores.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        EvaluatedIndividual that = (EvaluatedIndividual) o;
+
+        if (!scores.equals(that.scores)) return false;
+
+        return true;
     }
 }

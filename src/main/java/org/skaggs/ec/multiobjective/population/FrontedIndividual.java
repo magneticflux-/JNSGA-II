@@ -54,8 +54,10 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         return this.individual.toString() + " " + this.crowdingScore;
     }
 
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public boolean equals(Object obj) {
+    public boolean oldEquals(Object obj) {
         try {
             return (obj instanceof FrontedIndividual)
                     && ((Individual) obj).getIndividual().equals(this.getIndividual())
@@ -68,6 +70,38 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         } catch (NullPointerException e) {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + (front != null ? front.hashCode() : 0);
+        result = 31 * result + (dominatedIndividuals != null ? dominatedIndividuals.hashCode() : 0);
+        temp = Double.doubleToLongBits(crowdingScore);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + dominationCount;
+        result = 31 * result + rank;
+        return result;
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        FrontedIndividual that = (FrontedIndividual) o;
+
+        if (Double.compare(that.crowdingScore, crowdingScore) != 0) return false;
+        if (dominationCount != that.dominationCount) return false;
+        if (rank != that.rank) return false;
+        if (dominatedIndividuals != null ? !dominatedIndividuals.equals(that.dominatedIndividuals) : that.dominatedIndividuals != null)
+            return false;
+        if (front != null ? !front.equals(that.front) : that.front != null) return false;
+
+        return true;
     }
 
     public Front<E> getFront() {
