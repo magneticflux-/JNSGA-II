@@ -19,18 +19,18 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
 /**
  * Created by skaggsm on 12/27/15.
  */
-public class SCH {
+public final class SCH {
+    private SCH() {
+    }
+
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         XYSeriesCollection collection = new XYSeriesCollection();
         JFreeChart chart = ChartFactory.createScatterPlot("SCH", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
