@@ -32,7 +32,7 @@ public final class POL {
     }
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-        Thread.sleep(5000);
+        //Thread.sleep(7000);
         XYSeriesCollection collection = new XYSeriesCollection();
         JFreeChart chart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
         chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
@@ -50,12 +50,13 @@ public final class POL {
 
         //noinspection MagicNumber
         Properties properties = new Properties()
+                .setBoolean(Key.BooleanKey.THREADED, true)
                 .setInt(Key.IntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 2)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .25);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -68,7 +69,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             System.out.println("Elapsed time: " + (populationData.getElapsedTime() / 1000000f) + "ms");
                 collection.removeAllSeries();
-                for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
                         frontSeries.add(individual.getScore(function1), individual.getScore(function2));
@@ -82,7 +83,7 @@ public final class POL {
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
             //noinspection MagicNumber
-            //Thread.sleep(250);
+            //Thread.sleep(1000);
         }
     }
 

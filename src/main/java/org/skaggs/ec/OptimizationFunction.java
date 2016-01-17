@@ -3,6 +3,7 @@ package org.skaggs.ec;
 import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Properties;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Comparator;
  *
  * @see java.util.Comparator
  */
-public interface OptimizationFunction<E> extends Comparator<Double>, HasPropertyRequirements {
+public interface OptimizationFunction<E> extends Comparator<Double>, HasPropertyRequirements, Serializable {
 
     double evaluate(E object, Properties properties);
 

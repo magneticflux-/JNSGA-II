@@ -33,7 +33,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
         this.population = new ArrayList<EvaluatedIndividual<E>>(properties.getInt(Key.IntKey.POPULATION_SIZE));
 
         individualStream.forEach(individual -> {
-            HashMap<OptimizationFunction<E>, Double> scores = new HashMap<>(optimizationFunctions.size());
+            LinkedHashMap<OptimizationFunction<E>, Double> scores = new LinkedHashMap<>(optimizationFunctions.size());
             for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
                 scores.put(optimizationFunction, optimizationFunction.evaluate(individual.getIndividual(), properties));
             }

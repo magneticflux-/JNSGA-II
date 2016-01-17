@@ -3,8 +3,8 @@ package org.skaggs.ec.multiobjective.population;
 import org.skaggs.ec.population.individual.EvaluatedIndividual;
 import org.skaggs.ec.population.individual.Individual;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -14,7 +14,7 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     /**
      * The individuals that this individual dominates
      */
-    final List<FrontedIndividual<E>> dominatedIndividuals;
+    final Set<FrontedIndividual<E>> dominatedIndividuals;
     Front<E> front;
     /**
      * The SPARSENESS of this individual's score area
@@ -31,10 +31,10 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     int rank;
 
     @SuppressWarnings("unused")
-    public FrontedIndividual(EvaluatedIndividual<E> individual, Front<E> front, List<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
+    public FrontedIndividual(EvaluatedIndividual<E> individual, Front<E> front, Set<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
         super(individual);
         this.front = front;
-        this.dominatedIndividuals = new ArrayList<>(dominatedIndividuals);
+        this.dominatedIndividuals = new LinkedHashSet<>(dominatedIndividuals);
         this.crowdingScore = crowdingScore;
         this.dominationCount = dominationCount;
     }
@@ -43,7 +43,7 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         super(individual);
         rank = -1; // Unset rank
         dominationCount = 0;
-        dominatedIndividuals = new ArrayList<>();
+        dominatedIndividuals = new LinkedHashSet<>(2);
         crowdingScore = 0;
     }
 

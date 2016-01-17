@@ -62,7 +62,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
         // Start ranking individuals
 
-        for (FrontedIndividual<E> individual : castPopulationView) {
+        for (FrontedIndividual<E> individual : castPopulationView) { //TODO This takes 95% of the CPU time for each generation; optimize like crazy
             Stream<FrontedIndividual<E>> populationStream;
 
             if (threaded)
@@ -70,14 +70,18 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             else
                 populationStream = castPopulationView.stream();
 
-            populationStream.forEach(eFrontedIndividual -> {
-                if (eFrontedIndividual == individual) return;
-                if (individual.dominates(eFrontedIndividual)) {
-                    synchronized (individual.dominatedIndividuals) {
-                        individual.dominatedIndividuals.add(eFrontedIndividual);
-                    }
-                } else if (eFrontedIndividual.dominates(individual)) {
-                    individual.dominationCount++;
+            populationStream.forEach(otherIndividual -> {
+                if (otherIndividual == individual) return;
+                int domination = individual.dominates(otherIndividual);
+                switch (domination) {
+                    case -1:
+                        individual.dominationCount++;
+                        break;
+                    case 1:
+                        synchronized (individual.dominatedIndividuals) {
+                            individual.dominatedIndividuals.add(otherIndividual);
+                        }
+                        break;
                 }
             });
             if (individual.dominationCount == 0) { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0

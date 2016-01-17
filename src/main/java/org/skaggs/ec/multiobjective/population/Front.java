@@ -25,6 +25,25 @@ public class Front<E> implements Comparable<Front<E>> {
         return Integer.compare(this.rank, o.rank);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Front<?> front = (Front<?>) o;
+
+        if (rank != front.rank) return false;
+        return members != null ? members.equals(front.members) : front.members == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = members != null ? members.hashCode() : 0;
+        result = 31 * result + rank;
+        return result;
+    }
+
     public SortedSet<FrontedIndividual<E>> getMembers() {
         return Collections.unmodifiableSortedSet(members);
     }
