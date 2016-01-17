@@ -1,7 +1,7 @@
-package org.skaggs.ec.examples;
+package org.skaggs.ec.examples.numarical;
 
-import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.population.PopulationGenerator;
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 

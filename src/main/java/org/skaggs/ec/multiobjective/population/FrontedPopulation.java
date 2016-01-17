@@ -1,29 +1,29 @@
 package org.skaggs.ec.multiobjective.population;
 
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.population.EvaluatedIndividual;
 import org.skaggs.ec.population.EvaluatedPopulation;
+import org.skaggs.ec.population.individual.EvaluatedIndividual;
+import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by Mitchell on 11/28/2015.
  */
+@SuppressWarnings("AssignmentToSuperclassField")
 public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
     protected List<Front<E>> fronts;
 
-    public FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts) {
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
+    protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts) {
         this.fronts = fronts;
         this.population = population;
     }
 
-    public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
+    public FrontedPopulation(EvaluatedPopulation<E> population, Iterable<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
 
         this.fronts = new ArrayList<>();
@@ -37,14 +37,10 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
         for (EvaluatedIndividual<E> individual : population.getPopulation()) {
             FrontedIndividual<E> frontedIndividual = new FrontedIndividual<>(individual);
-
-            frontedIndividual.rank = -1; // Unset rank
-            frontedIndividual.dominationCount = 0;
-            frontedIndividual.dominatedIndividuals = new ArrayList<>();
-            frontedIndividual.crowdingScore = 0;
-
             castPopulationView.add(frontedIndividual);
         }
+
+        boolean threaded = properties.getBoolean(Key.BooleanKey.THREADED);
 
         Front<E> firstFront = new Front<>(new TreeSet<>(), 0);
         this.fronts.add(0, firstFront);
@@ -59,24 +55,31 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;
 
             for (int i = 1; i < (castPopulationView.size() - 1); i++) { // Don't check the outside ones
-                double toAdd = (castPopulationView.get(i + 1).getScore(optimizationFunction) - castPopulationView.get(i - 1).getScore(optimizationFunction)) / (optimizationFunction.max(properties) - optimizationFunction.min(properties));
-                if (toAdd < 0)
-                    System.out.println("Negative score with " + castPopulationView.get(i) + " ");
-                castPopulationView.get(i).crowdingScore += toAdd;
+                if (Double.isFinite(castPopulationView.get(i).crowdingScore)) // Only add to it if it isn't an outlier on another function
+                    castPopulationView.get(i).crowdingScore += (castPopulationView.get(i + 1).getScore(optimizationFunction) - castPopulationView.get(i - 1).getScore(optimizationFunction)) / (optimizationFunction.max(properties) - optimizationFunction.min(properties));
             }
         }
 
         // Start ranking individuals
 
         for (FrontedIndividual<E> individual : castPopulationView) {
-            for (FrontedIndividual<E> other : castPopulationView) {
-                if (other == individual) continue;
-                if (individual.dominates(other)) {
-                    individual.dominatedIndividuals.add(other);
-                } else if (other.dominates(individual)) {
+            Stream<FrontedIndividual<E>> populationStream;
+
+            if (threaded)
+                populationStream = castPopulationView.parallelStream();
+            else
+                populationStream = castPopulationView.stream();
+
+            populationStream.forEach(eFrontedIndividual -> {
+                if (eFrontedIndividual == individual) return;
+                if (individual.dominates(eFrontedIndividual)) {
+                    synchronized (individual.dominatedIndividuals) {
+                        individual.dominatedIndividuals.add(eFrontedIndividual);
+                    }
+                } else if (eFrontedIndividual.dominates(individual)) {
                     individual.dominationCount++;
                 }
-            }
+            });
             if (individual.dominationCount == 0) { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0
                 individual.rank = 0;
                 this.fronts.get(0).members.add(individual);
@@ -88,16 +91,34 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         int currentFrontRank = 0;
         while (!this.fronts.get(currentFrontRank).members.isEmpty()) {
             TreeSet<FrontedIndividual<E>> nextFront = new TreeSet<>();
+            final int finalCurrentFrontRank = currentFrontRank;
 
-            for (FrontedIndividual<E> individual : this.fronts.get(currentFrontRank).members) {
-                for (FrontedIndividual<E> dominated : individual.dominatedIndividuals) {
-                    dominated.dominationCount--;
-                    if (dominated.dominationCount == 0) {
-                        dominated.rank = currentFrontRank + 1; // Part of the next front
-                        nextFront.add(dominated);
+            Stream<FrontedIndividual<E>> frontStream;
+            if (threaded)
+                frontStream = this.fronts.get(currentFrontRank).members.parallelStream();
+            else
+                frontStream = this.fronts.get(currentFrontRank).members.stream();
+
+            frontStream.forEach(individual -> {
+                Stream<FrontedIndividual<E>> dominatedStream;
+                if (threaded)
+                    dominatedStream = individual.dominatedIndividuals.parallelStream();
+                else
+                    dominatedStream = individual.dominatedIndividuals.stream();
+
+                dominatedStream.forEach(dominatedIndividual -> {
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    synchronized (dominatedIndividual) {
+                        dominatedIndividual.dominationCount--;
+                        if (dominatedIndividual.dominationCount == 0) {
+                            dominatedIndividual.rank = finalCurrentFrontRank + 1; // Part of the next front
+                            synchronized (nextFront) {
+                                nextFront.add(dominatedIndividual);
+                            }
+                        }
                     }
-                }
-            }
+                });
+            });
             this.fronts.add(currentFrontRank + 1, new Front<>(nextFront, currentFrontRank + 1));
             currentFrontRank++;
         }

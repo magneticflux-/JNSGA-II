@@ -1,8 +1,9 @@
 package org.skaggs.ec.multiobjective.population;
 
-import org.skaggs.ec.population.EvaluatedIndividual;
-import org.skaggs.ec.population.Individual;
+import org.skaggs.ec.population.individual.EvaluatedIndividual;
+import org.skaggs.ec.population.individual.Individual;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,11 +11,11 @@ import java.util.List;
  */
 public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comparable<FrontedIndividual<E>> {
 
-    Front<E> front;
     /**
      * The individuals that this individual dominates
      */
-    List<FrontedIndividual<E>> dominatedIndividuals;
+    final List<FrontedIndividual<E>> dominatedIndividuals;
+    Front<E> front;
     /**
      * The SPARSENESS of this individual's score area
      */
@@ -23,18 +24,27 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
      * The number of individuals that dominate this individual
      */
     int dominationCount;
+
+    /**
+     * Used only in the fronting process
+     */
     int rank;
 
+    @SuppressWarnings("unused")
     public FrontedIndividual(EvaluatedIndividual<E> individual, Front<E> front, List<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
-        super(individual, individual.getScores());
+        super(individual);
         this.front = front;
-        this.dominatedIndividuals = dominatedIndividuals;
+        this.dominatedIndividuals = new ArrayList<>(dominatedIndividuals);
         this.crowdingScore = crowdingScore;
         this.dominationCount = dominationCount;
     }
 
-    FrontedIndividual(EvaluatedIndividual<E> individual) {
-        super(individual, individual.getScores());
+    protected FrontedIndividual(EvaluatedIndividual<E> individual) {
+        super(individual);
+        rank = -1; // Unset rank
+        dominationCount = 0;
+        dominatedIndividuals = new ArrayList<>();
+        crowdingScore = 0;
     }
 
     @Override

@@ -9,8 +9,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.examples.DoubleArrayPopulationGenerator;
-import org.skaggs.ec.examples.SimpleDoubleArrayMutationOperator;
+import org.skaggs.ec.examples.numarical.DoubleArrayPopulationGenerator;
+import org.skaggs.ec.examples.numarical.SimpleDoubleArrayMutationOperator;
 import org.skaggs.ec.multiobjective.NSGA_II;
 import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
@@ -47,12 +47,12 @@ public final class FON {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION_SIZE, 200)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1. / 3)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125 / 2);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 3)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -62,27 +62,7 @@ public final class FON {
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        collection.addSeries(new XYSeries("Accepted"));
-        collection.addSeries(new XYSeries("Rejected"));
-
-        //noinspection ConstantConditions,ConstantIfStatement
-        if (false) {
-            nsga_ii.addObserver(populationData -> {
-                XYSeries accepted = collection.getSeries("Accepted");
-                XYSeries rejected = collection.getSeries("Rejected");
-                accepted.clear();
-                rejected.clear();
-
-                for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
-                    accepted.add(individual.getScore(function1), individual.getScore(function2));
-                //noinspection Convert2streamapi
-                for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
-                    if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
-                        rejected.add(individual.getScore(function1), individual.getScore(function2));
-                //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
-            });
-        } else {
-            nsga_ii.addObserver(populationData -> {
+        nsga_ii.addObserver(populationData -> {
                 collection.removeAllSeries();
                 for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
@@ -92,12 +72,12 @@ public final class FON {
                     collection.addSeries(frontSeries);
                 }
             });
-        }
 
         //noinspection MagicNumber
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(500);
+            //noinspection MagicNumber
+            Thread.sleep(250);
         }
     }
 

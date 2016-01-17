@@ -1,5 +1,6 @@
 package org.skaggs.ec.population;
 
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Properties;
 

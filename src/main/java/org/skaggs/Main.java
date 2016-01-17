@@ -8,26 +8,24 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.examples.DoublePopulationGenerator;
+import org.skaggs.ec.examples.numarical.DoublePopulationGenerator;
 import org.skaggs.ec.multiobjective.NSGA_II;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;
-import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.PopulationGenerator;
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 public class Main {
 
@@ -45,7 +43,7 @@ public class Main {
 
 
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION, 1000)
+                .setInt(Key.IntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 1000)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1);

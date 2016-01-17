@@ -1,9 +1,9 @@
-package org.skaggs.ec.examples;
+package org.skaggs.ec.examples.numarical;
 
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;
-import org.skaggs.ec.population.Individual;
 import org.skaggs.ec.population.Population;
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 

@@ -9,8 +9,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.examples.DoublePopulationGenerator;
-import org.skaggs.ec.examples.SimpleDoubleMutationOperator;
+import org.skaggs.ec.examples.numarical.DoublePopulationGenerator;
+import org.skaggs.ec.examples.numarical.SimpleDoubleMutationOperator;
 import org.skaggs.ec.multiobjective.NSGA_II;
 import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
@@ -47,11 +47,11 @@ public final class SCH {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION_SIZE, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .25);
 
         Operator<Double> operator = new SimpleDoubleMutationOperator();
         OptimizationFunction<Double> function1 = new Function1();
@@ -61,27 +61,7 @@ public final class SCH {
 
         NSGA_II<Double> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        collection.addSeries(new XYSeries("Accepted"));
-        collection.addSeries(new XYSeries("Rejected"));
-
-        //noinspection ConstantConditions,ConstantIfStatement
-        if (false) {
-            nsga_ii.addObserver(populationData -> {
-                XYSeries accepted = collection.getSeries("Accepted");
-                XYSeries rejected = collection.getSeries("Rejected");
-                accepted.clear();
-                rejected.clear();
-
-                for (FrontedIndividual<Double> individual : populationData.getTruncatedPopulation().getPopulation())
-                    accepted.add(individual.getScore(function1), individual.getScore(function2));
-                //noinspection Convert2streamapi
-                for (FrontedIndividual<Double> individual : populationData.getFrontedPopulation().getPopulation())
-                    if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
-                        rejected.add(individual.getScore(function1), individual.getScore(function2));
-                //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
-            });
-        } else {
-            nsga_ii.addObserver(populationData -> {
+        nsga_ii.addObserver(populationData -> {
                 collection.removeAllSeries();
                 for (Front<Double> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
@@ -91,11 +71,12 @@ public final class SCH {
                     collection.addSeries(frontSeries);
                 }
             });
-        }
 
+        //noinspection MagicNumber
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
-            Thread.sleep(1000);
+            //noinspection MagicNumber
+            Thread.sleep(250);
         }
     }
 

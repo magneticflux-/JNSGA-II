@@ -1,47 +1,41 @@
-package org.skaggs.ec.population;
+package org.skaggs.ec.population.individual;
 
 /**
  * Created by Mitchell on 11/28/2015.
  */
-public class Individual<E> {
+public class Individual<E> extends PopulationMember {
 
     protected final E individual;
-    protected final double mutationProbability;
-    protected final double crossoverProbability;
 
     @Deprecated
     public Individual(E individual) {
+        this(individual, 0, 0, 0, 0);
+    }
+
+    public Individual(Individual<E> individual) {
+        super(individual);
+        this.individual = individual.individual;
+    }
+
+    public Individual(E individual, double mutationProbability, double crossoverProbability, double mutationStrength, double crossoverStrength) {
+        super(mutationStrength, mutationProbability, crossoverProbability, crossoverStrength);
         this.individual = individual;
-        mutationProbability = 0;
-        crossoverProbability = 0;
     }
 
-    public Individual(E individual, double mutationProbability, double crossoverProbability) {
-        this.individual = individual;
-        this.mutationProbability = mutationProbability;
-        this.crossoverProbability = crossoverProbability;
-    }
-
-    public double getMutationProbability() {
-        return mutationProbability;
-    }
-
-    public double getCrossoverProbability() {
-        return crossoverProbability;
-    }
-
+    @SuppressWarnings("unused")
     @Deprecated
     public boolean oldEquals(Object obj) {
         return obj instanceof Individual &&
                 ((Individual) obj).getIndividual().equals(this.getIndividual()) &&
-                ((Individual) obj).mutationProbability == this.mutationProbability &&
-                ((Individual) obj).crossoverProbability == this.crossoverProbability;
+                ((PopulationMember) obj).mutationProbability == this.mutationProbability &&
+                ((PopulationMember) obj).crossoverProbability == this.crossoverProbability;
     }
 
     public E getIndividual() {
         return this.individual;
     }
 
+    @SuppressWarnings("unused")
     @Deprecated
     public int oldHashCode() {
         return this.individual.hashCode() ^

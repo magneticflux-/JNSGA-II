@@ -9,8 +9,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.examples.DoubleArrayPopulationGenerator;
-import org.skaggs.ec.examples.SimpleDoubleArrayMutationOperator;
+import org.skaggs.ec.examples.numarical.DoubleArrayPopulationGenerator;
+import org.skaggs.ec.examples.numarical.SimpleDoubleArrayMutationOperator;
 import org.skaggs.ec.multiobjective.NSGA_II;
 import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
@@ -32,13 +32,14 @@ public final class POL {
     }
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
+        Thread.sleep(5000);
         XYSeriesCollection collection = new XYSeriesCollection();
         JFreeChart chart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
         chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         //noinspection MagicNumber
-        chart.getXYPlot().getDomainAxis().setRange(0, 15);
+        chart.getXYPlot().getDomainAxis().setRange(0, 20);
         //noinspection MagicNumber
-        chart.getXYPlot().getRangeAxis().setRange(0, 5);
+        chart.getXYPlot().getRangeAxis().setRange(0, 25);
         ChartPanel panel = new ChartPanel(chart);
         JFrame frame = new JFrame();
         frame.add(panel);
@@ -49,12 +50,12 @@ public final class POL {
 
         //noinspection MagicNumber
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION, 500)
+                .setInt(Key.IntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1. / 2)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .0625);
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 2)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .25);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -64,27 +65,8 @@ public final class POL {
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        collection.addSeries(new XYSeries("Accepted"));
-        collection.addSeries(new XYSeries("Rejected"));
-
-        //noinspection ConstantConditions,ConstantIfStatement
-        if (false) {
-            nsga_ii.addObserver(populationData -> {
-                XYSeries accepted = collection.getSeries("Accepted");
-                XYSeries rejected = collection.getSeries("Rejected");
-                accepted.clear();
-                rejected.clear();
-
-                for (FrontedIndividual<double[]> individual : populationData.getTruncatedPopulation().getPopulation())
-                    accepted.add(individual.getScore(function1), individual.getScore(function2));
-                //noinspection Convert2streamapi
-                for (FrontedIndividual<double[]> individual : populationData.getFrontedPopulation().getPopulation())
-                    if (!populationData.getTruncatedPopulation().getPopulation().contains(individual))
-                        rejected.add(individual.getScore(function1), individual.getScore(function2));
-                //System.out.println("Total crowding distance: " + populationData.getFrontedPopulation().getPopulation().parallelStream().mapToDouble(FrontedIndividual::getCrowdingScore).filter(Double::isFinite).sum());
-            });
-        } else {
-            nsga_ii.addObserver(populationData -> {
+        nsga_ii.addObserver(populationData -> {
+            System.out.println("Elapsed time: " + (populationData.getElapsedTime() / 1000000f) + "ms");
                 collection.removeAllSeries();
                 for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
@@ -94,25 +76,25 @@ public final class POL {
                     collection.addSeries(frontSeries);
                 }
             });
-        }
+
 
         //noinspection MagicNumber
         for (int i = 0; i < 10000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
             //noinspection MagicNumber
-            Thread.sleep(500);
+            //Thread.sleep(250);
         }
     }
 
     static class Function1 implements OptimizationFunction<double[]> {
         @SuppressWarnings("MagicNumber")
         @Override
-        public double evaluate(double[] object, Properties properties) {
-            assert object.length == 2;
+        public double evaluate(double[] vector, Properties properties) {
+            assert vector.length == 2;
             final double A1 = (((.5 * FastMath.sin(1)) - (2 * FastMath.cos(1))) + FastMath.sin(2)) - (1.5 * FastMath.cos(2));
             final double A2 = (((1.5 * FastMath.sin(1)) - FastMath.cos(1)) + (2 * FastMath.sin(2))) - (.5 * FastMath.cos(2));
-            final double B1 = (((.5 * FastMath.sin(object[0])) - (2 * FastMath.cos(object[0]))) + FastMath.sin(object[1])) - (1.5 * FastMath.cos(object[1]));
-            final double B2 = (((1.5 * FastMath.sin(object[0])) - FastMath.cos(object[0])) + (2 * FastMath.sin(object[1]))) - (.5 * FastMath.cos(object[1]));
+            final double B1 = (((.5 * FastMath.sin(vector[0])) - (2 * FastMath.cos(vector[0]))) + FastMath.sin(vector[1])) - (1.5 * FastMath.cos(vector[1]));
+            final double B2 = (((1.5 * FastMath.sin(vector[0])) - FastMath.cos(vector[0])) + (2 * FastMath.sin(vector[1]))) - (.5 * FastMath.cos(vector[1]));
             return 1 + FastMath.pow(A1 - B1, 2) + FastMath.pow(A2 - B2, 2);
         }
 

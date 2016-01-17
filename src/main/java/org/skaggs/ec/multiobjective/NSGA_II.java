@@ -13,15 +13,12 @@ import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/25/2015.
  */
+
 public class NSGA_II<E> implements HasPropertyRequirements {
 
     private final List<EvolutionObserver<E>> observers;
@@ -46,11 +43,16 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         this.checkKeyAvailability();
 
-        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.POPULATION), populationGenerator, properties);
+        long startTime = System.nanoTime();
+
+        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.POPULATION_SIZE), populationGenerator, properties);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
         this.population = frontedPopulation;
+
+        long elapsedTime = System.nanoTime() - startTime;
+        System.out.println("Initialization time: " + (elapsedTime / 1000000f) + "ms");
     }
 
     private void checkKeyAvailability() {
@@ -99,14 +101,20 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         [X] 2. Write Population.merge() method
         [X] 3. Write proper Double classes
          */
+        final long startTime = System.nanoTime();
 
         Population<E> offspring = this.operator.apply(this.population, this.properties);
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.POPULATION));
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.POPULATION_SIZE));
         this.population = truncatedPopulation;
-        this.update(new PopulationData<>(frontedPopulation, truncatedPopulation));
+
+        final long elapsedTime = System.nanoTime() - startTime;
+
+        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime);
+
+        this.update(populationData);
     }
 
     private void update(PopulationData<E> populationData) {
@@ -124,7 +132,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.IntKey.POPULATION,
+                Key.IntKey.POPULATION_SIZE,
                 Key.BooleanKey.THREADED
         };
     }

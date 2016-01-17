@@ -1,5 +1,6 @@
 package org.skaggs.ec.population;
 
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Properties;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
  */
 public class Population<E> {
 
-    public List<? extends Individual<E>> population;
+    protected List<? extends Individual<E>> population;
 
     protected Population() {
     }

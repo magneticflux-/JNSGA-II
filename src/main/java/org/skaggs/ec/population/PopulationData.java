@@ -10,10 +10,12 @@ import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 public class PopulationData<E> {
     private final FrontedPopulation<E> frontedPopulation;
     private final FrontedPopulation<E> truncatedPopulation;
+    private final long elapsedTime;
 
-    public PopulationData(FrontedPopulation<E> frontedPopulation, FrontedPopulation<E> truncatedPopulation) {
+    public PopulationData(FrontedPopulation<E> frontedPopulation, FrontedPopulation<E> truncatedPopulation, long elapsedTime) {
         this.frontedPopulation = frontedPopulation;
         this.truncatedPopulation = truncatedPopulation;
+        this.elapsedTime = elapsedTime;
     }
 
     public FrontedPopulation<E> getFrontedPopulation() {
@@ -22,5 +24,9 @@ public class PopulationData<E> {
 
     public FrontedPopulation<E> getTruncatedPopulation() {
         return this.truncatedPopulation;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
     }
 }

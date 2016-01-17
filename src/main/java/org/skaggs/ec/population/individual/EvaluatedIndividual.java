@@ -1,4 +1,4 @@
-package org.skaggs.ec.population;
+package org.skaggs.ec.population.individual;
 
 import org.skaggs.ec.OptimizationFunction;
 
@@ -13,8 +13,13 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     protected final Map<? extends OptimizationFunction<E>, Double> scores;
 
     public EvaluatedIndividual(Individual<E> individual, Map<? extends OptimizationFunction<E>, Double> scores) {
-        super(individual.getIndividual(), individual.mutationProbability, individual.crossoverProbability);
+        super(individual);
         this.scores = Collections.unmodifiableMap(scores);
+    }
+
+    public EvaluatedIndividual(EvaluatedIndividual<E> evaluatedIndividual) {
+        super(evaluatedIndividual);
+        this.scores = evaluatedIndividual.scores;
     }
 
     public Double getScore(OptimizationFunction<E> optimizationFunction) {
@@ -57,7 +62,7 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     @Deprecated
     @Override
     public boolean oldEquals(Object obj) {
-        return obj instanceof EvaluatedIndividual && ((EvaluatedIndividual) obj).getIndividual().equals(this.getIndividual()) && ((EvaluatedIndividual) obj).getScores().equals(this.getScores());
+        return obj instanceof EvaluatedIndividual && ((Individual) obj).getIndividual().equals(this.getIndividual()) && ((EvaluatedIndividual) obj).getScores().equals(this.getScores());
     }
 
     @Override
@@ -67,6 +72,7 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         return result;
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
