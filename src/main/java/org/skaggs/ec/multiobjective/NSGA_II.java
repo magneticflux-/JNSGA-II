@@ -27,6 +27,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private final Properties properties;
     private final PopulationGenerator<E> populationGenerator;
     private FrontedPopulation<E> population;
+    private int currentGeneration;
 
     public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
         if (optimizationFunctions.size() < 1)
@@ -40,6 +41,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.operator = operator;
         this.properties = properties;
         this.populationGenerator = populationGenerator;
+        this.currentGeneration = 0;
 
         this.checkKeyAvailability();
 
@@ -112,7 +114,9 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         final long elapsedTime = System.nanoTime() - startTime;
 
-        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime);
+        this.currentGeneration++;
+
+        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime, this.currentGeneration);
 
         this.update(populationData);
     }

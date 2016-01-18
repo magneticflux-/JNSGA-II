@@ -9,7 +9,7 @@ public class Individual<E> extends PopulationMember {
 
     @Deprecated
     public Individual(E individual) {
-        this(individual, 0, 0, 0, 0);
+        this(individual, -1, -1, -1, -1);
     }
 
     public Individual(Individual<E> individual) {
@@ -17,7 +17,7 @@ public class Individual<E> extends PopulationMember {
         this.individual = individual.individual;
     }
 
-    public Individual(E individual, double mutationProbability, double crossoverProbability, double mutationStrength, double crossoverStrength) {
+    public Individual(E individual, double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
         super(mutationStrength, mutationProbability, crossoverProbability, crossoverStrength);
         this.individual = individual;
     }

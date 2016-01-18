@@ -11,11 +11,13 @@ public class PopulationData<E> {
     private final FrontedPopulation<E> frontedPopulation;
     private final FrontedPopulation<E> truncatedPopulation;
     private final long elapsedTime;
+    private final int currentGeneration;
 
-    public PopulationData(FrontedPopulation<E> frontedPopulation, FrontedPopulation<E> truncatedPopulation, long elapsedTime) {
+    public PopulationData(FrontedPopulation<E> frontedPopulation, FrontedPopulation<E> truncatedPopulation, long elapsedTime, int currentGeneration) {
         this.frontedPopulation = frontedPopulation;
         this.truncatedPopulation = truncatedPopulation;
         this.elapsedTime = elapsedTime;
+        this.currentGeneration = currentGeneration;
     }
 
     public FrontedPopulation<E> getFrontedPopulation() {
@@ -28,5 +30,9 @@ public class PopulationData<E> {
 
     public long getElapsedTime() {
         return elapsedTime;
+    }
+
+    public int getCurrentGeneration() {
+        return currentGeneration;
     }
 }

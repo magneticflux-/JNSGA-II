@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -51,12 +52,19 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 1000)
+                .setInt(Key.IntKey.POPULATION_SIZE, 500)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 2)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
+
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125 / 256)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .5)
+
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .0625)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .125)
+
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .0625)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .125);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -67,20 +75,27 @@ public final class POL {
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
         nsga_ii.addObserver(populationData -> {
-            System.out.println("Elapsed time: " + (populationData.getElapsedTime() / 1000000f) + "ms");
-                collection.removeAllSeries();
+            //System.out.println("\rElapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
+            System.out.println(((float) populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
+                @Override
+                public double applyAsDouble(FrontedIndividual<double[]> value) {
+                    return value.mutationProbability;
+                }
+            }).average().orElse(-1)));
+
+            collection.removeAllSeries();
             for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
                         frontSeries.add(individual.getScore(function1), individual.getScore(function2));
                     }
                     collection.addSeries(frontSeries);
-                }
-            });
+            }
+        });
 
 
         //noinspection MagicNumber
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
             //noinspection MagicNumber
             //Thread.sleep(1000);

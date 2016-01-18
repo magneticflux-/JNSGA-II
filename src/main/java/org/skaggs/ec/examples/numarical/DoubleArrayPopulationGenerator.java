@@ -19,10 +19,12 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
         double min = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         double max = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
         int length = properties.getInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
+        double initialMutationStrength = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
+        double initialMutationProbability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
 
         List<Individual<double[]>> individuals = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            individuals.add(new Individual<>(this.getIndividual(r, length, min, max)));
+            individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialMutationStrength, initialMutationProbability, -1, -1));
         }
         return individuals;
     }
@@ -41,6 +43,7 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH};
+        return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH,
+                Key.DoubleKey.INITIAL_MUTATION_STRENGTH, Key.DoubleKey.INITIAL_MUTATION_PROBABILITY};
     }
 }
