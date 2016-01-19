@@ -40,7 +40,7 @@ public class Properties {
         this.getValue(key);
     }
 
-    private Object getValue(Key key) {
+    public Object getValue(Key key) {
         Object value = this.values.get(key);
         if (value == null) {
             value = defaultValues.get(key);
@@ -55,33 +55,39 @@ public class Properties {
         return this.locked;
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public int getInt(Key.IntKey key) {
         return (int) this.getValue(key);
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public boolean getBoolean(Key.BooleanKey key) {
         return (boolean) this.getValue(key);
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public double getDouble(Key.DoubleKey key) {
         return (double) this.getValue(key);
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public Properties setInt(Key.IntKey key, int value) {
         return this.setValue(key, value);
     }
 
-    private Properties setValue(Key key, Object object) {
+    public Properties setValue(Key key, Object object) {
         if (this.locked)
             throw new ObjectLockedException("This Properties object is already locked!");
         this.values.put(key, object);
         return this;
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public Properties setBoolean(Key.BooleanKey key, boolean value) {
         return this.setValue(key, value);
     }
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public Properties setDouble(Key.DoubleKey key, double value) {
         return this.setValue(key, value);
     }

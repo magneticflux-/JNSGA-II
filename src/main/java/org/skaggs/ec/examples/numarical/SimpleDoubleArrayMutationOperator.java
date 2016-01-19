@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -36,7 +37,7 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
     @Override
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
         List<Individual<double[]>> individuals = new ArrayList<>(population.getPopulation().size());
-        Random r = new Random();
+        Random r = ThreadLocalRandom.current();
 
         double mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
         double mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);

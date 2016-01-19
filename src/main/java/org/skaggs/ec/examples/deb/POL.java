@@ -5,6 +5,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -20,6 +21,7 @@ import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
 import javax.swing.*;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -34,18 +36,32 @@ public final class POL {
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         //Thread.sleep(7000);
-        XYSeriesCollection collection = new XYSeriesCollection();
-        JFreeChart chart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", collection, PlotOrientation.VERTICAL, true, true, false);
-        chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
+        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, true, false);
+        currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         //noinspection MagicNumber
-        chart.getXYPlot().getDomainAxis().setRange(0, 20);
+        currentGenerationChart.getXYPlot().getDomainAxis().setRange(0, 20);
         //noinspection MagicNumber
-        chart.getXYPlot().getRangeAxis().setRange(0, 25);
-        ChartPanel panel = new ChartPanel(chart);
-        JFrame frame = new JFrame();
-        frame.add(panel);
+        currentGenerationChart.getXYPlot().getRangeAxis().setRange(0, 30);
+        ChartPanel currentGenerationPanel = new ChartPanel(currentGenerationChart);
+
+        XYSeriesCollection generationHistoryCollection = new XYSeriesCollection();
+        XYSeries averageMutationStrength = new XYSeries("Average Mutation Strength");
+        XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
+        generationHistoryCollection.addSeries(averageMutationStrength);
+        generationHistoryCollection.addSeries(averageMutationProbability);
+        JFreeChart generationHistoryChart = ChartFactory.createScatterPlot("POL", "Generation", "Y", generationHistoryCollection, PlotOrientation.VERTICAL, true, true, false);
+        generationHistoryChart.getXYPlot().setRenderer(new XYErrorRenderer());
+        generationHistoryChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        ChartPanel generationHistoryPanel = new ChartPanel(generationHistoryChart);
+
+        JFrame frame = new JFrame("Evolutionary Algorithm");
+        frame.add(currentGenerationPanel, BorderLayout.CENTER);
+        frame.add(generationHistoryPanel, BorderLayout.SOUTH);
         //noinspection MagicNumber
-        frame.setSize(800, 800);
+        frame.setSize(700, 1000);
+        //noinspection MagicNumber
+        frame.setLocation(400, 0);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,14 +73,14 @@ public final class POL {
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125 / 256)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .5)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .0625)
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .125)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .25)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .0625)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .125);
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .25);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -75,22 +91,32 @@ public final class POL {
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
         nsga_ii.addObserver(populationData -> {
-            //System.out.println("\rElapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
-            System.out.println(((float) populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
-                @Override
-                public double applyAsDouble(FrontedIndividual<double[]> value) {
-                    return value.mutationProbability;
-                }
-            }).average().orElse(-1)));
-
-            collection.removeAllSeries();
-            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
+            currentGenerationCollection.removeAllSeries();
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
                         frontSeries.add(individual.getScore(function1), individual.getScore(function2));
                     }
-                    collection.addSeries(frontSeries);
+                currentGenerationCollection.addSeries(frontSeries);
             }
+        });
+
+        nsga_ii.addObserver(populationData -> {
+            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
+            double currentAverageMutationStrength = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
+                @Override
+                public double applyAsDouble(FrontedIndividual<double[]> value) {
+                    return value.mutationStrength;
+                }
+            }).average().orElse(Double.NaN);
+            double currentAverageMutationProbability = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
+                @Override
+                public double applyAsDouble(FrontedIndividual<double[]> value) {
+                    return value.mutationProbability;
+                }
+            }).average().orElse(Double.NaN);
+            averageMutationStrength.add(populationData.getCurrentGeneration(), currentAverageMutationStrength);
+            averageMutationProbability.add(populationData.getCurrentGeneration(), currentAverageMutationProbability);
         });
 
 
@@ -98,7 +124,7 @@ public final class POL {
         for (int i = 0; i < 1000000; i++) {
             SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
             //noinspection MagicNumber
-            //Thread.sleep(1000);
+            //Thread.sleep(200);
         }
     }
 
