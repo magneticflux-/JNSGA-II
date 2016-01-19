@@ -20,12 +20,14 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.ToDoubleFunction;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -73,14 +75,14 @@ public final class POL {
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, 1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125)
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .25)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 4)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .5)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .25);
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 4)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .5);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -103,18 +105,8 @@ public final class POL {
 
         nsga_ii.addObserver(populationData -> {
             System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
-            double currentAverageMutationStrength = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
-                @Override
-                public double applyAsDouble(FrontedIndividual<double[]> value) {
-                    return value.mutationStrength;
-                }
-            }).average().orElse(Double.NaN);
-            double currentAverageMutationProbability = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(new ToDoubleFunction<FrontedIndividual<double[]>>() {
-                @Override
-                public double applyAsDouble(FrontedIndividual<double[]> value) {
-                    return value.mutationProbability;
-                }
-            }).average().orElse(Double.NaN);
+            double currentAverageMutationStrength = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationStrength).average().orElse(Double.NaN);
+            double currentAverageMutationProbability = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationProbability).average().orElse(Double.NaN);
             averageMutationStrength.add(populationData.getCurrentGeneration(), currentAverageMutationStrength);
             averageMutationProbability.add(populationData.getCurrentGeneration(), currentAverageMutationProbability);
         });

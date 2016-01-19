@@ -5,16 +5,16 @@ package org.skaggs.ec.properties;
  */
 public interface Key {
 
-    enum IntKey implements Key {
+    public static enum IntKey implements Key {
         POPULATION_SIZE,
         DOUBLE_ARRAY_GENERATION_LENGTH
     }
 
-    enum BooleanKey implements Key {
+    public static enum BooleanKey implements Key {
         THREADED
     }
 
-    enum DoubleKey implements Key {
+    public static enum DoubleKey implements Key {
         INITIAL_MUTATION_STRENGTH,
         MUTATION_STRENGTH_MUTATION_PROBABILITY,
         MUTATION_STRENGTH_MUTATION_STRENGTH,
