@@ -12,6 +12,7 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
+import org.skaggs.ec.properties.Requirement;
 
 import java.util.*;
 
@@ -54,26 +55,50 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         this.population = frontedPopulation;
 
         long elapsedTime = System.nanoTime() - startTime;
+        //noinspection MagicNumber
         System.out.println("Initialization time: " + (elapsedTime / 1000000f) + "ms");
     }
 
     private void checkKeyAvailability() {
-        Collection<Key> missingKeys = new HashSet<>();
+        Collection<Key> missingKeys = new LinkedHashSet<>();
+        Collection<String> failedRequirements = new LinkedHashSet<>();
 
+
+        //noinspection SpellCheckingInspection
         Collection<HasPropertyRequirements> hasPropertyRequirementses = new LinkedList<>(Arrays.asList(this.operator, this, this.populationGenerator)); // Hobbitses...
         hasPropertyRequirementses.addAll(this.optimizationFunctions);
 
-        for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses)
+        for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses) {
             for (Key key : hasPropertyRequirements.requestProperties())
                 try {
                     this.properties.testKey(key);
                 } catch (NoValueSetException e) {
                     missingKeys.add(key);
                 }
-
-        if (!missingKeys.isEmpty()) {
-            throw new NoValueSetException("These required keys have no default value. Please provide a value. " + missingKeys);
+            for (Requirement requirement : hasPropertyRequirements.requestDetailedRequirements()) {
+                boolean result = requirement.test(properties);
+                if (!result) {
+                    failedRequirements.add(requirement.describe());
+                }
+            }
         }
+
+        boolean error = !missingKeys.isEmpty() || !failedRequirements.isEmpty();
+
+        if (error)
+            System.err.println("Fatal error!");
+        if (!missingKeys.isEmpty()) {
+            System.err.println("Missing Keys:");
+            for (Key key : missingKeys)
+                System.err.println("\t" + key);
+        }
+        if (!failedRequirements.isEmpty()) {
+            System.err.println("Failed Requirements:");
+            for (String requirement : failedRequirements)
+                System.err.println("\t" + requirement);
+        }
+        if (error)
+            throw new NoValueSetException("Invalid properties!");
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -129,6 +154,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         return this.observers.add(observer);
     }
 
+    @SuppressWarnings("unused")
     public boolean removeObserver(EvolutionObserver<E> observer) {
         return this.observers.remove(observer);
     }
@@ -138,6 +164,28 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         return new Key[]{
                 Key.IntKey.POPULATION_SIZE,
                 Key.BooleanKey.THREADED
+        };
+    }
+
+    @Override
+    public Requirement[] requestDetailedRequirements() {
+        return new Requirement[]{
+                new Requirement() {
+                    @Override
+                    public String describe() {
+                        return "Population must be greater than 0";
+                    }
+
+                    @Override
+                    public boolean test(Properties properties) {
+                        boolean succeeded = false;
+                        try {
+                            succeeded = properties.getInt(Key.IntKey.POPULATION_SIZE) > 0;
+                        } catch (NoValueSetException ignored) {
+                        }
+                        return succeeded;
+                    }
+                }
         };
     }
 }

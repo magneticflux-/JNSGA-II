@@ -5,7 +5,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -20,14 +19,12 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
+import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -39,7 +36,7 @@ public final class POL {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         //Thread.sleep(7000);
         XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
-        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("POL", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, true, false);
         currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         //noinspection MagicNumber
         currentGenerationChart.getXYPlot().getDomainAxis().setRange(0, 20);
@@ -52,16 +49,24 @@ public final class POL {
         XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
         generationHistoryCollection.addSeries(averageMutationStrength);
         generationHistoryCollection.addSeries(averageMutationProbability);
-        JFreeChart generationHistoryChart = ChartFactory.createScatterPlot("POL", "Generation", "Y", generationHistoryCollection, PlotOrientation.VERTICAL, true, true, false);
-        generationHistoryChart.getXYPlot().setRenderer(new XYErrorRenderer());
+        JFreeChart generationHistoryChart = ChartFactory.createScatterPlot("Full Graph", "Generation", "Y", generationHistoryCollection, PlotOrientation.VERTICAL, true, true, false);
         generationHistoryChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        System.out.println(generationHistoryChart.getXYPlot().getDomainAxis().getLabelFont());
         ChartPanel generationHistoryPanel = new ChartPanel(generationHistoryChart);
 
+        XYSeriesCollection currentPopulationCollection = new XYSeriesCollection();
+        JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, true, false);
+        currentPopulationChart.getXYPlot().getDomainAxis().setAttributedLabel(new AttributedString("X\u2081"));
+        currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
+        ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
+
         JFrame frame = new JFrame("Evolutionary Algorithm");
-        frame.add(currentGenerationPanel, BorderLayout.CENTER);
-        frame.add(generationHistoryPanel, BorderLayout.SOUTH);
+        frame.setLayout(new GridLayout(2, 2));
+        frame.add(currentGenerationPanel);
+        frame.add(currentPopulationPanel);
+        frame.add(generationHistoryPanel);
         //noinspection MagicNumber
-        frame.setSize(700, 1000);
+        frame.setSize(1400, 1000);
         //noinspection MagicNumber
         frame.setLocation(400, 0);
         frame.setVisible(true);
@@ -75,13 +80,13 @@ public final class POL {
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, 1)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 4)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .5)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 4)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .5);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
@@ -94,12 +99,23 @@ public final class POL {
 
         nsga_ii.addObserver(populationData -> {
             currentGenerationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
                         frontSeries.add(individual.getScore(function1), individual.getScore(function2));
                     }
                 currentGenerationCollection.addSeries(frontSeries);
+            }
+        });
+
+        nsga_ii.addObserver(populationData -> {
+            currentPopulationCollection.removeAllSeries();
+            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
+                XYSeries frontSeries = new XYSeries(front.toString());
+                for (FrontedIndividual<double[]> individual : front.getMembers()) {
+                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
+                }
+                currentPopulationCollection.addSeries(frontSeries);
             }
         });
 

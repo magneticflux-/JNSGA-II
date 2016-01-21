@@ -60,17 +60,15 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             }
         }
 
-        // Start ranking individuals
+        // Start ranking individuals //TODO This takes 95% of the CPU time for each generation; optimize like crazy
 
-        for (FrontedIndividual<E> individual : castPopulationView) { //TODO This takes 95% of the CPU time for each generation; optimize like crazy
-            Stream<FrontedIndividual<E>> populationStream;
-
-            if (threaded)
-                populationStream = castPopulationView.parallelStream();
-            else
-                populationStream = castPopulationView.stream();
-
-            populationStream.forEach(otherIndividual -> {
+        Stream<FrontedIndividual<E>> populationStream;
+        if (threaded)
+            populationStream = castPopulationView.parallelStream();
+        else
+            populationStream = castPopulationView.stream();
+        populationStream.forEach(individual -> {
+            for (FrontedIndividual<E> otherIndividual : castPopulationView) {
                 if (otherIndividual == individual) return;
                 int domination = individual.dominates(otherIndividual);
                 switch (domination) {
@@ -78,17 +76,17 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
                         individual.dominationCount++;
                         break;
                     case 1:
-                        synchronized (individual.dominatedIndividuals) {
-                            individual.dominatedIndividuals.add(otherIndividual);
-                        }
+                        individual.dominatedIndividuals.add(otherIndividual);
                         break;
                 }
-            });
-            if (individual.dominationCount == 0) { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0
-                individual.rank = 0;
-                this.fronts.get(0).members.add(individual);
             }
-        }
+        });
+
+        castPopulationView.stream().filter(individual -> individual.dominationCount == 0).forEach(individual -> { // Add it to the first front (Front 0). That front has RANK 0, is at POSITION 0, and the individual has RANK 0
+            individual.rank = 0;
+            this.fronts.get(0).members.add(individual);
+        });
+
 
         // Start establishing Fronts from ranked individuals
 

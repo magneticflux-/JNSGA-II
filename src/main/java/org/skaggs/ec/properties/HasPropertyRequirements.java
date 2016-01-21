@@ -3,6 +3,7 @@ package org.skaggs.ec.properties;
 /**
  * Created by skaggsm on 11/26/15.
  */
+@FunctionalInterface
 public interface HasPropertyRequirements {
 
     /**
@@ -11,4 +12,8 @@ public interface HasPropertyRequirements {
      * @return an array of requests
      */
     Key[] requestProperties();
+
+    default Requirement[] requestDetailedRequirements() {
+        return new Requirement[0];
+    }
 }
