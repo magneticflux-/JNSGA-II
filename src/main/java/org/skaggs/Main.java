@@ -19,7 +19,8 @@ import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

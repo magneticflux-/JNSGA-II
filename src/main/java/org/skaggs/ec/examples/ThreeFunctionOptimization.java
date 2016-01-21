@@ -11,9 +11,8 @@ import org.jzy3d.maths.Rectangle;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Mitchell on 1/4/2016.
