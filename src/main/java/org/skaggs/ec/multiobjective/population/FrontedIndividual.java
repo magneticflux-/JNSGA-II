@@ -64,19 +64,19 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         return this.individual.toString() + " " + this.crowdingScore;
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "unchecked"})
     @Deprecated
     @Override
     public boolean oldEquals(Object obj) {
         try {
             return (obj instanceof FrontedIndividual)
-                    && ((Individual) obj).getIndividual().equals(this.getIndividual())
-                    && ((EvaluatedIndividual) obj).getScores().equals(this.getScores())
-                    && ((FrontedIndividual) obj).getFront().equals(this.getFront())
-                    && (((FrontedIndividual) obj).getCrowdingScore() == this.getCrowdingScore())
-                    && ((FrontedIndividual) obj).dominatedIndividuals.equals(this.dominatedIndividuals)
-                    && (((FrontedIndividual) obj).dominationCount == this.dominationCount)
-                    && (((FrontedIndividual) obj).rank == this.rank);
+                    && ((Individual<E>) obj).getIndividual().equals(this.getIndividual())
+                    && ((EvaluatedIndividual<E>) obj).getScores().equals(this.getScores())
+                    && ((FrontedIndividual<E>) obj).getFront().equals(this.getFront())
+                    && (((FrontedIndividual<E>) obj).getCrowdingScore() == this.getCrowdingScore())
+                    && ((FrontedIndividual<E>) obj).dominatedIndividuals.equals(this.dominatedIndividuals)
+                    && (((FrontedIndividual<E>) obj).dominationCount == this.dominationCount)
+                    && (((FrontedIndividual<E>) obj).rank == this.rank);
         } catch (NullPointerException e) {
             return false;
         }
@@ -102,7 +102,8 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        FrontedIndividual that = (FrontedIndividual) o;
+        //noinspection unchecked
+        FrontedIndividual<E> that = (FrontedIndividual<E>) o;
 
         if (Double.compare(that.crowdingScore, crowdingScore) != 0) return false;
         if (dominationCount != that.dominationCount) return false;
