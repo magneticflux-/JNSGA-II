@@ -19,14 +19,15 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import java.awt.GridLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -40,21 +41,7 @@ public final class POL {
         XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
         JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, true, false);
         currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
-        //noinspection MagicNumber
-        currentGenerationChart.getXYPlot().getDomainAxis().setRange(0, 20);
-        //noinspection MagicNumber
-        currentGenerationChart.getXYPlot().getRangeAxis().setRange(0, 30);
         ChartPanel currentGenerationPanel = new ChartPanel(currentGenerationChart);
-
-        XYSeriesCollection generationHistoryCollection = new XYSeriesCollection();
-        XYSeries averageMutationStrength = new XYSeries("Average Mutation Strength");
-        XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
-        generationHistoryCollection.addSeries(averageMutationStrength);
-        generationHistoryCollection.addSeries(averageMutationProbability);
-        JFreeChart generationHistoryChart = ChartFactory.createScatterPlot("Full Graph", "Generation", "Y", generationHistoryCollection, PlotOrientation.VERTICAL, true, true, false);
-        generationHistoryChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
-        System.out.println(generationHistoryChart.getXYPlot().getDomainAxis().getLabelFont());
-        ChartPanel generationHistoryPanel = new ChartPanel(generationHistoryChart);
 
         XYSeriesCollection currentPopulationCollection = new XYSeriesCollection();
         JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, true, false);
@@ -62,11 +49,26 @@ public final class POL {
         currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
         ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
 
+        XYSeriesCollection averageMutationStrengthCollection = new XYSeriesCollection();
+        XYSeries averageMutationStrength = new XYSeries("Average Mutation Strength");
+        averageMutationStrengthCollection.addSeries(averageMutationStrength);
+        JFreeChart averageMutationStrengthChart = ChartFactory.createScatterPlot("Average Mutation Strength", "Generation", "Y", averageMutationStrengthCollection, PlotOrientation.VERTICAL, true, true, false);
+        averageMutationStrengthChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        ChartPanel averageMutationStrengthPanel = new ChartPanel(averageMutationStrengthChart);
+
+        XYSeriesCollection averageMutationProbabilityCollection = new XYSeriesCollection();
+        XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
+        averageMutationProbabilityCollection.addSeries(averageMutationProbability);
+        JFreeChart averageMutationProbabilityChart = ChartFactory.createScatterPlot("Average Mutation Probability", "Generation", "Y", averageMutationProbabilityCollection, PlotOrientation.VERTICAL, true, true, false);
+        averageMutationProbabilityChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        ChartPanel averageMutationProbabilityPanel = new ChartPanel(averageMutationProbabilityChart);
+
         JFrame frame = new JFrame("Evolutionary Algorithm");
         frame.setLayout(new GridLayout(2, 2));
         frame.add(currentGenerationPanel);
         frame.add(currentPopulationPanel);
-        frame.add(generationHistoryPanel);
+        frame.add(averageMutationStrengthPanel);
+        frame.add(averageMutationProbabilityPanel);
         //noinspection MagicNumber
         frame.setSize(1400, 1000);
         //noinspection MagicNumber
@@ -77,13 +79,13 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 500)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -FastMath.PI)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, FastMath.PI)
+                .setInt(Key.IntKey.POPULATION_SIZE, 400)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -4)//-FastMath.PI)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 0)//FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .05)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .95)
 
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .5)
