@@ -14,9 +14,13 @@ import java.util.function.Function;
 /**
  * Created by skaggsm on 1/22/16.
  */
-public abstract class Mutator<E> extends LateUpdatingProperties implements Function<Individual<E>, Individual<E>>, HasPropertyRequirements {
+public abstract class Mutator<E> implements Function<Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties {
 
     private double mutationProbabilityMutationProbability, mutationProbabilityMutationStrength, mutationStrengthMutationProbability, mutationStrengthMutationStrength;
+
+    public static double mutate(double d, Random r, double range) {
+        return (d + (r.nextDouble() * 2 * range)) - range;
+    }
 
     @Override
     public void updateProperties(Properties properties) {
@@ -38,10 +42,6 @@ public abstract class Mutator<E> extends LateUpdatingProperties implements Funct
         E individual = (r.nextDouble() < e.mutationProbability) ? mutate(e.getIndividual(), e.mutationStrength, e.mutationProbability) : e.getIndividual();
 
         return new Individual<>(individual, mutationStrength, mutationProbability, e.crossoverStrength, e.crossoverProbability);
-    }
-
-    public static double mutate(double d, Random r, double range) {
-        return (d + (r.nextDouble() * 2 * range)) - range;
     }
 
     protected abstract E mutate(E object, double mutationStrength, double mutationProbability);

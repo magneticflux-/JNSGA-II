@@ -24,13 +24,19 @@ public class DefaultOperator<E> implements Operator<E> {
         this.crossoverer = crossoverer;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
         mutator.updateProperties(properties);
         crossoverer.updateProperties(properties);
+        boolean threaded = properties.getBoolean(Key.BooleanKey.THREADED);
 
         Stream<FrontedIndividual<E>> individualStream;
 
+        if (threaded)
+            individualStream = (Stream<FrontedIndividual<E>>) population.getPopulation().parallelStream();
+        else
+            individualStream = (Stream<FrontedIndividual<E>>) population.getPopulation().stream();
 
         return null;
     }

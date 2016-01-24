@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 /**
  * Created by skaggsm on 1/22/16.
  */
-public abstract class Crossoverer<E> extends LateUpdatingProperties implements BiFunction<Individual<E>, Individual<E>, Individual<E>>, HasPropertyRequirements {
+public abstract class Crossoverer<E> implements BiFunction<Individual<E>, Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties {
 
     private double crossoverProbabilityMutationProbability, crossoverProbabilityMutationStrength, crossoverStrengthMutationProbability, crossoverStrengthMutationStrength;
 
