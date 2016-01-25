@@ -79,19 +79,19 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 400)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -4)//-FastMath.PI)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 0)//FastMath.PI)
+                .setInt(Key.IntKey.POPULATION_SIZE, 4000)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -300)//-FastMath.PI)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 300)//FastMath.PI)
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .05)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .95)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .01)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .5)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .25)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .5);
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .25);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -106,7 +106,7 @@ public final class POL {
             for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(function1), individual.getScore(function2));
+                        frontSeries.add(individual.getScore(function1), individual.getScore(function2), false);
                     }
                 currentGenerationCollection.addSeries(frontSeries);
             }
@@ -117,7 +117,7 @@ public final class POL {
             for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
+                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1], false);
                 }
                 currentPopulationCollection.addSeries(frontSeries);
             }
