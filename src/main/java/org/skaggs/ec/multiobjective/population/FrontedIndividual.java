@@ -1,7 +1,6 @@
 package org.skaggs.ec.multiobjective.population;
 
 import org.skaggs.ec.population.individual.EvaluatedIndividual;
-import org.skaggs.ec.population.individual.Individual;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,7 +14,6 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
      * The individuals that this individual dominates
      */
     final Set<FrontedIndividual<E>> dominatedIndividuals;
-    Front<E> front;
     /**
      * The SPARSENESS of this individual's score area
      */
@@ -31,9 +29,8 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     int rank;
 
     @SuppressWarnings("unused")
-    public FrontedIndividual(EvaluatedIndividual<E> individual, Front<E> front, Set<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
+    public FrontedIndividual(EvaluatedIndividual<E> individual, Set<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
         super(individual);
-        this.front = front;
         this.dominatedIndividuals = new LinkedHashSet<>(dominatedIndividuals);
         this.crowdingScore = crowdingScore;
         this.dominationCount = dominationCount;
@@ -64,29 +61,10 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         return this.individual.toString() + " " + this.crowdingScore;
     }
 
-    @SuppressWarnings({"deprecation", "unchecked"})
-    @Deprecated
-    @Override
-    public boolean oldEquals(Object obj) {
-        try {
-            return (obj instanceof FrontedIndividual)
-                    && ((Individual<E>) obj).getIndividual().equals(this.getIndividual())
-                    && ((EvaluatedIndividual<E>) obj).getScores().equals(this.getScores())
-                    && ((FrontedIndividual<E>) obj).getFront().equals(this.getFront())
-                    && (((FrontedIndividual<E>) obj).getCrowdingScore() == this.getCrowdingScore())
-                    && ((FrontedIndividual<E>) obj).dominatedIndividuals.equals(this.dominatedIndividuals)
-                    && (((FrontedIndividual<E>) obj).dominationCount == this.dominationCount)
-                    && (((FrontedIndividual<E>) obj).rank == this.rank);
-        } catch (NullPointerException e) {
-            return false;
-        }
-    }
-
     @Override
     public int hashCode() {
         int result = super.hashCode();
         long temp;
-        result = 31 * result + (front != null ? front.hashCode() : 0);
         result = 31 * result + (dominatedIndividuals != null ? dominatedIndividuals.hashCode() : 0);
         temp = Double.doubleToLongBits(crowdingScore);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
@@ -110,13 +88,8 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         if (rank != that.rank) return false;
         if (dominatedIndividuals != null ? !dominatedIndividuals.equals(that.dominatedIndividuals) : that.dominatedIndividuals != null)
             return false;
-        if (front != null ? !front.equals(that.front) : that.front != null) return false;
 
         return true;
-    }
-
-    public Front<E> getFront() {
-        return this.front;
     }
 
     public double getCrowdingScore() {

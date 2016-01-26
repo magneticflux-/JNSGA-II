@@ -23,8 +23,6 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -58,7 +56,8 @@ public final class SCH {
         Operator<Double> operator = new SimpleDoubleMutationOperator();
         OptimizationFunction<Double> function1 = new Function1();
         OptimizationFunction<Double> function2 = new Function2();
-        List<OptimizationFunction<Double>> optimizationFunctions = Arrays.asList(function1, function2);
+        @SuppressWarnings("unchecked")
+        OptimizationFunction<Double>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<Double> populationGenerator = new DoublePopulationGenerator();
 
         NSGA_II<Double> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
@@ -68,7 +67,7 @@ public final class SCH {
                 for (Front<Double> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<Double> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(function1), individual.getScore(function2));
+                        frontSeries.add(individual.getScore(0), individual.getScore(1));
                     }
                     collection.addSeries(frontSeries);
                 }

@@ -23,8 +23,6 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -59,7 +57,8 @@ public final class FON {
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
         OptimizationFunction<double[]> function2 = new Function2();
-        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
+        @SuppressWarnings("unchecked")
+        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
@@ -69,7 +68,7 @@ public final class FON {
                 for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(function1), individual.getScore(function2));
+                        frontSeries.add(individual.getScore(0), individual.getScore(1));
                     }
                     collection.addSeries(frontSeries);
                 }

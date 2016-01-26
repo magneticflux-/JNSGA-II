@@ -6,8 +6,6 @@ import org.skaggs.ec.properties.Properties;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -32,7 +30,10 @@ public class Population<E> {
     }
 
     public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
-        return new Population<>((ArrayList<Individual<E>>) Stream.concat(population1.population.stream(), population2.population.stream()).collect(Collectors.toCollection(ArrayList::new)));
+        ArrayList<Individual<E>> individuals = new ArrayList<>(population1.population.size() + population2.population.size());
+        individuals.addAll(population1.population);
+        individuals.addAll(population2.population);
+        return new Population<>(individuals);
     }
 
     public List<? extends Individual<E>> getPopulation() {

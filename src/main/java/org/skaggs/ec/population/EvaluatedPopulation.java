@@ -6,7 +6,10 @@ import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -21,7 +24,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
      * @param optimizationFunctions the functions to use to evaluate the population
      */
     @SuppressWarnings("AssignmentToSuperclassField")
-    public EvaluatedPopulation(Population<E> population, Collection<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
+    public EvaluatedPopulation(Population<E> population, OptimizationFunction<E>[] optimizationFunctions, Properties properties) {
         super();
         Stream<? extends Individual<E>> individualStream;
         if (properties.getBoolean(Key.BooleanKey.THREADED)) {
@@ -33,19 +36,17 @@ public class EvaluatedPopulation<E> extends Population<E> {
         this.population = new ArrayList<EvaluatedIndividual<E>>(properties.getInt(Key.IntKey.POPULATION_SIZE));
 
         individualStream.forEach(individual -> {
-            LinkedHashMap<OptimizationFunction<E>, Double> scores = new LinkedHashMap<>(optimizationFunctions.size());
-            for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
-                scores.put(optimizationFunction, optimizationFunction.evaluate(individual.getIndividual(), properties));
+            double[] scores = new double[optimizationFunctions.length];
+            for (int i = 0; i < optimizationFunctions.length; i++) {
+                scores[i] = optimizationFunctions[i].evaluate(individual.getIndividual(), properties);
             }
-            EvaluatedIndividual<E> evaluatedIndividual = new EvaluatedIndividual<>(individual, scores);
+            EvaluatedIndividual<E> evaluatedIndividual = new EvaluatedIndividual<>(individual, optimizationFunctions, scores);
             //noinspection SynchronizeOnNonFinalField
             synchronized (EvaluatedPopulation.this.population) {
                 //noinspection unchecked
                 ((Collection<EvaluatedIndividual<E>>) EvaluatedPopulation.this.population).add(evaluatedIndividual);
             }
         });
-
-        // *throws salt over shoulder*
     }
 
     protected EvaluatedPopulation() {

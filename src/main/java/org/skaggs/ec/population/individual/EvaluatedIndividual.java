@@ -2,28 +2,31 @@ package org.skaggs.ec.population.individual;
 
 import org.skaggs.ec.OptimizationFunction;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Created by Mitchell on 11/25/2015.
  */
 public class EvaluatedIndividual<E> extends Individual<E> {
 
-    protected final Map<? extends OptimizationFunction<E>, Double> scores;
+    protected final OptimizationFunction<E>[] optimizationFunctions;
+    protected final double[] scores;
 
-    public EvaluatedIndividual(Individual<E> individual, Map<? extends OptimizationFunction<E>, Double> scores) {
+    @SuppressWarnings({"unchecked", "AssignmentToCollectionOrArrayFieldFromParameter"})
+    public EvaluatedIndividual(Individual<E> individual, OptimizationFunction<E>[] optimizationFunctions, double[] scores) {
         super(individual);
-        this.scores = Collections.unmodifiableMap(scores);
+        this.optimizationFunctions = optimizationFunctions;
+        this.scores = scores;
     }
 
     public EvaluatedIndividual(EvaluatedIndividual<E> evaluatedIndividual) {
         super(evaluatedIndividual);
-        this.scores = evaluatedIndividual.scores;
+        optimizationFunctions = evaluatedIndividual.optimizationFunctions;
+        scores = evaluatedIndividual.scores;
     }
 
-    public Double getScore(OptimizationFunction<E> optimizationFunction) {
-        return this.scores.get(optimizationFunction);
+    public double getScore(int i) {
+        return this.scores[i];
     }
 
     /**
@@ -39,9 +42,8 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         //assert this.getScores().keySet().equals(o.getScores().keySet()); // They should NEVER be different
 
         //loop:
-        for (Map.Entry<? extends OptimizationFunction<E>, Double> entry : this.scores.entrySet()) {
-            OptimizationFunction<E> function = entry.getKey();
-            switch (function.compare(this.getScores().get(function), other.getScores().get(function))) {
+        for (int i = 0; i < optimizationFunctions.length; i++) {
+            switch (optimizationFunctions[i].compare(this.getScore(i), other.getScore(i))) {
                 case -1: // If 'this' has a worse score than 'o'
                     //isAtLeastEqualToForAll = false;
                     otherDominatesInAtLeastOne = true;
@@ -66,36 +68,25 @@ public class EvaluatedIndividual<E> extends Individual<E> {
             return 0;
     }
 
-    public Map<? extends OptimizationFunction<E>, Double> getScores() {
-        return this.scores;
-    }
-
-    //Old method just in case
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    @Override
-    public boolean oldEquals(Object obj) {
-        return obj instanceof EvaluatedIndividual && ((Individual) obj).getIndividual().equals(this.getIndividual()) && ((EvaluatedIndividual) obj).getScores().equals(this.getScores());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + scores.hashCode();
-        return result;
-    }
-
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        EvaluatedIndividual that = (EvaluatedIndividual) o;
+        EvaluatedIndividual<?> that = (EvaluatedIndividual<?>) o;
 
-        if (!scores.equals(that.scores)) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(optimizationFunctions, that.optimizationFunctions)) return false;
+        return Arrays.equals(scores, that.scores);
 
-        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(optimizationFunctions);
+        result = 31 * result + Arrays.hashCode(scores);
+        return result;
     }
 }

@@ -23,7 +23,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.population = population;
     }
 
-    public FrontedPopulation(EvaluatedPopulation<E> population, Iterable<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
+    public FrontedPopulation(EvaluatedPopulation<E> population, OptimizationFunction<E>[] optimizationFunctions, Properties properties) {
         super();
 
         this.fronts = new ArrayList<>();
@@ -47,16 +47,18 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
         // Start computing the crowding distance
 
-        for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
+        //for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
+        for (int i = 0; i < optimizationFunctions.length; i++) {
             // Sorts the population according to the comparator
-            Collections.sort(castPopulationView, (o1, o2) -> -optimizationFunction.compare(o1.getScores().get(optimizationFunction), o2.getScores().get(optimizationFunction))); // Lowest first
+            final int finalI = i; // To satisfy the lambda
+            Collections.sort(castPopulationView, (o1, o2) -> -optimizationFunctions[finalI].compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
             // First and last have priority with the crowding score
             castPopulationView.get(0).crowdingScore = Double.POSITIVE_INFINITY;
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;
 
-            for (int i = 1; i < (castPopulationView.size() - 1); i++) { // Don't check the outside ones
-                if (Double.isFinite(castPopulationView.get(i).crowdingScore)) // Only add to it if it isn't an outlier on another function
-                    castPopulationView.get(i).crowdingScore += (castPopulationView.get(i + 1).getScore(optimizationFunction) - castPopulationView.get(i - 1).getScore(optimizationFunction)) / (optimizationFunction.max(properties) - optimizationFunction.min(properties));
+            for (int j = 1; j < (castPopulationView.size() - 1); j++) { // Don't check the outside ones
+                if (Double.isFinite(castPopulationView.get(j).crowdingScore)) // Only add to it if it isn't an outlier on another function
+                    castPopulationView.get(j).crowdingScore += (castPopulationView.get(j + 1).getScore(i) - castPopulationView.get(j - 1).getScore(i)) / (optimizationFunctions[i].max(properties) - optimizationFunctions[i].min(properties));
             }
         }
 
@@ -145,7 +147,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     public FrontedPopulation<E> truncate(int limit) {
         this.sort();
         List<Front<E>> newFronts = new ArrayList<>();
-        List<FrontedIndividual<E>> newPopulation = new ArrayList<>();
+        List<FrontedIndividual<E>> newPopulation = new ArrayList<>(limit);
 
         int currentFront = 0;
         int numIndividuals = 0;

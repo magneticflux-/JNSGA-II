@@ -19,15 +19,12 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -37,14 +34,14 @@ public final class POL {
     }
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-        //Thread.sleep(7000);
+        Thread.sleep(5000);
         XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
-        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, false, false);
         currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         ChartPanel currentGenerationPanel = new ChartPanel(currentGenerationChart);
 
         XYSeriesCollection currentPopulationCollection = new XYSeriesCollection();
-        JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, false, false);
         currentPopulationChart.getXYPlot().getDomainAxis().setAttributedLabel(new AttributedString("X\u2081"));
         currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
         ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
@@ -52,14 +49,14 @@ public final class POL {
         XYSeriesCollection averageMutationStrengthCollection = new XYSeriesCollection();
         XYSeries averageMutationStrength = new XYSeries("Average Mutation Strength");
         averageMutationStrengthCollection.addSeries(averageMutationStrength);
-        JFreeChart averageMutationStrengthChart = ChartFactory.createScatterPlot("Average Mutation Strength", "Generation", "Y", averageMutationStrengthCollection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart averageMutationStrengthChart = ChartFactory.createScatterPlot("Average Mutation Strength", "Generation", "Y", averageMutationStrengthCollection, PlotOrientation.VERTICAL, true, false, false);
         averageMutationStrengthChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         ChartPanel averageMutationStrengthPanel = new ChartPanel(averageMutationStrengthChart);
 
         XYSeriesCollection averageMutationProbabilityCollection = new XYSeriesCollection();
         XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
         averageMutationProbabilityCollection.addSeries(averageMutationProbability);
-        JFreeChart averageMutationProbabilityChart = ChartFactory.createScatterPlot("Average Mutation Probability", "Generation", "Y", averageMutationProbabilityCollection, PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart averageMutationProbabilityChart = ChartFactory.createScatterPlot("Average Mutation Probability", "Generation", "Y", averageMutationProbabilityCollection, PlotOrientation.VERTICAL, true, false, false);
         averageMutationProbabilityChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
         ChartPanel averageMutationProbabilityPanel = new ChartPanel(averageMutationProbabilityChart);
 
@@ -96,31 +93,36 @@ public final class POL {
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
         OptimizationFunction<double[]> function2 = new Function2();
-        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
+        @SuppressWarnings("unchecked")
+        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
         nsga_ii.addObserver(populationData -> {
+            currentGenerationChart.setNotify(false);
             currentGenerationCollection.removeAllSeries();
             for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(function1), individual.getScore(function2), false);
+                        frontSeries.add(individual.getScore(0), individual.getScore(1));
                     }
                 currentGenerationCollection.addSeries(frontSeries);
             }
+            currentGenerationChart.setNotify(true);
         });
 
         nsga_ii.addObserver(populationData -> {
+            currentPopulationChart.setNotify(false);
             currentPopulationCollection.removeAllSeries();
             for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1], false);
+                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
                 }
                 currentPopulationCollection.addSeries(frontSeries);
             }
+            currentPopulationChart.setNotify(true);
         });
 
         nsga_ii.addObserver(populationData -> {
@@ -134,7 +136,7 @@ public final class POL {
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
-            SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
+            EventQueue.invokeAndWait(nsga_ii::runGeneration);
             //noinspection MagicNumber
             //Thread.sleep(200);
         }

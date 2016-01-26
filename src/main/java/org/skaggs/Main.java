@@ -22,7 +22,6 @@ import org.skaggs.ec.properties.Properties;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -131,7 +130,8 @@ public class Main {
                 return new Key[0];
             }
         };
-        List<OptimizationFunction<Double>> optimizationFunctions = Arrays.asList(function1, function2);
+        @SuppressWarnings("unchecked")
+        OptimizationFunction<Double>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<Double> populationGenerator = new DoublePopulationGenerator();
 
         NSGA_II<Double> nsgaii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
@@ -141,7 +141,7 @@ public class Main {
             XYSeries accepted = new XYSeries("Accepted");
             XYSeries rejected = new XYSeries("Rejected");
             for (FrontedIndividual<Double> individual : populationData.getTruncatedPopulation().getPopulation())
-                accepted.add(individual.getIndividual(), new Double(individual.getScore(function1) + individual.getScore(function2)));
+                accepted.add(individual.getIndividual(), new Double(individual.getScore(0) + individual.getScore(1)));
             populationData.getFrontedPopulation().getPopulation().stream().filter(new Predicate<FrontedIndividual<Double>>() {
                 @Override
                 public boolean test(FrontedIndividual<Double> doubleFrontedIndividual) {
@@ -154,7 +154,7 @@ public class Main {
             }).forEachOrdered(new Consumer<FrontedIndividual<Double>>() {
                 @Override
                 public void accept(FrontedIndividual<Double> individual) {
-                    rejected.add(individual.getIndividual(), new Double(individual.getScore(function1) + individual.getScore(function2)));
+                    rejected.add(individual.getIndividual(), new Double(individual.getScore(0) + individual.getScore(1)));
                 }
             });
             collection.addSeries(accepted);
