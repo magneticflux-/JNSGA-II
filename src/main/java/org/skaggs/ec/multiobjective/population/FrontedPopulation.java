@@ -6,11 +6,7 @@ import org.skaggs.ec.population.individual.EvaluatedIndividual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -156,7 +152,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         int numIndividuals = 0;
 
         while (currentFront < this.fronts.size() && (numIndividuals + this.fronts.get(currentFront).members.size()) <= limit) {
-            System.out.println("Adding front " + currentFront + " out of " + this.fronts.size());
+            //System.out.println("Adding front " + currentFront + " out of " + this.fronts.size());
             newPopulation.addAll(this.fronts.get(currentFront).members);
             newFronts.add(currentFront, this.fronts.get(currentFront));
             numIndividuals += this.fronts.get(currentFront).members.size();
@@ -180,6 +176,5 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     public void sort() {
         //noinspection unchecked
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
-        System.out.println(this.population);
     }
 }
