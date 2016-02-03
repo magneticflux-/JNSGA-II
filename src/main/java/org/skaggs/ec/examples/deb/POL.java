@@ -19,12 +19,13 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -76,23 +77,23 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 4000)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -300)//-FastMath.PI)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 300)//FastMath.PI)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
+                .setInt(Key.IntKey.POPULATION_SIZE, 100)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -5)//-FastMath.PI)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 5)//FastMath.PI)
+                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .01)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .25)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .25);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
-        OptimizationFunction<double[]> function1 = new Function1();
-        OptimizationFunction<double[]> function2 = new Function2();
+        OptimizationFunction<double[]> function1 = new Function3();
+        OptimizationFunction<double[]> function2 = new Function4();
         @SuppressWarnings("unchecked")
         OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
@@ -126,7 +127,9 @@ public final class POL {
         });
 
         nsga_ii.addObserver(populationData -> {
-            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
+            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms; " +
+                    populationData.getTruncatedPopulation().getPopulation().size() + " individuals in " +
+                    populationData.getTruncatedPopulation().getFronts().size() + " fronts");
             double currentAverageMutationStrength = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationStrength).average().orElse(Double.NaN);
             double currentAverageMutationProbability = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationProbability).average().orElse(Double.NaN);
             averageMutationStrength.add(populationData.getCurrentGeneration(), currentAverageMutationStrength);
@@ -194,6 +197,70 @@ public final class POL {
         @Override
         public double max(Properties properties) {
             return FastMath.pow(FastMath.PI + 3, 2) + FastMath.pow(FastMath.PI + 1, 2);
+        }
+
+        @Override
+        public int compare(Double o1, Double o2) {
+            return -Double.compare(o1, o2);
+        }
+
+        @Override
+        public Key[] requestProperties() {
+            return new Key[0];
+        }
+    }
+
+    static class Function3 implements OptimizationFunction<double[]> {
+        @Override
+        public double evaluate(double[] object, Properties properties) {
+            assert object.length == 3;
+            double result = 0;
+            for (int i = 0; i < 2; i++) {
+                result += -10 * FastMath.exp(-0.2 * FastMath.sqrt(FastMath.pow(object[i], 2) + FastMath.pow(object[i + 1], 2)));
+            }
+            return result;
+        }
+
+        @Override
+        public double min(Properties properties) {
+            return 0;
+        }
+
+        @Override
+        public double max(Properties properties) {
+            return 1;
+        }
+
+        @Override
+        public int compare(Double o1, Double o2) {
+            return -Double.compare(o1, o2);
+        }
+
+        @Override
+        public Key[] requestProperties() {
+            return new Key[0];
+        }
+    }
+
+    static class Function4 implements OptimizationFunction<double[]> {
+        @Override
+        public double evaluate(double[] object, Properties properties) {
+            assert object.length == 3;
+            double result = 0;
+            for (int i = 0; i < 3; i++) {
+                result += FastMath.pow(FastMath.abs(object[i]), 0.8) + 5 * FastMath.sin(FastMath.pow(object[i], 3));
+            }
+            return result;
+        }
+
+        @Override
+        public double min(Properties properties) {
+            return 0;
+        }
+
+        @Override
+        public double max(Properties properties) {
+            return 1;
         }
 
         @Override

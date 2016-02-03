@@ -6,7 +6,11 @@ import org.skaggs.ec.population.individual.EvaluatedIndividual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 /**
@@ -71,15 +75,14 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             populationStream = castPopulationView.stream();
         populationStream.forEach(individual -> {
             for (FrontedIndividual<E> otherIndividual : castPopulationView) {
-                if (otherIndividual == individual) return;
+                if (otherIndividual == individual) continue;
                 int domination = individual.dominates(otherIndividual);
-                switch (domination) {
-                    case -1:
-                        individual.dominationCount++;
-                        break;
-                    case 1:
-                        individual.dominatedIndividuals.add(otherIndividual);
-                        break;
+                if (domination < 0) {
+                    //System.out.println("Individual was dominated");
+                    individual.dominationCount++;
+                } else if (domination > 0) {
+                    //System.out.println("Added individual to dominated list...");
+                    individual.dominatedIndividuals.add(otherIndividual);
                 }
             }
         });
@@ -152,12 +155,14 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         int currentFront = 0;
         int numIndividuals = 0;
 
-        while (currentFront < this.fronts.size() && numIndividuals + this.fronts.get(currentFront).members.size() <= limit) {
+        while (currentFront < this.fronts.size() && (numIndividuals + this.fronts.get(currentFront).members.size()) <= limit) {
+            System.out.println("Adding front " + currentFront + " out of " + this.fronts.size());
             newPopulation.addAll(this.fronts.get(currentFront).members);
             newFronts.add(currentFront, this.fronts.get(currentFront));
             numIndividuals += this.fronts.get(currentFront).members.size();
             currentFront++;
         }
+        assert numIndividuals == newPopulation.size();
         if (currentFront < this.fronts.size() && limit - numIndividuals > 0) {
             TreeSet<FrontedIndividual<E>> individuals = new TreeSet<>();
             Iterator<FrontedIndividual<E>> iterator = this.fronts.get(currentFront).members.iterator();
@@ -175,5 +180,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     public void sort() {
         //noinspection unchecked
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
+        System.out.println(this.population);
     }
 }

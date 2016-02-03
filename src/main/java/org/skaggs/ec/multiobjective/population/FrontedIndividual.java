@@ -2,8 +2,8 @@ package org.skaggs.ec.multiobjective.population;
 
 import org.skaggs.ec.population.individual.EvaluatedIndividual;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -13,7 +13,7 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     /**
      * The individuals that this individual dominates
      */
-    final Set<FrontedIndividual<E>> dominatedIndividuals;
+    final List<FrontedIndividual<E>> dominatedIndividuals;
     /**
      * The SPARSENESS of this individual's score area
      */
@@ -29,9 +29,9 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
     int rank;
 
     @SuppressWarnings("unused")
-    public FrontedIndividual(EvaluatedIndividual<E> individual, Set<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
+    public FrontedIndividual(EvaluatedIndividual<E> individual, List<FrontedIndividual<E>> dominatedIndividuals, double crowdingScore, int dominationCount) {
         super(individual);
-        this.dominatedIndividuals = new LinkedHashSet<>(dominatedIndividuals);
+        this.dominatedIndividuals = new LinkedList<>(dominatedIndividuals);
         this.crowdingScore = crowdingScore;
         this.dominationCount = dominationCount;
     }
@@ -40,7 +40,7 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         super(individual);
         rank = -1; // Unset rank
         dominationCount = 0;
-        dominatedIndividuals = new LinkedHashSet<>(2);
+        dominatedIndividuals = new LinkedList<>();
         crowdingScore = 0;
     }
 
@@ -58,19 +58,7 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
 
     @Override
     public String toString() {
-        return this.individual.toString() + " " + this.crowdingScore;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        long temp;
-        result = 31 * result + (dominatedIndividuals != null ? dominatedIndividuals.hashCode() : 0);
-        temp = Double.doubleToLongBits(crowdingScore);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + dominationCount;
-        result = 31 * result + rank;
-        return result;
+        return "{" + this.individual.toString() + " " + this.crowdingScore + "}";
     }
 
     @SuppressWarnings("RedundantIfStatement")
@@ -90,6 +78,18 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
             return false;
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + (dominatedIndividuals != null ? dominatedIndividuals.hashCode() : 0);
+        temp = Double.doubleToLongBits(crowdingScore);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + dominationCount;
+        result = 31 * result + rank;
+        return result;
     }
 
     public double getCrowdingScore() {
