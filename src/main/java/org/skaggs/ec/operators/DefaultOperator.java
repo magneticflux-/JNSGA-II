@@ -18,10 +18,14 @@ public class DefaultOperator<E> implements Operator<E> {
 
     private final Mutator<E> mutator;
     private final Crossoverer<E> crossoverer;
+    private final Selector<E> selector;
+    private final Speciator<E> speciator;
 
-    public DefaultOperator(Mutator<E> mutator, Crossoverer<E> crossoverer) {
+    public DefaultOperator(Mutator<E> mutator, Crossoverer<E> crossoverer, Selector<E> selector, Speciator<E> speciator) {
         this.mutator = mutator;
         this.crossoverer = crossoverer;
+        this.selector = selector;
+        this.speciator = speciator;
     }
 
     @SuppressWarnings("unchecked")
@@ -43,14 +47,14 @@ public class DefaultOperator<E> implements Operator<E> {
 
     @Override
     public Key[] requestProperties() {
-        return Utils.concat(mutator.requestProperties(), crossoverer.requestProperties(), new Key[]{
+        return Utils.concat(mutator.requestProperties(), crossoverer.requestProperties(), selector.requestProperties(), speciator.requestProperties(), new Key[]{
                 Key.BooleanKey.THREADED
         });
     }
 
     @Override
     public Requirement[] requestDetailedRequirements() {
-        return Utils.concat(mutator.requestDetailedRequirements(), crossoverer.requestDetailedRequirements(), new Requirement[]{
+        return Utils.concat(mutator.requestDetailedRequirements(), crossoverer.requestDetailedRequirements(), selector.requestDetailedRequirements(), speciator.requestDetailedRequirements(), new Requirement[]{
         });
     }
 }
