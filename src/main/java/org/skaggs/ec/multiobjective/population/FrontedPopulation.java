@@ -6,11 +6,8 @@ import org.skaggs.ec.population.individual.EvaluatedIndividual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -134,6 +131,11 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     public List<Front<E>> getFronts() {
         return Collections.unmodifiableList(fronts);
     }
+
+    public List<Front<E>> getFronts(int limit) {
+        return Collections.unmodifiableList(fronts.stream().limit(limit).collect(Collectors.toList()));
+    }
+
 
     @Override
     public String toString() {

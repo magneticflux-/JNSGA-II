@@ -19,13 +19,12 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -35,7 +34,7 @@ public final class POL {
     }
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-        Thread.sleep(5000);
+        //Thread.sleep(5000);
         XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
         JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, false, false);
         currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
@@ -77,19 +76,19 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 500)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
+                .setInt(Key.IntKey.POPULATION_SIZE, 2000)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -5)//-FastMath.PI)
+                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 5)//FastMath.PI)
+                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .04)
                 .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .9)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 128)
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, .5)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
+                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 128)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, .5);
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();
@@ -103,7 +102,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentGenerationChart.setNotify(false);
             currentGenerationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts(40)) {
                     XYSeries frontSeries = new XYSeries(front.toString());
                     for (FrontedIndividual<double[]> individual : front.getMembers()) {
                         frontSeries.add(individual.getScore(0), individual.getScore(1));
@@ -116,7 +115,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentPopulationChart.setNotify(false);
             currentPopulationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts(40)) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
                     frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
@@ -127,7 +126,7 @@ public final class POL {
         });
 
         nsga_ii.addObserver(populationData -> {
-            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms");
+            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + (populationData.getElapsedTime() / 1000000f) + "ms;\t\t ms/front: " + ((populationData.getElapsedTime() / 1000000f) / populationData.getFrontedPopulation().getFronts().size()));
             double currentAverageMutationStrength = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationStrength).average().orElse(Double.NaN);
             double currentAverageMutationProbability = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationProbability).average().orElse(Double.NaN);
             averageMutationStrength.add(populationData.getCurrentGeneration(), currentAverageMutationStrength);

@@ -8,10 +8,10 @@ import java.util.function.BiFunction;
 /**
  * Created by skaggsm on 2/3/16.
  */
-public abstract class Speciator<E> implements BiFunction<Individual<E>, Individual<E>, Double>, HasPropertyRequirements {
+public abstract class Speciator<E> implements BiFunction<Individual<E>, Individual<E>, Boolean>, HasPropertyRequirements {
     @Override
-    public Double apply(Individual<E> individual, Individual<E> individual2) {
-        return getDistance(individual, individual2);
+    public Boolean apply(Individual<E> individual, Individual<E> individual2) {
+        return getDistance(individual, individual2) < getMaxDistance();
     }
 
     protected abstract double getDistance(Individual<E> individual, Individual<E> individual2);
