@@ -3,11 +3,16 @@ package org.skaggs.ec.operators;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.population.Population;
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.properties.Requirement;
 import org.skaggs.ec.util.Utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -33,6 +38,9 @@ public class DefaultOperator<E> implements Operator<E> {
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
         mutator.updateProperties(properties);
         crossoverer.updateProperties(properties);
+        speciator.updateProperties(properties);
+        selector.updateProperties(properties);
+
         boolean threaded = properties.getBoolean(Key.BooleanKey.THREADED);
 
         Stream<FrontedIndividual<E>> individualStream;
@@ -42,7 +50,26 @@ public class DefaultOperator<E> implements Operator<E> {
         else
             individualStream = (Stream<FrontedIndividual<E>>) population.getPopulation().stream();
 
-        return null;
+        List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
+
+        for (int i = 0; i < population.getPopulation().size(); i++) {
+            FrontedIndividual<E> individual = selector.apply((List<FrontedIndividual<E>>) population.getPopulation());
+
+            final FrontedIndividual<E> finalIndividual = individual;
+            List<FrontedIndividual<E>> compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream().filter(eFrontedIndividual -> speciator.apply(finalIndividual, eFrontedIndividual)).collect(Collectors.toList());
+            while (compatibleIndividuals.size() == 0) {
+                individual = selector.choose((List<FrontedIndividual<E>>) population.getPopulation());
+
+                final FrontedIndividual<E> finalIndividual1 = individual;
+                compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream().filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual)).collect(Collectors.toList());
+            }
+            FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
+            newPopulation.add(crossoverer.apply(individual, otherIndividual));
+        }
+
+        newPopulation.replaceAll(mutator::apply);
+
+        return new Population<>(newPopulation);
     }
 
     @Override

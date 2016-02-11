@@ -1,6 +1,7 @@
 package org.skaggs.ec.examples.numarical;
 
 import org.apache.commons.lang3.Range;
+import org.apache.commons.math3.util.FastMath;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.operators.Operator;
@@ -33,8 +34,10 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
         double mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
 
         for (FrontedIndividual<double[]> d : population.getPopulation()) {
-            double[] newIndividual = Arrays.stream(d.getIndividual()).parallel().map(value -> (r.nextDouble() < d.mutationProbability) ? this.mutate(value, r, d.mutationStrength) : value).toArray();
+            double[] newIndividual = Arrays.stream(d.getIndividual()).parallel().map(value -> (r.nextDouble() < d.mutationProbability) ? this.mutate(value, r, FastMath.pow(d.mutationStrength, 2)) : value).toArray();
+
             double mutationStrength = (r.nextDouble() < mutationStrengthMutationProbability) ? this.mutate(d.mutationStrength, r, mutationStrengthMutationStrength) : d.mutationStrength;
+
             double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? this.mutate(d.mutationProbability, r, mutationProbabilityMutationStrength) : d.mutationProbability;
 
             mutationStrength = clip(0, mutationStrength, Double.POSITIVE_INFINITY);
