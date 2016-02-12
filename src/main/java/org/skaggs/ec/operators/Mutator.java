@@ -34,9 +34,9 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
     public Individual<E> apply(Individual<E> e) {
         Random r = ThreadLocalRandom.current();
 
-        double mutationStrength = (r.nextDouble() < mutationStrengthMutationProbability) ? mutate(e.mutationStrength, r, mutationStrengthMutationStrength) : e.mutationStrength;
+        double mutationStrength = (r.nextDouble() < mutationStrengthMutationProbability) ? Mutator.mutate(e.mutationStrength, r, mutationStrengthMutationStrength) : e.mutationStrength;
         mutationStrength = Range.clip(0, mutationStrength, Double.POSITIVE_INFINITY);
-        double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? mutate(e.mutationProbability, r, mutationProbabilityMutationStrength) : e.mutationProbability;
+        double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? Mutator.mutate(e.mutationProbability, r, mutationProbabilityMutationStrength) : e.mutationProbability;
         mutationProbability = Range.clip(0, mutationProbability, 1);
 
         E individual = (r.nextDouble() < e.mutationProbability) ? mutate(e.getIndividual(), e.mutationStrength, e.mutationProbability) : e.getIndividual();

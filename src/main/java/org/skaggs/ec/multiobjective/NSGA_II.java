@@ -30,6 +30,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private FrontedPopulation<E> population;
     private int currentGeneration;
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public NSGA_II(Properties properties, Operator<E> operator, OptimizationFunction<E>[] optimizationFunctions, PopulationGenerator<E> populationGenerator) {
         if (optimizationFunctions.length < 1)
             throw new IllegalArgumentException("There must be at least one optimization function!");
@@ -52,7 +53,8 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        this.population = frontedPopulation;
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.POPULATION_SIZE));
+        this.population = truncatedPopulation;
 
         long elapsedTime = System.nanoTime() - startTime;
         //noinspection MagicNumber

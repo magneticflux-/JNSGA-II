@@ -8,26 +8,26 @@ import java.util.List;
  * Created by Mitchell on 1/15/2016.
  */
 public abstract class PopulationMember {
-    public final double mutationProbability;
-    public final double crossoverProbability;
     public final double mutationStrength;
+    public final double mutationProbability;
     public final double crossoverStrength;
+    public final double crossoverProbability;
     public final List<Double> parameters;
 
     public PopulationMember(ArrayList<Double> parameters) {
         this.parameters = Collections.unmodifiableList(new ArrayList<>(parameters));
-        mutationProbability = 0;
-        crossoverProbability = 0;
         mutationStrength = 0;
+        mutationProbability = 0;
         crossoverStrength = 0;
+        crossoverProbability = 0;
     }
 
     @Deprecated
-    public PopulationMember(double mutationStrength, double mutationProbability, double crossoverProbability, double crossoverStrength) {
+    public PopulationMember(double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
         this.mutationStrength = mutationStrength;
         this.mutationProbability = mutationProbability;
-        this.crossoverProbability = crossoverProbability;
         this.crossoverStrength = crossoverStrength;
+        this.crossoverProbability = crossoverProbability;
         parameters = Collections.unmodifiableList(new ArrayList<>());
     }
 

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by skaggsm on 1/22/16.
@@ -40,15 +39,6 @@ public class DefaultOperator<E> implements Operator<E> {
         crossoverer.updateProperties(properties);
         speciator.updateProperties(properties);
         selector.updateProperties(properties);
-
-        boolean threaded = properties.getBoolean(Key.BooleanKey.THREADED);
-
-        Stream<FrontedIndividual<E>> individualStream;
-
-        if (threaded)
-            individualStream = (Stream<FrontedIndividual<E>>) population.getPopulation().parallelStream();
-        else
-            individualStream = (Stream<FrontedIndividual<E>>) population.getPopulation().stream();
 
         List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
 

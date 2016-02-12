@@ -18,7 +18,7 @@ public class Individual<E> extends PopulationMember {
     }
 
     public Individual(E individual, double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
-        super(mutationStrength, mutationProbability, crossoverProbability, crossoverStrength);
+        super(mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
         this.individual = individual;
     }
 

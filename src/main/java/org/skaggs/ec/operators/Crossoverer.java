@@ -33,14 +33,14 @@ public abstract class Crossoverer<E> implements BiFunction<Individual<E>, Indivi
 
         boolean doCrossover = r.nextDouble() < t.crossoverProbability;
 
-        double mutationStrength = doCrossover ? (t.mutationStrength + u.mutationStrength) / 2 : t.mutationStrength;
-        double mutationProbability = doCrossover ? (t.mutationProbability + u.mutationProbability) / 2 : t.mutationProbability;
-        double crossoverStrength = Range.clip(0, (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(t.mutationStrength, r, crossoverStrengthMutationStrength) : t.mutationStrength, Double.POSITIVE_INFINITY);
-        double crossoverProbability = Range.clip(0, (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(t.mutationProbability, r, crossoverProbabilityMutationStrength) : t.mutationProbability, 1);
+        double crossoverStrength = (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(t.crossoverStrength, r, crossoverStrengthMutationStrength) : t.crossoverStrength;
+        crossoverStrength = Range.clip(0, crossoverStrength, Double.POSITIVE_INFINITY);
+        double crossoverProbability = (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(t.crossoverProbability, r, crossoverProbabilityMutationStrength) : t.crossoverProbability;
+        crossoverProbability = Range.clip(0, crossoverProbability, 1);
 
         E individual = doCrossover ? crossover(t.getIndividual(), u.getIndividual(), crossoverStrength, crossoverProbability) : t.getIndividual();
 
-        return new Individual<>(individual, mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
+        return new Individual<>(individual, t.mutationStrength, t.mutationProbability, crossoverStrength, crossoverProbability);
     }
 
     protected abstract E crossover(E parent1, E parent2, double crossoverStrength, double crossoverProbability);
