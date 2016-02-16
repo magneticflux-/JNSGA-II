@@ -101,33 +101,35 @@ public final class POL {
                 .setInt(Key.IntKey.POPULATION_SIZE, 2000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -5)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 5)//FastMath.PI)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .25)
+                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
+                .setDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .015)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .95)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .3)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .5)
 
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
+                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 8)
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
 
 
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, 0)
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, .5)
+                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, .12)
+                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, .99)
 
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 32)
+                .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 8)
                 .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1);
 
-        Operator<double[]> operator = new DefaultOperator<>(new DoubleArrayMutator(), new DoubleArrayAverageCrossoverer(), new RouletteWheelLinearSelection<>(), new DoubleArraySpeciator());//new SimpleDoubleArrayMutationOperator();
+        Operator<double[]> operator = new DefaultOperator<>(new DoubleArrayMutator(), new DoubleArrayAverageCrossoverer(), new RouletteWheelLinearSelection<>(), new DoubleArraySpeciator());
         OptimizationFunction<double[]> function1 = new Function1();
         OptimizationFunction<double[]> function2 = new Function2();
+        OptimizationFunction<double[]> function3 = new Function3();
+        OptimizationFunction<double[]> function4 = new Function4();
         @SuppressWarnings("unchecked")
-        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
+        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2, function3};
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
