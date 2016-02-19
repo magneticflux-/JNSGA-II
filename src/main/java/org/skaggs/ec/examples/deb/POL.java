@@ -8,8 +8,11 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.YIntervalRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.data.xy.YIntervalSeries;
+import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.defaultoperatorframework.DoubleArrayAverageCrossoverer;
 import org.skaggs.ec.examples.defaultoperatorframework.DoubleArrayMutator;
@@ -25,12 +28,13 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -52,32 +56,32 @@ public final class POL {
         currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
         ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
 
-        XYSeriesCollection averageMutationStrengthCollection = new XYSeriesCollection();
-        XYSeries averageMutationStrength = new XYSeries("Average Mutation Strength");
+        YIntervalSeriesCollection averageMutationStrengthCollection = new YIntervalSeriesCollection();
+        YIntervalSeries averageMutationStrength = new YIntervalSeries("Average Mutation Strength");
         averageMutationStrengthCollection.addSeries(averageMutationStrength);
         JFreeChart averageMutationStrengthChart = ChartFactory.createScatterPlot("Average Mutation Strength", "Generation", "Y", averageMutationStrengthCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageMutationStrengthChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        averageMutationStrengthChart.getXYPlot().setRenderer(new YIntervalRenderer());
         ChartPanel averageMutationStrengthPanel = new ChartPanel(averageMutationStrengthChart);
 
-        XYSeriesCollection averageMutationProbabilityCollection = new XYSeriesCollection();
-        XYSeries averageMutationProbability = new XYSeries("Average Mutation Probability");
+        YIntervalSeriesCollection averageMutationProbabilityCollection = new YIntervalSeriesCollection();
+        YIntervalSeries averageMutationProbability = new YIntervalSeries("Average Mutation Probability");
         averageMutationProbabilityCollection.addSeries(averageMutationProbability);
         JFreeChart averageMutationProbabilityChart = ChartFactory.createScatterPlot("Average Mutation Probability", "Generation", "Y", averageMutationProbabilityCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageMutationProbabilityChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        averageMutationProbabilityChart.getXYPlot().setRenderer(new YIntervalRenderer());
         ChartPanel averageMutationProbabilityPanel = new ChartPanel(averageMutationProbabilityChart);
 
-        XYSeriesCollection averageCrossoverStrengthCollection = new XYSeriesCollection();
-        XYSeries averageCrossoverStrength = new XYSeries("Average Crossover Strength");
+        YIntervalSeriesCollection averageCrossoverStrengthCollection = new YIntervalSeriesCollection();
+        YIntervalSeries averageCrossoverStrength = new YIntervalSeries("Average Crossover Strength");
         averageCrossoverStrengthCollection.addSeries(averageCrossoverStrength);
         JFreeChart averageCrossoverStrengthChart = ChartFactory.createScatterPlot("Average Crossover Strength", "Generation", "Y", averageCrossoverStrengthCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageCrossoverStrengthChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        averageCrossoverStrengthChart.getXYPlot().setRenderer(new YIntervalRenderer());
         ChartPanel averageCrossoverStrengthPanel = new ChartPanel(averageCrossoverStrengthChart);
 
-        XYSeriesCollection averageCrossoverProbabilityCollection = new XYSeriesCollection();
-        XYSeries averageCrossoverProbability = new XYSeries("Average Crossover Probability");
+        YIntervalSeriesCollection averageCrossoverProbabilityCollection = new YIntervalSeriesCollection();
+        YIntervalSeries averageCrossoverProbability = new YIntervalSeries("Average Crossover Probability");
         averageCrossoverProbabilityCollection.addSeries(averageCrossoverProbability);
         JFreeChart averageCrossoverProbabilityChart = ChartFactory.createScatterPlot("Average Crossover Probability", "Generation", "Y", averageCrossoverProbabilityCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageCrossoverProbabilityChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
+        averageCrossoverProbabilityChart.getXYPlot().setRenderer(new YIntervalRenderer());
         ChartPanel averageCrossoverProbabilityPanel = new ChartPanel(averageCrossoverProbabilityChart);
 
         JFrame frame = new JFrame("Evolutionary Algorithm");
@@ -98,14 +102,14 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 2000)
+                .setInt(Key.IntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -5)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 5)//FastMath.PI)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
+                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
                 .setDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .3)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, .5)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, 0)
+                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 0)
 
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
@@ -114,8 +118,8 @@ public final class POL {
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
 
 
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, .12)
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, .99)
+                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, 0)
+                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, 0)
 
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 32)
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
@@ -129,7 +133,7 @@ public final class POL {
         OptimizationFunction<double[]> function3 = new Function3();
         OptimizationFunction<double[]> function4 = new Function4();
         @SuppressWarnings("unchecked")
-        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2, function3};
+        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
@@ -137,11 +141,11 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentGenerationChart.setNotify(false);
             currentGenerationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
-                    XYSeries frontSeries = new XYSeries(front.toString());
-                    for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(0), individual.getScore(1));
-                    }
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+                XYSeries frontSeries = new XYSeries(front.toString());
+                for (FrontedIndividual<double[]> individual : front.getMembers()) {
+                    frontSeries.add(individual.getScore(0), individual.getScore(1));
+                }
                 currentGenerationCollection.addSeries(frontSeries);
             }
             currentGenerationChart.setNotify(true);
@@ -150,7 +154,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentPopulationChart.setNotify(false);
             currentPopulationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
                     frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
@@ -167,10 +171,15 @@ public final class POL {
             StatisticalSummary currentMutationProbability = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationProbability).toArray());
             StatisticalSummary currentCrossoverStrength = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.crossoverStrength).toArray());
             StatisticalSummary currentCrossoverProbability = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.crossoverProbability).toArray());
-            averageMutationStrength.add(populationData.getCurrentGeneration(), currentMutationStrength.getMean());
-            averageMutationProbability.add(populationData.getCurrentGeneration(), currentMutationProbability.getMean());
-            averageCrossoverStrength.add(populationData.getCurrentGeneration(), currentCrossoverStrength.getMean());
-            averageCrossoverProbability.add(populationData.getCurrentGeneration(), currentCrossoverProbability.getMean());
+
+            averageMutationStrength.add(populationData.getCurrentGeneration(), currentMutationStrength.getMean(), currentMutationStrength.getMean() - currentMutationStrength.getStandardDeviation(), currentMutationStrength.getMean() + currentMutationStrength.getStandardDeviation());
+
+            averageMutationProbability.add(populationData.getCurrentGeneration(), currentMutationProbability.getMean(), currentMutationProbability.getMean() - currentMutationProbability.getStandardDeviation(), currentMutationProbability.getMean() + currentMutationProbability.getStandardDeviation());
+
+            averageCrossoverStrength.add(populationData.getCurrentGeneration(), currentCrossoverStrength.getMean(), currentCrossoverStrength.getMean() - currentCrossoverStrength.getStandardDeviation(), currentCrossoverStrength.getMean() + currentCrossoverStrength.getStandardDeviation());
+
+            averageCrossoverProbability.add(populationData.getCurrentGeneration(), currentCrossoverProbability.getMean(), currentCrossoverProbability.getMean() - currentMutationStrength.getStandardDeviation(), currentCrossoverProbability.getMean() + currentCrossoverProbability.getStandardDeviation());
+
         });
 
 
@@ -252,7 +261,7 @@ public final class POL {
         public double evaluate(double[] object, Properties properties) {
             assert object.length == 3;
             double result = 0;
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < object.length - 1; i++) {
                 result += -10 * FastMath.exp(-0.2 * FastMath.sqrt(FastMath.pow(object[i], 2) + FastMath.pow(object[i + 1], 2)));
             }
             return result;
@@ -284,7 +293,7 @@ public final class POL {
         public double evaluate(double[] object, Properties properties) {
             assert object.length == 3;
             double result = 0;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < object.length; i++) {
                 result += FastMath.pow(FastMath.abs(object[i]), 0.8) + 5 * FastMath.sin(FastMath.pow(object[i], 3));
             }
             return result;
