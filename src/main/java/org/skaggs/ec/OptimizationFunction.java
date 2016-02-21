@@ -1,10 +1,12 @@
 package org.skaggs.ec;
 
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Properties;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -17,7 +19,7 @@ import java.util.Comparator;
  */
 public interface OptimizationFunction<E> extends Comparator<Double>, HasPropertyRequirements, Serializable {
 
-    double evaluate(E object, Properties properties);
+    double[] evaluate(List<Individual<E>> individuals, Properties properties);
 
     /**
      * @param properties the evolutionary algorithm's properties

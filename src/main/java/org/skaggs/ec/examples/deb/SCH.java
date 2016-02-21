@@ -8,6 +8,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.skaggs.ec.DefaultOptimizationFunction;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.numarical.DoublePopulationGenerator;
 import org.skaggs.ec.examples.numarical.SimpleDoubleMutationOperator;
@@ -81,7 +82,7 @@ public final class SCH {
         }
     }
 
-    static class Function1 implements OptimizationFunction<Double> {
+    static class Function1 extends DefaultOptimizationFunction<Double> {
         @Override
         public int compare(Double o1, Double o2) {
             return -Double.compare(o1, o2);
@@ -93,38 +94,38 @@ public final class SCH {
         }
 
         @Override
-        public double evaluate(Double object, Properties properties) {
+        public double evaluateIndividual(Double object, Properties properties) {
             return FastMath.pow(object, 2);
         }
 
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
 
     }
 
-    static class Function2 implements OptimizationFunction<Double> {
+    static class Function2 extends DefaultOptimizationFunction<Double> {
         @Override
-        public double evaluate(Double object, Properties properties) {
+        public double evaluateIndividual(Double object, Properties properties) {
             return FastMath.pow(object - 2, 2);
         }
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluate(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override

@@ -8,6 +8,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.skaggs.ec.DefaultOptimizationFunction;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.numarical.DoubleArrayPopulationGenerator;
 import org.skaggs.ec.examples.numarical.SimpleDoubleArrayMutationOperator;
@@ -82,9 +83,9 @@ public final class FON {
         }
     }
 
-    static class Function1 implements OptimizationFunction<double[]> {
+    static class Function1 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluate(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, Properties properties) {
             assert object.length == 3;
             return 1 - FastMath.exp(-(this.f(object[0]) + this.f(object[1]) + this.f(object[2])));
         }
@@ -117,9 +118,9 @@ public final class FON {
 
     }
 
-    static class Function2 implements OptimizationFunction<double[]> {
+    static class Function2 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluate(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, Properties properties) {
             assert object.length == 3;
             return 1 - FastMath.exp(-(this.f(object[0]) + this.f(object[1]) + this.f(object[2])));
         }

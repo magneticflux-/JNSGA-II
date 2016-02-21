@@ -7,6 +7,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.skaggs.ec.DefaultOptimizationFunction;
 import org.skaggs.ec.OptimizationFunction;
 import org.skaggs.ec.examples.numarical.DoublePopulationGenerator;
 import org.skaggs.ec.multiobjective.NSGA_II;
@@ -77,9 +78,9 @@ public class Main {
                 return new Key[]{Key.DoubleKey.INITIAL_MUTATION_PROBABILITY};
             }
         };
-        OptimizationFunction<Double> function1 = new OptimizationFunction<Double>() {
+        OptimizationFunction<Double> function1 = new DefaultOptimizationFunction<Double>() {
             @Override
-            public double evaluate(Double object, Properties properties) {
+            public double evaluateIndividual(Double object, Properties properties) {
                 return FastMath.pow(object - 1, 2);
             }
 
@@ -104,9 +105,9 @@ public class Main {
                 return new Key[0];
             }
         };
-        OptimizationFunction<Double> function2 = new OptimizationFunction<Double>() {
+        OptimizationFunction<Double> function2 = new DefaultOptimizationFunction<Double>() {
             @Override
-            public double evaluate(Double object, Properties properties) {
+            public double evaluateIndividual(Double object, Properties properties) {
                 return FastMath.pow(object - 3, 2);
             }
 

@@ -29,6 +29,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private final PopulationGenerator<E> populationGenerator;
     private FrontedPopulation<E> population;
     private int currentGeneration;
+    private long previousObservationTime;
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     public NSGA_II(Properties properties, Operator<E> operator, OptimizationFunction<E>[] optimizationFunctions, PopulationGenerator<E> populationGenerator) {
@@ -130,23 +131,24 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         [X] 2. Write Population.merge() method
         [X] 3. Write proper Double classes
          */
-        final long startTime = System.nanoTime();
-
+        long startTime = System.nanoTime();
         Population<E> offspring = this.operator.apply(this.population, this.properties);
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
         FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.POPULATION_SIZE));
         this.population = truncatedPopulation;
-        //System.gc();
-
-        final long elapsedTime = System.nanoTime() - startTime;
+        long elapsedTime = System.nanoTime() - startTime;
 
         this.currentGeneration++;
 
-        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime, this.currentGeneration);
+        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime, previousObservationTime, this.currentGeneration);
 
+        startTime = System.nanoTime();
         this.update(populationData);
+        elapsedTime = System.nanoTime() - startTime;
+
+        previousObservationTime = elapsedTime;
     }
 
     private void update(PopulationData<E> populationData) {

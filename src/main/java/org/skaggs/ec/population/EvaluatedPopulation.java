@@ -7,10 +7,9 @@ import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 /**
  * Created by Mitchell on 11/29/2015.
@@ -26,28 +25,25 @@ public class EvaluatedPopulation<E> extends Population<E> {
     @SuppressWarnings("AssignmentToSuperclassField")
     public EvaluatedPopulation(Population<E> population, OptimizationFunction<E>[] optimizationFunctions, Properties properties) {
         super();
-        Stream<? extends Individual<E>> individualStream;
-        if (properties.getBoolean(Key.BooleanKey.THREADED)) {
-            individualStream = population.population.parallelStream();
-        } else {
-            individualStream = population.population.stream();
+
+        double[][] scores = new double[population.size()][optimizationFunctions.length];
+
+        for (int i = 0; i < optimizationFunctions.length; i++) {
+            @SuppressWarnings("unchecked")
+            double[] functionScores = optimizationFunctions[i].evaluate((List<Individual<E>>) population.getPopulation(), properties);
+            final int finalI = i; // It _is_ effectively final! Ugh.
+            IntStream.range(0, scores.length).parallel().forEach(
+                    value -> scores[value][finalI] = functionScores[value]
+            );
+        }
+        List<EvaluatedIndividual<E>> newPopulation = new ArrayList<>(properties.getInt(Key.IntKey.POPULATION_SIZE));
+        for (int i = 0; i < population.size(); i++) {
+            newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctions, scores[i]));
         }
 
-        this.population = new ArrayList<EvaluatedIndividual<E>>(properties.getInt(Key.IntKey.POPULATION_SIZE));
-
-        individualStream.forEach(individual -> {
-            double[] scores = new double[optimizationFunctions.length];
-            for (int i = 0; i < optimizationFunctions.length; i++) {
-                scores[i] = optimizationFunctions[i].evaluate(individual.getIndividual(), properties);
-            }
-            EvaluatedIndividual<E> evaluatedIndividual = new EvaluatedIndividual<>(individual, optimizationFunctions, scores);
-            //noinspection SynchronizeOnNonFinalField
-            synchronized (EvaluatedPopulation.this.population) {
-                //noinspection unchecked
-                ((Collection<EvaluatedIndividual<E>>) EvaluatedPopulation.this.population).add(evaluatedIndividual);
-            }
-        });
+        this.population = newPopulation;
     }
+
 
     protected EvaluatedPopulation() {
     }

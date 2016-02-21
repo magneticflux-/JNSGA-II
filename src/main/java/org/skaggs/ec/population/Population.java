@@ -36,6 +36,10 @@ public class Population<E> {
         return new Population<>(individuals);
     }
 
+    public int size() {
+        return this.population.size();
+    }
+
     public List<? extends Individual<E>> getPopulation() {
         return Collections.unmodifiableList(this.population);
     }
