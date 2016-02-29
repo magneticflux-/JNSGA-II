@@ -1,6 +1,6 @@
 package org.skaggs.ec.examples.defaultoperatorframework;
 
-import org.skaggs.ec.operators.Crossoverer;
+import org.skaggs.ec.operators.Recombiner;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.util.Utils;
@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by skaggsm on 2/11/16.
  */
-public class DoubleArrayCrossoverer extends Crossoverer<double[]> {
+public class DoubleArrayRecombiner extends Recombiner<double[]> {
 
     private int doubleArrayGenerationLength;
 

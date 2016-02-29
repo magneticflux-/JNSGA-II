@@ -17,6 +17,12 @@ public class Individual<E> extends PopulationMember {
         this.individual = individual.individual;
     }
 
+    public Individual(E individual, double[] aspects) {
+        super(aspects);
+        this.individual = individual;
+    }
+
+    @Deprecated
     public Individual(E individual, double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
         super(mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
         this.individual = individual;
@@ -27,8 +33,8 @@ public class Individual<E> extends PopulationMember {
     public boolean oldEquals(Object obj) {
         return obj instanceof Individual &&
                 ((Individual) obj).getIndividual().equals(this.getIndividual()) &&
-                ((PopulationMember) obj).mutationProbability == this.mutationProbability &&
-                ((PopulationMember) obj).crossoverProbability == this.crossoverProbability;
+                ((PopulationMember) obj).getMutationProbability() == this.getMutationProbability() &&
+                ((PopulationMember) obj).getCrossoverProbability() == this.getCrossoverProbability();
     }
 
     public E getIndividual() {
@@ -39,8 +45,8 @@ public class Individual<E> extends PopulationMember {
     @Deprecated
     public int oldHashCode() {
         return this.individual.hashCode() ^
-                Double.hashCode(mutationProbability) ^
-                Double.hashCode(crossoverProbability);
+                Double.hashCode(getMutationProbability()) ^
+                Double.hashCode(getCrossoverProbability());
     }
 
     @Override
@@ -48,9 +54,9 @@ public class Individual<E> extends PopulationMember {
         int result;
         long temp;
         result = individual != null ? individual.hashCode() : 0;
-        temp = Double.doubleToLongBits(mutationProbability);
+        temp = Double.doubleToLongBits(getMutationProbability());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(crossoverProbability);
+        temp = Double.doubleToLongBits(getCrossoverProbability());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -63,8 +69,8 @@ public class Individual<E> extends PopulationMember {
 
         Individual that = (Individual) o;
 
-        if (Double.compare(that.crossoverProbability, crossoverProbability) != 0) return false;
-        if (Double.compare(that.mutationProbability, mutationProbability) != 0) return false;
+        if (Double.compare(that.getCrossoverProbability(), getCrossoverProbability()) != 0) return false;
+        if (Double.compare(that.getMutationProbability(), getMutationProbability()) != 0) return false;
         if (individual != null ? !individual.equals(that.individual) : that.individual != null)
             return false;
 

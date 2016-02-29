@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 /**
  * Created by skaggsm on 1/22/16.
  */
-public abstract class Crossoverer<E> implements BiFunction<Individual<E>, Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties {
+public abstract class Recombiner<E> implements BiFunction<Individual<E>, Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties {
 
     private double crossoverProbabilityMutationProbability, crossoverProbabilityMutationStrength, crossoverStrengthMutationProbability, crossoverStrengthMutationStrength;
 
@@ -31,16 +31,16 @@ public abstract class Crossoverer<E> implements BiFunction<Individual<E>, Indivi
     public Individual<E> apply(Individual<E> t, Individual<E> u) {
         Random r = ThreadLocalRandom.current();
 
-        boolean doCrossover = r.nextDouble() < t.crossoverProbability;
+        boolean doCrossover = r.nextDouble() < t.getCrossoverProbability();
 
-        double crossoverStrength = (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(t.crossoverStrength, r, crossoverStrengthMutationStrength) : t.crossoverStrength;
+        double crossoverStrength = (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(t.getCrossoverStrength(), r, crossoverStrengthMutationStrength) : t.getCrossoverStrength();
         crossoverStrength = Range.clip(0, crossoverStrength, Double.POSITIVE_INFINITY);
-        double crossoverProbability = (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(t.crossoverProbability, r, crossoverProbabilityMutationStrength) : t.crossoverProbability;
+        double crossoverProbability = (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(t.getCrossoverProbability(), r, crossoverProbabilityMutationStrength) : t.getCrossoverProbability();
         crossoverProbability = Range.clip(0, crossoverProbability, 1);
 
         E individual = doCrossover ? crossover(t.getIndividual(), u.getIndividual(), crossoverStrength, crossoverProbability) : t.getIndividual();
 
-        return new Individual<>(individual, t.mutationStrength, t.mutationProbability, crossoverStrength, crossoverProbability);
+        return new Individual<>(individual, t.getMutationStrength(), t.getMutationProbability(), crossoverStrength, crossoverProbability);
     }
 
     protected abstract E crossover(E parent1, E parent2, double crossoverStrength, double crossoverProbability);

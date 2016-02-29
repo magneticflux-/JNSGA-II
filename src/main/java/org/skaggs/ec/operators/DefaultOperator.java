@@ -4,6 +4,7 @@ import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.individual.Individual;
+import org.skaggs.ec.properties.HasPropertyRequirements;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.properties.Requirement;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by skaggsm on 1/22/16.
@@ -20,14 +22,14 @@ import java.util.stream.Collectors;
 public class DefaultOperator<E> implements Operator<E> {
 
 
-    private final Mutator<E> mutator;
-    private final Crossoverer<E> crossoverer;
+    private final List<Mutator<E>> mutators;
+    private final Recombiner<E> recombiner;
     private final Selector<E> selector;
     private final Speciator<E> speciator;
 
-    public DefaultOperator(Mutator<E> mutator, Crossoverer<E> crossoverer, Selector<E> selector, Speciator<E> speciator) {
-        this.mutator = mutator;
-        this.crossoverer = crossoverer;
+    public DefaultOperator(List<Mutator<E>> mutators, Recombiner<E> recombiner, Selector<E> selector, Speciator<E> speciator) {
+        this.mutators = new ArrayList<>(mutators);
+        this.recombiner = recombiner;
         this.selector = selector;
         this.speciator = speciator;
     }
@@ -35,8 +37,8 @@ public class DefaultOperator<E> implements Operator<E> {
     @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
-        mutator.updateProperties(properties);
-        crossoverer.updateProperties(properties);
+        mutators.forEach(mutator -> mutator.updateProperties(properties));
+        recombiner.updateProperties(properties);
         speciator.updateProperties(properties);
         selector.updateProperties(properties);
 
@@ -54,24 +56,34 @@ public class DefaultOperator<E> implements Operator<E> {
                 compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream().filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual)).collect(Collectors.toList());
             }
             FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
-            newPopulation.add(crossoverer.apply(individual, otherIndividual));
+            newPopulation.add(recombiner.apply(individual, otherIndividual));
         }
 
-        newPopulation.replaceAll(mutator::apply);
+        IntStream.range(0, mutators.size()).forEach(value -> newPopulation.replaceAll(mutators.get(value)::apply));
 
         return new Population<>(newPopulation);
     }
 
     @Override
     public Key[] requestProperties() {
-        return Utils.concat(mutator.requestProperties(), crossoverer.requestProperties(), selector.requestProperties(), speciator.requestProperties(), new Key[]{
+        return Utils.concat(
+                Utils.concat((Key[]) mutators.stream().map(HasPropertyRequirements::requestProperties).toArray()),
+                recombiner.requestProperties(),
+                selector.requestProperties(),
+                speciator.requestProperties(),
+                new Key[]{
                 Key.BooleanKey.THREADED
         });
     }
 
     @Override
     public Requirement[] requestDetailedRequirements() {
-        return Utils.concat(mutator.requestDetailedRequirements(), crossoverer.requestDetailedRequirements(), selector.requestDetailedRequirements(), speciator.requestDetailedRequirements(), new Requirement[]{
+        return Utils.concat(
+                Utils.concat((Requirement[]) mutators.stream().map(HasPropertyRequirements::requestDetailedRequirements).toArray()),
+                recombiner.requestDetailedRequirements(),
+                selector.requestDetailedRequirements(),
+                speciator.requestDetailedRequirements(),
+                new Requirement[]{
         });
     }
 }

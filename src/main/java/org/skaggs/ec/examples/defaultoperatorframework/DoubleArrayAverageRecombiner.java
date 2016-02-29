@@ -1,6 +1,6 @@
 package org.skaggs.ec.examples.defaultoperatorframework;
 
-import org.skaggs.ec.operators.Crossoverer;
+import org.skaggs.ec.operators.Recombiner;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.util.Utils;
@@ -8,7 +8,7 @@ import org.skaggs.ec.util.Utils;
 /**
  * Created by Mitchell on 2/11/2016.
  */
-public class DoubleArrayAverageCrossoverer extends Crossoverer<double[]> {
+public class DoubleArrayAverageRecombiner extends Recombiner<double[]> {
 
     private int doubleArrayGenerationLength;
 

@@ -23,6 +23,14 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
     public static final Range<Double> probabilityRange = Range.between(0d, 1d);
 
+    public static double clip(double lower, double toClip, double upper) {
+        if (toClip > lower) {
+            if (toClip < upper) {
+                return toClip;
+            } else return upper;
+        } else return lower;
+    }
+
     @Override
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
         List<Individual<double[]>> individuals = new ArrayList<>(population.getPopulation().size());
@@ -34,30 +42,22 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
         double mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
 
         for (FrontedIndividual<double[]> d : population.getPopulation()) {
-            double[] newIndividual = Arrays.stream(d.getIndividual()).parallel().map(value -> (r.nextDouble() < d.mutationProbability) ? this.mutate(value, r, FastMath.pow(d.mutationStrength, 2)) : value).toArray();
+            double[] newIndividual = Arrays.stream(d.getIndividual()).parallel().map(value -> (r.nextDouble() < d.getMutationProbability()) ? this.mutate(value, r, FastMath.pow(d.getMutationStrength(), 2)) : value).toArray();
 
-            double mutationStrength = (r.nextDouble() < mutationStrengthMutationProbability) ? this.mutate(d.mutationStrength, r, mutationStrengthMutationStrength) : d.mutationStrength;
+            double mutationStrength = (r.nextDouble() < mutationStrengthMutationProbability) ? this.mutate(d.getMutationStrength(), r, mutationStrengthMutationStrength) : d.getMutationStrength();
 
-            double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? this.mutate(d.mutationProbability, r, mutationProbabilityMutationStrength) : d.mutationProbability;
+            double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? this.mutate(d.getMutationProbability(), r, mutationProbabilityMutationStrength) : d.getMutationProbability();
 
             mutationStrength = clip(0, mutationStrength, Double.POSITIVE_INFINITY);
             mutationProbability = clip(0, mutationProbability, 1);
 
-            individuals.add(new Individual<>(newIndividual, mutationStrength, mutationProbability, d.crossoverStrength, d.crossoverProbability));
+            individuals.add(new Individual<>(newIndividual, mutationStrength, mutationProbability, d.getCrossoverStrength(), d.getCrossoverProbability()));
         }
         return new Population<>(individuals);
     }
 
     private double mutate(double d, Random r, double range) {
         return (d + (r.nextDouble() * 2 * range)) - range;
-    }
-
-    public static double clip(double lower, double toClip, double upper) {
-        if (toClip > lower) {
-            if (toClip < upper) {
-                return toClip;
-            } else return upper;
-        } else return lower;
     }
 
     @Override

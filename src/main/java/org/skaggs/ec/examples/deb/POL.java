@@ -17,7 +17,7 @@ import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.skaggs.ec.DefaultOptimizationFunction;
 import org.skaggs.ec.OptimizationFunction;
-import org.skaggs.ec.examples.defaultoperatorframework.DoubleArrayAverageCrossoverer;
+import org.skaggs.ec.examples.defaultoperatorframework.DoubleArrayAverageRecombiner;
 import org.skaggs.ec.examples.defaultoperatorframework.DoubleArrayMutator;
 import org.skaggs.ec.examples.defaultoperatorframework.DoubleArraySpeciator;
 import org.skaggs.ec.examples.defaultoperatorframework.RouletteWheelLinearSelection;
@@ -28,6 +28,7 @@ import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.operators.DefaultOperator;
 import org.skaggs.ec.operators.Operator;
 import org.skaggs.ec.population.PopulationGenerator;
+import org.skaggs.ec.population.individual.PopulationMember;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
@@ -40,6 +41,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
+import java.util.Collections;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -168,7 +170,7 @@ public final class POL {
                 .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
                 .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1);
 
-        Operator<double[]> operator = new DefaultOperator<>(new DoubleArrayMutator(), new DoubleArrayAverageCrossoverer(), new RouletteWheelLinearSelection<>(), new DoubleArraySpeciator());
+        Operator<double[]> operator = new DefaultOperator<>(Collections.singletonList(new DoubleArrayMutator()), new DoubleArrayAverageRecombiner(), new RouletteWheelLinearSelection<>(), new DoubleArraySpeciator());
         OptimizationFunction<double[]> function1 = new Function1();
         OptimizationFunction<double[]> function2 = new Function2();
         OptimizationFunction<double[]> function3 = new Function3();
@@ -210,10 +212,10 @@ public final class POL {
             double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
             System.out.print("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
 
-            final double[] mutationStrengthData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationStrength).toArray();
-            final double[] mutationProbabilityData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.mutationProbability).toArray();
-            final double[] crossoverStrengthData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.crossoverStrength).toArray();
-            final double[] crossoverProbabilityData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.crossoverProbability).toArray();
+            final double[] mutationStrengthData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(PopulationMember::getMutationStrength).toArray();
+            final double[] mutationProbabilityData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(PopulationMember::getMutationProbability).toArray();
+            final double[] crossoverStrengthData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(PopulationMember::getCrossoverStrength).toArray();
+            final double[] crossoverProbabilityData = populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(PopulationMember::getCrossoverProbability).toArray();
 
             final StatisticalSummary currentMutationStrength = new DescriptiveStatistics(mutationStrengthData);
             final StatisticalSummary currentMutationProbability = new DescriptiveStatistics(mutationProbabilityData);
