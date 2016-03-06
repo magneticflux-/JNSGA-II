@@ -7,6 +7,7 @@ public interface Key {
 
     public static enum IntKey implements Key {
         POPULATION_SIZE,
+        ASPECT_COUNT,
         DOUBLE_ARRAY_GENERATION_LENGTH
     }
 

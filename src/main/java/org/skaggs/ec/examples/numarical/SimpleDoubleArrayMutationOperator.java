@@ -1,6 +1,5 @@
 package org.skaggs.ec.examples.numarical;
 
-import org.apache.commons.lang3.Range;
 import org.apache.commons.math3.util.FastMath;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
@@ -19,17 +18,8 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by skaggsm on 12/27/15.
  */
+@Deprecated
 public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
-
-    public static final Range<Double> probabilityRange = Range.between(0d, 1d);
-
-    public static double clip(double lower, double toClip, double upper) {
-        if (toClip > lower) {
-            if (toClip < upper) {
-                return toClip;
-            } else return upper;
-        } else return lower;
-    }
 
     @Override
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
@@ -58,6 +48,14 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
     private double mutate(double d, Random r, double range) {
         return (d + (r.nextDouble() * 2 * range)) - range;
+    }
+
+    public static double clip(double lower, double toClip, double upper) {
+        if (toClip > lower) {
+            if (toClip < upper) {
+                return toClip;
+            } else return upper;
+        } else return lower;
     }
 
     @Override

@@ -9,12 +9,7 @@ public class Individual<E> extends PopulationMember {
 
     @Deprecated
     public Individual(E individual) {
-        this(individual, -1, -1, -1, -1);
-    }
-
-    public Individual(Individual<E> individual) {
-        super(individual);
-        this.individual = individual.individual;
+        this(individual, new double[0]);
     }
 
     public Individual(E individual, double[] aspects) {
@@ -22,10 +17,17 @@ public class Individual<E> extends PopulationMember {
         this.individual = individual;
     }
 
+    public Individual(Individual<E> individual) {
+        super(individual);
+        this.individual = individual.individual;
+    }
+
     @Deprecated
     public Individual(E individual, double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
-        super(mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
-        this.individual = individual;
+        super(new double[0]);
+        throw new UnsupportedOperationException("Do not use mutation/crossover. Aspects only");
+        //super(mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
+        //this.individual = individual;
     }
 
     @SuppressWarnings("unused")
@@ -69,8 +71,10 @@ public class Individual<E> extends PopulationMember {
 
         Individual that = (Individual) o;
 
-        if (Double.compare(that.getCrossoverProbability(), getCrossoverProbability()) != 0) return false;
-        if (Double.compare(that.getMutationProbability(), getMutationProbability()) != 0) return false;
+        if (Double.compare(that.getCrossoverProbability(), getCrossoverProbability()) != 0)
+            return false;
+        if (Double.compare(that.getMutationProbability(), getMutationProbability()) != 0)
+            return false;
         if (individual != null ? !individual.equals(that.individual) : that.individual != null)
             return false;
 

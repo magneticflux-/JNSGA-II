@@ -31,16 +31,19 @@ public abstract class Recombiner<E> implements BiFunction<Individual<E>, Individ
     public Individual<E> apply(Individual<E> t, Individual<E> u) {
         Random r = ThreadLocalRandom.current();
 
+        double[] newAspects = t.aspects.clone();
+
         boolean doCrossover = r.nextDouble() < t.getCrossoverProbability();
 
-        double crossoverStrength = (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(t.getCrossoverStrength(), r, crossoverStrengthMutationStrength) : t.getCrossoverStrength();
-        crossoverStrength = Range.clip(0, crossoverStrength, Double.POSITIVE_INFINITY);
-        double crossoverProbability = (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(t.getCrossoverProbability(), r, crossoverProbabilityMutationStrength) : t.getCrossoverProbability();
-        crossoverProbability = Range.clip(0, crossoverProbability, 1);
+        newAspects[0] = (r.nextDouble() < crossoverStrengthMutationProbability) ? Mutator.mutate(newAspects[0], r, crossoverStrengthMutationStrength) : newAspects[0];
+        newAspects[0] = Range.clip(0, newAspects[0], Double.POSITIVE_INFINITY);
 
-        E individual = doCrossover ? crossover(t.getIndividual(), u.getIndividual(), crossoverStrength, crossoverProbability) : t.getIndividual();
+        newAspects[1] = (r.nextDouble() < crossoverProbabilityMutationProbability) ? Mutator.mutate(newAspects[1], r, crossoverProbabilityMutationStrength) : newAspects[1];
+        newAspects[1] = Range.clip(0, newAspects[1], 1);
 
-        return new Individual<>(individual, t.getMutationStrength(), t.getMutationProbability(), crossoverStrength, crossoverProbability);
+        E individual = doCrossover ? crossover(t.getIndividual(), u.getIndividual(), newAspects[0], newAspects[1]) : t.getIndividual();
+
+        return new Individual<>(individual, newAspects);
     }
 
     protected abstract E crossover(E parent1, E parent2, double crossoverStrength, double crossoverProbability);

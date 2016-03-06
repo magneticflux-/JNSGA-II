@@ -14,7 +14,11 @@ import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.properties.Requirement;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -79,7 +83,11 @@ public class NSGA_II<E> implements HasPropertyRequirements {
                     missingKeys.add(key);
                 }
             for (Requirement requirement : hasPropertyRequirements.requestDetailedRequirements()) {
-                boolean result = requirement.test(properties);
+                boolean result = false;
+                try {
+                    result = requirement.test(properties);
+                } catch (Exception e) {
+                }
                 if (!result) {
                     failedRequirements.add(requirement.describe());
                 }

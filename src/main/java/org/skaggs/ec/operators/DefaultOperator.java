@@ -42,6 +42,10 @@ public class DefaultOperator<E> implements Operator<E> {
         speciator.updateProperties(properties);
         selector.updateProperties(properties);
 
+        for (int i = 0; i < mutators.size(); i++) {
+            mutators.get(i).setAspectOffset((i + 1) * 2);
+        }
+
         List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
 
         for (int i = 0; i < population.getPopulation().size(); i++) {
@@ -67,7 +71,7 @@ public class DefaultOperator<E> implements Operator<E> {
     @Override
     public Key[] requestProperties() {
         return Utils.concat(
-                Utils.concat((Key[]) mutators.stream().map(HasPropertyRequirements::requestProperties).toArray()),
+                Utils.concat(mutators.stream().map(HasPropertyRequirements::requestProperties).toArray(Key[][]::new)),
                 recombiner.requestProperties(),
                 selector.requestProperties(),
                 speciator.requestProperties(),
@@ -79,11 +83,22 @@ public class DefaultOperator<E> implements Operator<E> {
     @Override
     public Requirement[] requestDetailedRequirements() {
         return Utils.concat(
-                Utils.concat((Requirement[]) mutators.stream().map(HasPropertyRequirements::requestDetailedRequirements).toArray()),
+                Utils.concat(mutators.stream().map(HasPropertyRequirements::requestDetailedRequirements).toArray(Requirement[][]::new)),
                 recombiner.requestDetailedRequirements(),
                 selector.requestDetailedRequirements(),
                 speciator.requestDetailedRequirements(),
                 new Requirement[]{
-        });
+                        new Requirement() {
+                            @Override
+                            public String describe() {
+                                return (mutators.size() + 1) + " aspects required.";
+                            }
+
+                            @Override
+                            public boolean test(Properties properties) {
+                                return properties.getInt(Key.IntKey.ASPECT_COUNT) >= mutators.size() + 1;
+                            }
+                        }
+                });
     }
 }
