@@ -51,8 +51,6 @@ public abstract class Recombiner<E> implements BiFunction<Individual<E>, Individ
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH,
-                Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY,
                 Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH,
                 Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY,
                 Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH,

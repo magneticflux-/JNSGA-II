@@ -155,8 +155,10 @@ public final class POL {
                 .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
                 .setDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
+                .setValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY, new double[]{0, 1, 0, 1, 0, 1})
+
+                        //.setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
+                        //.setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
 
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
                 .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
@@ -165,8 +167,8 @@ public final class POL {
                 .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
 
 
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, 0)
-                .setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, 1)
+                        //.setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, 0)
+                        //.setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, 1)
 
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 16)
                 .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
@@ -267,7 +269,7 @@ public final class POL {
                 try {
                     aspectProbabilitySeries = averageAspectProbabilityCollection.getSeries(i);
                 } catch (IllegalArgumentException e) {
-                    aspectProbabilitySeries = new YIntervalSeries("Median Aspect " + i + "Probability");
+                    aspectProbabilitySeries = new YIntervalSeries("Median Aspect " + i + " Probability");
                     averageAspectProbabilityCollection.addSeries(aspectProbabilitySeries);
                 }
 

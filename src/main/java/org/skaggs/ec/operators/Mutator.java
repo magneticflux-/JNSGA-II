@@ -60,8 +60,6 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.DoubleKey.INITIAL_MUTATION_STRENGTH,
-                Key.DoubleKey.INITIAL_MUTATION_PROBABILITY,
                 Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH,
                 Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
                 Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH,

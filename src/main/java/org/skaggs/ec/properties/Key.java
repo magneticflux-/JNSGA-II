@@ -16,6 +16,8 @@ public interface Key {
     }
 
     public static enum DoubleKey implements Key {
+        INITIAL_ASPECT_ARRAY, // Stored as an array, needs to be cast. Hack-y, but works.
+
         INITIAL_MUTATION_STRENGTH,
         MUTATION_STRENGTH_MUTATION_PROBABILITY,
         MUTATION_STRENGTH_MUTATION_STRENGTH,

@@ -191,12 +191,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
                     @Override
                     public boolean test(Properties properties) {
-                        boolean succeeded = false;
-                        try {
-                            succeeded = properties.getInt(Key.IntKey.POPULATION_SIZE) > 0;
-                        } catch (NoValueSetException ignored) {
-                        }
-                        return succeeded;
+                        return properties.getInt(Key.IntKey.POPULATION_SIZE) > 0;
                     }
                 }
         };

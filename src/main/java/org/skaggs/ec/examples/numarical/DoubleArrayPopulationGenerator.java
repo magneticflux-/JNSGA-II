@@ -21,21 +21,23 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
         double min = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         double max = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
         int length = properties.getInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
-        double initialMutationStrength = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
-        double initialMutationProbability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
-        double initialCrossoverStrength = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH);
-        double initialCrossoverProbability = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY);
+        //double initialMutationStrength = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
+        //double initialMutationProbability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
+        //double initialCrossoverStrength = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH);
+        //double initialCrossoverProbability = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY);
 
-        int numAspects = properties.getInt(Key.IntKey.ASPECT_COUNT);
-        double[] aspects = new double[numAspects * 2];
-        aspects[0] = initialCrossoverStrength;
-        aspects[1] = initialCrossoverProbability;
-        aspects[2] = initialMutationStrength;
-        aspects[3] = initialMutationProbability;
+        double[] initialAspects = (double[]) properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY);
+
+        //int numAspects = properties.getInt(Key.IntKey.ASPECT_COUNT);
+        //double[] aspects = new double[numAspects * 2];
+        //aspects[0] = initialCrossoverStrength;
+        //aspects[1] = initialCrossoverProbability;
+        //aspects[2] = initialMutationStrength;
+        //aspects[3] = initialMutationProbability;
 
         List<Individual<double[]>> individuals = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            individuals.add(new Individual<>(this.getIndividual(r, length, min, max), aspects.clone()));
+            individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialAspects.clone()));
         }
         return individuals;
     }
@@ -55,8 +57,11 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
     @Override
     public Key[] requestProperties() {
         return new Key[]{
+
                 Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH,
+                /*
                 Key.DoubleKey.INITIAL_MUTATION_STRENGTH, Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY,
+                */
                 Key.IntKey.ASPECT_COUNT
         };
     }
@@ -73,6 +78,28 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
                     @Override
                     public boolean test(Properties properties) {
                         return properties.getInt(Key.IntKey.ASPECT_COUNT) >= 2;
+                    }
+                },
+                new Requirement() {
+                    @Override
+                    public String describe() {
+                        return "DoubleKey \"INITIAL_ASPECT_ARRAY\" must be of type\"double[]\"";
+                    }
+
+                    @Override
+                    public boolean test(Properties properties) {
+                        return properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY) instanceof double[];
+                    }
+                },
+                new Requirement() {
+                    @Override
+                    public String describe() {
+                        return "INITIAL_ASPECT_ARRAY's size must equal ASPECT_COUNT * 2";
+                    }
+
+                    @Override
+                    public boolean test(Properties properties) {
+                        return properties.getInt(Key.IntKey.ASPECT_COUNT) * 2 == ((double[]) properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY)).length;
                     }
                 }
         };
