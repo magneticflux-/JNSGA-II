@@ -36,7 +36,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
                     value -> scores[value][finalI] = functionScores[value]
             );
         }
-        List<EvaluatedIndividual<E>> newPopulation = new ArrayList<>(properties.getInt(Key.IntKey.POPULATION_SIZE));
+        List<EvaluatedIndividual<E>> newPopulation = new ArrayList<>(properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
         for (int i = 0; i < population.size(); i++) {
             newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctions, scores[i]));
         }

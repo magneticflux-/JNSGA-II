@@ -28,6 +28,10 @@ import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
+import javax.swing.GroupLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -35,11 +39,6 @@ import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
-import javax.swing.GroupLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -104,40 +103,33 @@ public final class POL {
         //noinspection MagicNumber
         windowFrame.setSize(1400, 1000);
         //noinspection MagicNumber
-        windowFrame.setLocation(400, 0);
+        windowFrame.setLocation(0, 0);
         windowFrame.setVisible(true);
         windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         //noinspection MagicNumber
         Properties properties = new Properties()
-                .setBoolean(Key.BooleanKey.THREADED, true)
-                .setInt(Key.IntKey.POPULATION_SIZE, 1000)
-                .setInt(Key.IntKey.ASPECT_COUNT, 3)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -2)//-FastMath.PI)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 2)//FastMath.PI)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
+                .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
+                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
+                .setInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT, 3)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
+                .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
-                .setValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY, new double[]{0, 1, 0, 1, 0, 1})
+                .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{0, 1, 0, 1, 0, 1})
 
-                        //.setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .1)
-                        //.setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
 
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
 
-
-                        //.setDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, 0)
-                        //.setDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY, 1)
-
-                .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
-
-                .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1);
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1);
 
         Operator<double[]> operator = new DefaultOperator<>(Arrays.asList(
                 new Mutator<double[]>() {
@@ -147,6 +139,7 @@ public final class POL {
                         double[] newObject = new double[object.length];
                         for (int i = 0; i < newObject.length; i++) {
                             newObject[i] = (r.nextGaussian() * mutationStrength) + object[i];
+                            //newObject[i] = Mutator.mutate(object[i], r, mutationStrength);
                         }
                         return newObject;
                     }
@@ -176,7 +169,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentGenerationChart.setNotify(false);
             currentGenerationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
                     frontSeries.add(individual.getScore(0), individual.getScore(1));
@@ -189,7 +182,7 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             currentPopulationChart.setNotify(false);
             currentPopulationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getFrontedPopulation().getFronts()) {
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
                 XYSeries frontSeries = new XYSeries(front.toString());
                 for (FrontedIndividual<double[]> individual : front.getMembers()) {
                     frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
@@ -204,7 +197,7 @@ public final class POL {
             double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
             System.out.print("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
 
-            for (int i = 0; i < properties.getInt(Key.IntKey.ASPECT_COUNT); i++) {
+            for (int i = 0; i < properties.getInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT); i++) {
                 final int finalI = i;
                 YIntervalSeries aspectStrengthSeries, aspectProbabilitySeries;
                 DescriptiveStatistics aspectStrengthSummary, aspectProbabilitySummary;

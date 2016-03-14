@@ -23,8 +23,8 @@ public class SimpleDoubleMutationOperator implements Operator<Double> {
     @Override
     public Population<Double> apply(FrontedPopulation<Double> population, Properties properties) {
         Random r = new Random();
-        double probability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
-        double range = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
+        double probability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY);
+        double range = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH);
 
         List<Individual<Double>> individuals = new ArrayList<>(population.getPopulation().size());
 
@@ -44,6 +44,6 @@ public class SimpleDoubleMutationOperator implements Operator<Double> {
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DoubleKey.INITIAL_MUTATION_STRENGTH};
+        return new Key[]{Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH};
     }
 }

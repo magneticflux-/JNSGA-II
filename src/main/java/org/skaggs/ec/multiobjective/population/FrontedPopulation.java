@@ -41,7 +41,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             castPopulationView.add(frontedIndividual);
         }
 
-        boolean threaded = properties.getBoolean(Key.BooleanKey.THREADED);
+        boolean threaded = properties.getBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED);
 
         Front<E> firstFront = new Front<>(new TreeSet<>(), 0);
         this.fronts.add(0, firstFront);

@@ -29,12 +29,17 @@ public class DoubleArraySpeciator extends Speciator<double[]> {
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE};
+        return new Key[]{Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE};
     }
 
     @Override
     public void updateProperties(Properties properties) {
-        doubleArrayGenerationLength = properties.getInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
-        maxDistance = properties.getDouble(Key.DoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE);
+        doubleArrayGenerationLength = properties.getInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
+        maxDistance = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE);
+    }
+
+    @Override
+    public int requestAspectLocation(int startIndex) {
+        return 0;
     }
 }

@@ -4,10 +4,7 @@ import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.HasPropertyRequirements;
-import org.skaggs.ec.properties.Key;
-import org.skaggs.ec.properties.Properties;
-import org.skaggs.ec.properties.Requirement;
+import org.skaggs.ec.properties.*;
 import org.skaggs.ec.util.Utils;
 
 import java.util.ArrayList;
@@ -34,6 +31,18 @@ public class DefaultOperator<E> implements Operator<E> {
         this.speciator = speciator;
     }
 
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
+    }
+
+    private HasAspectRequirements[] getHasAspectRequirementses() {
+        return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
@@ -42,9 +51,7 @@ public class DefaultOperator<E> implements Operator<E> {
         speciator.updateProperties(properties);
         selector.updateProperties(properties);
 
-        for (int i = 0; i < mutators.size(); i++) {
-            mutators.get(i).setAspectOffset((i + 1) * 2);
-        }
+        setAspectIndices(getHasAspectRequirementses());
 
         List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
 
@@ -76,7 +83,7 @@ public class DefaultOperator<E> implements Operator<E> {
                 selector.requestProperties(),
                 speciator.requestProperties(),
                 new Key[]{
-                Key.BooleanKey.THREADED
+                        Key.BooleanKey.DefaultBooleanKey.THREADED
         });
     }
 
@@ -91,12 +98,14 @@ public class DefaultOperator<E> implements Operator<E> {
                         new Requirement() {
                             @Override
                             public String describe() {
-                                return (mutators.size() + 1) + " aspects required.";
+                                int size = setAspectIndices(getHasAspectRequirementses());
+                                return size + " aspect data slots required.";
                             }
 
                             @Override
                             public boolean test(Properties properties) {
-                                return properties.getInt(Key.IntKey.ASPECT_COUNT) >= mutators.size() + 1;
+                                int size = setAspectIndices(getHasAspectRequirementses());
+                                return ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length == size;
                             }
                         }
                 });

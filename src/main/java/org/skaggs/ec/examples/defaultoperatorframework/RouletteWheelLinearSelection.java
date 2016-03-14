@@ -38,4 +38,9 @@ public class RouletteWheelLinearSelection<E> extends Selector<E> {
     @Override
     public void updateProperties(Properties properties) {
     }
+
+    @Override
+    public int requestAspectLocation(int startIndex) {
+        return 0;
+    }
 }

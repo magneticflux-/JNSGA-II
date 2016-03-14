@@ -18,7 +18,7 @@ public class DoubleArrayRecombiner extends Recombiner<double[]> {
     @Override
     public void updateProperties(Properties properties) {
         super.updateProperties(properties);
-        doubleArrayGenerationLength = properties.getInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
+        doubleArrayGenerationLength = properties.getInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
     }
 
     @Override
@@ -40,6 +40,6 @@ public class DoubleArrayRecombiner extends Recombiner<double[]> {
 
     @Override
     public Key[] requestProperties() {
-        return Utils.concat(super.requestProperties(), new Key[]{Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH});
+        return Utils.concat(super.requestProperties(), new Key[]{Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH});
     }
 }

@@ -14,11 +14,7 @@ import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.properties.Requirement;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -54,11 +50,11 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         long startTime = System.nanoTime();
 
-        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.POPULATION_SIZE), populationGenerator, properties);
+        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), populationGenerator, properties);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
         //noinspection UnnecessaryLocalVariable
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.POPULATION_SIZE));
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
         this.population = truncatedPopulation;
 
         long elapsedTime = System.nanoTime() - startTime;
@@ -144,7 +140,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         Population<E> merged = Population.merge(this.population, offspring);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.POPULATION_SIZE));
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
         this.population = truncatedPopulation;
         long elapsedTime = System.nanoTime() - startTime;
 
@@ -175,8 +171,8 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.IntKey.POPULATION_SIZE,
-                Key.BooleanKey.THREADED
+                Key.IntKey.DefaultIntKey.POPULATION_SIZE,
+                Key.BooleanKey.DefaultBooleanKey.THREADED
         };
     }
 
@@ -191,7 +187,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
                     @Override
                     public boolean test(Properties properties) {
-                        return properties.getInt(Key.IntKey.POPULATION_SIZE) > 0;
+                        return properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE) > 0;
                     }
                 }
         };

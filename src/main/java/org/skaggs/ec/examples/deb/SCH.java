@@ -48,11 +48,11 @@ public final class SCH {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION_SIZE, 500)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .25);
+                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 500)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -100)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 100)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY, 1)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH, .25);
 
         Operator<Double> operator = new SimpleDoubleMutationOperator();
         OptimizationFunction<Double> function1 = new Function1();
@@ -90,7 +90,7 @@ public final class SCH {
 
         @Override
         public Key[] requestProperties() {
-            return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
+            return new Key[]{Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
         }
 
         @Override
@@ -101,12 +101,12 @@ public final class SCH {
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
 
@@ -120,12 +120,12 @@ public final class SCH {
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
         }
 
         @Override
@@ -135,7 +135,7 @@ public final class SCH {
 
         @Override
         public Key[] requestProperties() {
-            return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
+            return new Key[]{Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM};
         }
     }
 }

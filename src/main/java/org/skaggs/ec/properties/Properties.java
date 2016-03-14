@@ -18,7 +18,7 @@ public class Properties {
     static { //Default value initialization
         Map<Key, Object> v = new HashMap<>();
 
-        v.put(Key.BooleanKey.THREADED, true);
+        v.put(Key.BooleanKey.DefaultBooleanKey.THREADED, true);
 
         defaultValues = Collections.unmodifiableMap(v);
     }
@@ -56,22 +56,22 @@ public class Properties {
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public int getInt(Key.IntKey key) {
+    public int getInt(Key.IntKey.DefaultIntKey key) {
         return (int) this.getValue(key);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public boolean getBoolean(Key.BooleanKey key) {
+    public boolean getBoolean(Key.BooleanKey.DefaultBooleanKey key) {
         return (boolean) this.getValue(key);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public double getDouble(Key.DoubleKey key) {
+    public double getDouble(Key.DoubleKey.DefaultDoubleKey key) {
         return (double) this.getValue(key);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public Properties setInt(Key.IntKey key, int value) {
+    public Properties setInt(Key.IntKey.DefaultIntKey key, int value) {
         return this.setValue(key, value);
     }
 
@@ -83,12 +83,12 @@ public class Properties {
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public Properties setBoolean(Key.BooleanKey key, boolean value) {
+    public Properties setBoolean(Key.BooleanKey.DefaultBooleanKey key, boolean value) {
         return this.setValue(key, value);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public Properties setDouble(Key.DoubleKey key, double value) {
+    public Properties setDouble(Key.DoubleKey.DefaultDoubleKey key, double value) {
         return this.setValue(key, value);
     }
 

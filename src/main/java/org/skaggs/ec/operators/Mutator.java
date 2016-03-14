@@ -1,10 +1,7 @@
 package org.skaggs.ec.operators;
 
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.HasPropertyRequirements;
-import org.skaggs.ec.properties.Key;
-import org.skaggs.ec.properties.LateUpdatingProperties;
-import org.skaggs.ec.properties.Properties;
+import org.skaggs.ec.properties.*;
 import org.skaggs.ec.util.Range;
 
 import java.util.Random;
@@ -14,24 +11,27 @@ import java.util.function.Function;
 /**
  * Created by skaggsm on 1/22/16.
  */
-public abstract class Mutator<E> implements Function<Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties {
+public abstract class Mutator<E> implements Function<Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
 
     private double mutationProbabilityMutationProbability, mutationProbabilityMutationStrength, mutationStrengthMutationProbability, mutationStrengthMutationStrength;
-    private int offset;
+    private int startIndex;
 
-    /**
-     * @param offset The location in the individual's aspect array of the mutation strength for this mutator. <code>offset + 1</code> is the mutator's probability. This should be >= 2, since locations 0 and 1 are used by the recombiner.
-     */
-    public void setAspectOffset(int offset) {
-        this.offset = offset;
+    public static double mutate(double d, Random r, double range) {
+        return (d + (r.nextDouble() * 2 * range)) - range;
+    }
+
+    @Override
+    public int requestAspectLocation(int startIndex) {
+        this.startIndex = startIndex;
+        return 2;
     }
 
     @Override
     public void updateProperties(Properties properties) {
-        mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
-        mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);
-        mutationProbabilityMutationStrength = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH);
-        mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
+        mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
+        mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);
+        mutationProbabilityMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH);
+        mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
     }
 
     @Override
@@ -40,19 +40,20 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
 
         double[] newAspects = e.aspects.clone();
 
-        newAspects[offset] = (r.nextDouble() < mutationStrengthMutationProbability) ? Mutator.mutate(newAspects[offset], r, mutationStrengthMutationStrength) : newAspects[offset];
-        newAspects[offset] = Range.clip(0, newAspects[offset], Double.POSITIVE_INFINITY);
+        if (r.nextDouble() < mutationStrengthMutationProbability)
+            newAspects[startIndex] = Mutator.mutate(newAspects[startIndex], r, mutationStrengthMutationStrength);
+        if (r.nextDouble() < mutationProbabilityMutationProbability)
+            newAspects[startIndex + 1] = Mutator.mutate(newAspects[startIndex + 1], r, mutationProbabilityMutationStrength);
 
-        newAspects[offset + 1] = (r.nextDouble() < mutationProbabilityMutationProbability) ? Mutator.mutate(newAspects[offset + 1], r, mutationProbabilityMutationStrength) : newAspects[offset + 1];
-        newAspects[offset + 1] = Range.clip(0, newAspects[offset + 1], 1);
+        newAspects[startIndex] = Range.clip(0, newAspects[startIndex], Double.POSITIVE_INFINITY);
+        newAspects[startIndex + 1] = Range.clip(0, newAspects[startIndex + 1], 1);
 
-        E individual = (r.nextDouble() < e.getMutationProbability()) ? mutate(e.getIndividual(), e.getMutationStrength(), e.getMutationProbability()) : e.getIndividual();
+        E individual = e.getIndividual();
+
+        if (r.nextDouble() < e.getMutationProbability())
+            individual = mutate(e.getIndividual(), e.getMutationStrength(), e.getMutationProbability());
 
         return new Individual<>(individual, newAspects);
-    }
-
-    public static double mutate(double d, Random r, double range) {
-        return (d + (r.nextDouble() * 2 * range)) - range;
     }
 
     protected abstract E mutate(E object, double mutationStrength, double mutationProbability);
@@ -60,10 +61,10 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH,
-                Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
-                Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH,
-                Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH,
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH,
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY
         };
     }
 }

@@ -18,17 +18,17 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
     @Override
     public List<Individual<double[]>> generatePopulation(int num, Properties properties) {
         Random r = ThreadLocalRandom.current();
-        double min = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
-        double max = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
-        int length = properties.getInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
-        //double initialMutationStrength = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH);
-        //double initialMutationProbability = properties.getDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY);
-        //double initialCrossoverStrength = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH);
-        //double initialCrossoverProbability = properties.getDouble(Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY);
+        double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
+        double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
+        int length = properties.getInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH);
+        //double initialMutationStrength = properties.getDouble(Key.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH);
+        //double initialMutationProbability = properties.getDouble(Key.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY);
+        //double initialCrossoverStrength = properties.getDouble(Key.DefaultDoubleKey.INITIAL_CROSSOVER_STRENGTH);
+        //double initialCrossoverProbability = properties.getDouble(Key.DefaultDoubleKey.INITIAL_CROSSOVER_PROBABILITY);
 
-        double[] initialAspects = (double[]) properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY);
+        double[] initialAspects = (double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY);
 
-        //int numAspects = properties.getInt(Key.IntKey.ASPECT_COUNT);
+        //int numAspects = properties.getInt(Key.DefaultIntKey.ASPECT_COUNT);
         //double[] aspects = new double[numAspects * 2];
         //aspects[0] = initialCrossoverStrength;
         //aspects[1] = initialCrossoverProbability;
@@ -58,11 +58,11 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
     public Key[] requestProperties() {
         return new Key[]{
 
-                Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH,
+                Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH,
                 /*
-                Key.DoubleKey.INITIAL_MUTATION_STRENGTH, Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DoubleKey.INITIAL_CROSSOVER_STRENGTH, Key.DoubleKey.INITIAL_CROSSOVER_PROBABILITY,
+                Key.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH, Key.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY, Key.DefaultDoubleKey.INITIAL_CROSSOVER_STRENGTH, Key.DefaultDoubleKey.INITIAL_CROSSOVER_PROBABILITY,
                 */
-                Key.IntKey.ASPECT_COUNT
+                Key.IntKey.DefaultIntKey.ASPECT_COUNT
         };
     }
 
@@ -77,18 +77,18 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
 
                     @Override
                     public boolean test(Properties properties) {
-                        return properties.getInt(Key.IntKey.ASPECT_COUNT) >= 2;
+                        return properties.getInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT) >= 2;
                     }
                 },
                 new Requirement() {
                     @Override
                     public String describe() {
-                        return "DoubleKey \"INITIAL_ASPECT_ARRAY\" must be of type\"double[]\"";
+                        return "DefaultDoubleKey \"INITIAL_ASPECT_ARRAY\" must be of type\"double[]\"";
                     }
 
                     @Override
                     public boolean test(Properties properties) {
-                        return properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY) instanceof double[];
+                        return properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY) instanceof double[];
                     }
                 },
                 new Requirement() {
@@ -99,7 +99,7 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
 
                     @Override
                     public boolean test(Properties properties) {
-                        return properties.getInt(Key.IntKey.ASPECT_COUNT) * 2 == ((double[]) properties.getValue(Key.DoubleKey.INITIAL_ASPECT_ARRAY)).length;
+                        return properties.getInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT) * 2 == ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length;
                     }
                 }
         };

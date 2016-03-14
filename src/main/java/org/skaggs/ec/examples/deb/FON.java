@@ -48,12 +48,12 @@ public final class FON {
 
         @SuppressWarnings("MagicNumber")
         Properties properties = new Properties()
-                .setInt(Key.IntKey.POPULATION_SIZE, 200)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)
-                .setDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)
-                .setInt(Key.IntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 3)
-                .setDouble(Key.DoubleKey.INITIAL_MUTATION_STRENGTH, .125);
+                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 200)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)
+                .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_PROBABILITY, 1d / 3)
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.INITIAL_MUTATION_STRENGTH, .125);
 
         Operator<double[]> operator = new SimpleDoubleArrayMutationOperator();
         OptimizationFunction<double[]> function1 = new Function1();

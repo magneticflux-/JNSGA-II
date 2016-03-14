@@ -21,15 +21,23 @@ import java.util.concurrent.ThreadLocalRandom;
 @Deprecated
 public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
+    public static double clip(double lower, double toClip, double upper) {
+        if (toClip > lower) {
+            if (toClip < upper) {
+                return toClip;
+            } else return upper;
+        } else return lower;
+    }
+
     @Override
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
         List<Individual<double[]>> individuals = new ArrayList<>(population.getPopulation().size());
         Random r = ThreadLocalRandom.current();
 
-        double mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
-        double mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);
-        double mutationProbabilityMutationStrength = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH);
-        double mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
+        double mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
+        double mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);
+        double mutationProbabilityMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH);
+        double mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
 
         for (FrontedIndividual<double[]> d : population.getPopulation()) {
             double[] newIndividual = Arrays.stream(d.getIndividual()).parallel().map(value -> (r.nextDouble() < d.getMutationProbability()) ? this.mutate(value, r, FastMath.pow(d.getMutationStrength(), 2)) : value).toArray();
@@ -50,19 +58,11 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
         return (d + (r.nextDouble() * 2 * range)) - range;
     }
 
-    public static double clip(double lower, double toClip, double upper) {
-        if (toClip > lower) {
-            if (toClip < upper) {
-                return toClip;
-            } else return upper;
-        } else return lower;
-    }
-
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.DoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, Key.DoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
-                Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, Key.DoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
+                Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY
         };
     }
 }

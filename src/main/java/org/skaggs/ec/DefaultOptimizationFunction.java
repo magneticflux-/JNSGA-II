@@ -18,7 +18,7 @@ public abstract class DefaultOptimizationFunction<E> implements OptimizationFunc
         double[] scores = new double[individuals.size()];
 
         IntStream stream = IntStream.range(0, scores.length);
-        if (properties.getBoolean(Key.BooleanKey.THREADED))
+        if (properties.getBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED))
             stream = stream.parallel();
 
         stream.forEach(
@@ -30,7 +30,7 @@ public abstract class DefaultOptimizationFunction<E> implements OptimizationFunc
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.BooleanKey.THREADED
+                Key.BooleanKey.DefaultBooleanKey.THREADED
         };
     }
 }

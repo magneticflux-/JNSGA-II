@@ -16,8 +16,8 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
     @Override
     public List<Individual<Double>> generatePopulation(int num, Properties properties) {
-        final double min = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
-        final double max = properties.getDouble(Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
+        final double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
+        final double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
         final double difference = max - min;
 
         if (max <= min)
@@ -33,6 +33,6 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
     @Override
     public Key[] requestProperties() {
-        return new Key[]{Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM};
+        return new Key[]{Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM};
     }
 }
