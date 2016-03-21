@@ -4,7 +4,11 @@ import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.*;
+import org.skaggs.ec.properties.HasAspectRequirements;
+import org.skaggs.ec.properties.HasPropertyRequirements;
+import org.skaggs.ec.properties.Key;
+import org.skaggs.ec.properties.Properties;
+import org.skaggs.ec.properties.Requirement;
 import org.skaggs.ec.util.Utils;
 
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ import java.util.stream.IntStream;
 /**
  * Created by skaggsm on 1/22/16.
  */
-public class DefaultOperator<E> implements Operator<E> {
+public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
 
     private final List<Mutator<E>> mutators;
@@ -29,18 +33,6 @@ public class DefaultOperator<E> implements Operator<E> {
         this.recombiner = recombiner;
         this.selector = selector;
         this.speciator = speciator;
-    }
-
-    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
-        int currentIndex = 0;
-        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
-            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
-        }
-        return currentIndex;
-    }
-
-    private HasAspectRequirements[] getHasAspectRequirementses() {
-        return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
     }
 
     @SuppressWarnings("unchecked")
@@ -73,6 +65,18 @@ public class DefaultOperator<E> implements Operator<E> {
         IntStream.range(0, mutators.size()).forEach(value -> newPopulation.replaceAll(mutators.get(value)::apply));
 
         return new Population<>(newPopulation);
+    }
+
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
+    }
+
+    private HasAspectRequirements[] getHasAspectRequirementses() {
+        return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
     }
 
     @Override
@@ -109,5 +113,15 @@ public class DefaultOperator<E> implements Operator<E> {
                             }
                         }
                 });
+    }
+
+    @Override
+    public int requestAspectLocation(int startIndex) {
+        throw new UnsupportedOperationException("This only supports the descriptions.");
+    }
+
+    @Override
+    public String[] getAspectDescriptions() {
+        return Utils.concat(recombiner.getAspectDescriptions(), selector.getAspectDescriptions(), speciator.getAspectDescriptions(), mutators.stream().map(Mutator<E>::getAspectDescriptions).reduce(new String[0], Utils::concat));
     }
 }

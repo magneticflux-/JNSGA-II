@@ -42,4 +42,9 @@ public class DoubleArraySpeciator extends Speciator<double[]> {
     public int requestAspectLocation(int startIndex) {
         return 0;
     }
+
+    @Override
+    public String[] getAspectDescriptions() {
+        return new String[]{};
+    }
 }

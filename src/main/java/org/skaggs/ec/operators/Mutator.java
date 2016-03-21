@@ -1,7 +1,11 @@
 package org.skaggs.ec.operators;
 
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.*;
+import org.skaggs.ec.properties.HasAspectRequirements;
+import org.skaggs.ec.properties.HasPropertyRequirements;
+import org.skaggs.ec.properties.Key;
+import org.skaggs.ec.properties.LateUpdatingProperties;
+import org.skaggs.ec.properties.Properties;
 import org.skaggs.ec.util.Range;
 
 import java.util.Random;
@@ -13,12 +17,8 @@ import java.util.function.Function;
  */
 public abstract class Mutator<E> implements Function<Individual<E>, Individual<E>>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
 
-    private double mutationProbabilityMutationProbability, mutationProbabilityMutationStrength, mutationStrengthMutationProbability, mutationStrengthMutationStrength;
     private int startIndex;
-
-    public static double mutate(double d, Random r, double range) {
-        return (d + (r.nextDouble() * 2 * range)) - range;
-    }
+    private double[] aspectModificationArray;
 
     @Override
     public int requestAspectLocation(int startIndex) {
@@ -27,11 +27,13 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
     }
 
     @Override
+    public String[] getAspectDescriptions() {
+        return new String[]{"Mutation Strength", "Mutation Probability"};
+    }
+
+    @Override
     public void updateProperties(Properties properties) {
-        mutationStrengthMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH);
-        mutationStrengthMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY);
-        mutationProbabilityMutationStrength = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH);
-        mutationProbabilityMutationProbability = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY);
+        aspectModificationArray = (double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY);
     }
 
     @Override
@@ -40,10 +42,10 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
 
         double[] newAspects = e.aspects.clone();
 
-        if (r.nextDouble() < mutationStrengthMutationProbability)
-            newAspects[startIndex] = Mutator.mutate(newAspects[startIndex], r, mutationStrengthMutationStrength);
-        if (r.nextDouble() < mutationProbabilityMutationProbability)
-            newAspects[startIndex + 1] = Mutator.mutate(newAspects[startIndex + 1], r, mutationProbabilityMutationStrength);
+        if (r.nextDouble() < aspectModificationArray[startIndex * 2 + 1])
+            newAspects[startIndex] = Mutator.mutate(newAspects[startIndex], r, aspectModificationArray[startIndex * 2]);
+        if (r.nextDouble() < aspectModificationArray[startIndex * 2 + 3])
+            newAspects[startIndex + 1] = Mutator.mutate(newAspects[startIndex + 1], r, aspectModificationArray[startIndex * 2 + 2]);
 
         newAspects[startIndex] = Range.clip(0, newAspects[startIndex], Double.POSITIVE_INFINITY);
         newAspects[startIndex + 1] = Range.clip(0, newAspects[startIndex + 1], 1);
@@ -54,6 +56,10 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
             individual = mutate(e.getIndividual(), e.getMutationStrength(), e.getMutationProbability());
 
         return new Individual<>(individual, newAspects);
+    }
+
+    public static double mutate(double d, Random r, double range) {
+        return (d + (r.nextDouble() * 2 * range)) - range;
     }
 
     protected abstract E mutate(E object, double mutationStrength, double mutationProbability);

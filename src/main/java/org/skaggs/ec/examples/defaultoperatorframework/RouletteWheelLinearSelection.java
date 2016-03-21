@@ -43,4 +43,9 @@ public class RouletteWheelLinearSelection<E> extends Selector<E> {
     public int requestAspectLocation(int startIndex) {
         return 0;
     }
+
+    @Override
+    public String[] getAspectDescriptions() {
+        return new String[]{};
+    }
 }

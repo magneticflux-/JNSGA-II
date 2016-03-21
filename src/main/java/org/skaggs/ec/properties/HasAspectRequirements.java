@@ -12,4 +12,6 @@ public interface HasAspectRequirements {
      * @return the size of the area requested.
      */
     int requestAspectLocation(int startIndex);
+
+    String[] getAspectDescriptions();
 }
