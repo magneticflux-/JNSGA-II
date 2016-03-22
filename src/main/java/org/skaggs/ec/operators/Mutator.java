@@ -1,11 +1,7 @@
 package org.skaggs.ec.operators;
 
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.HasAspectRequirements;
-import org.skaggs.ec.properties.HasPropertyRequirements;
-import org.skaggs.ec.properties.Key;
-import org.skaggs.ec.properties.LateUpdatingProperties;
-import org.skaggs.ec.properties.Properties;
+import org.skaggs.ec.properties.*;
 import org.skaggs.ec.util.Range;
 
 import java.util.Random;
@@ -19,6 +15,10 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
 
     private int startIndex;
     private double[] aspectModificationArray;
+
+    public static double mutate(double d, Random r, double range) {
+        return (d + (r.nextDouble() * 2 * range)) - range;
+    }
 
     @Override
     public int requestAspectLocation(int startIndex) {
@@ -52,14 +52,10 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
 
         E individual = e.getIndividual();
 
-        if (r.nextDouble() < e.getMutationProbability())
-            individual = mutate(e.getIndividual(), e.getMutationStrength(), e.getMutationProbability());
+        if (r.nextDouble() < newAspects[startIndex + 1])
+            individual = mutate(e.getIndividual(), newAspects[startIndex], newAspects[startIndex + 1]);
 
         return new Individual<>(individual, newAspects);
-    }
-
-    public static double mutate(double d, Random r, double range) {
-        return (d + (r.nextDouble() * 2 * range)) - range;
     }
 
     protected abstract E mutate(E object, double mutationStrength, double mutationProbability);
@@ -67,10 +63,7 @@ public abstract class Mutator<E> implements Function<Individual<E>, Individual<E
     @Override
     public Key[] requestProperties() {
         return new Key[]{
-                Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH,
-                Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY,
-                Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH,
-                Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY
+                Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY
         };
     }
 }

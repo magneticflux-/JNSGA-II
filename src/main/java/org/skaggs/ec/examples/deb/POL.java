@@ -23,7 +23,6 @@ import org.skaggs.ec.multiobjective.population.Front;
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.operators.DefaultOperator;
 import org.skaggs.ec.operators.Mutator;
-import org.skaggs.ec.operators.Operator;
 import org.skaggs.ec.population.PopulationGenerator;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
@@ -63,15 +62,10 @@ public final class POL {
         currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
         ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
 
-        YIntervalSeriesCollection averageAspectStrengthCollection = new YIntervalSeriesCollection();
-        JFreeChart averageMutationStrengthChart = ChartFactory.createScatterPlot("Average Aspect Strengths", "Generation", "Y", averageAspectStrengthCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageMutationStrengthChart.getXYPlot().setRenderer(averagePlotRenderer);
-        ChartPanel averageMutationStrengthPanel = new ChartPanel(averageMutationStrengthChart);
-
-        YIntervalSeriesCollection averageAspectProbabilityCollection = new YIntervalSeriesCollection();
-        JFreeChart averageMutationProbabilityChart = ChartFactory.createScatterPlot("Average Aspect Probabilities", "Generation", "Y", averageAspectProbabilityCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageMutationProbabilityChart.getXYPlot().setRenderer(averagePlotRenderer);
-        ChartPanel averageMutationProbabilityPanel = new ChartPanel(averageMutationProbabilityChart);
+        YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
+        JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
+        averageAspectChart.getXYPlot().setRenderer(averagePlotRenderer);
+        ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
 
         JFrame windowFrame = new JFrame("Evolutionary Algorithm");
         JPanel mainPanel = new JPanel();
@@ -84,20 +78,17 @@ public final class POL {
         groupLayout.setAutoCreateContainerGaps(true);
 
         groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-                        .addGroup(groupLayout.createParallelGroup()
-                                .addComponent(currentGenerationPanel)
-                                .addComponent(currentPopulationPanel))
-                        .addGroup(groupLayout.createParallelGroup()
-                                .addComponent(averageMutationStrengthPanel)
-                                .addComponent(averageMutationProbabilityPanel))
-        );
-        groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
                 .addGroup(groupLayout.createParallelGroup()
                         .addComponent(currentGenerationPanel)
-                        .addComponent(averageMutationStrengthPanel))
-                        .addGroup(groupLayout.createParallelGroup()
-                                .addComponent(currentPopulationPanel)
-                                .addComponent(averageMutationProbabilityPanel))
+                        .addComponent(currentPopulationPanel))
+                .addGroup(groupLayout.createParallelGroup()
+                        .addComponent(averageAspectPanel))
+        );
+        groupLayout.setVerticalGroup(groupLayout.createParallelGroup()
+                .addGroup(groupLayout.createSequentialGroup()
+                        .addComponent(currentGenerationPanel)
+                        .addComponent(currentPopulationPanel))
+                .addComponent(averageAspectPanel)
         );
 
         //noinspection MagicNumber
@@ -110,6 +101,7 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
+                .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 100)
                 .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
                 .setInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT, 3)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
@@ -117,8 +109,20 @@ public final class POL {
                 .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
-                .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{0, 1, 0, 1, 0, 1})
-
+                .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{
+                        0, 1, // Crossover STR/PROB
+                        0, 1, // Mutation 1
+                        0, 1 // Mutation 2
+                })
+                .setValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY, new double[]{
+                        .125 / 16, 1, // Crossover STR
+                        .125 / 16, 1, // Crossover PROB
+                        .125 / 16, 1, // Mutation 1 STR
+                        .125 / 16, 1, // Mutation 1 PROB
+                        .125 / 16, 1, // Mutation 2 STR
+                        .125 / 16, 1 // Mutation 2 PROB
+                })
+/*
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
 
@@ -129,9 +133,9 @@ public final class POL {
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
 
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1);
+                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1)*/;
 
-        Operator<double[]> operator = new DefaultOperator<>(Arrays.asList(
+        DefaultOperator<double[]> operator = new DefaultOperator<>(Arrays.asList(
                 new Mutator<double[]>() {
                     @Override
                     protected double[] mutate(double[] object, double mutationStrength, double mutationProbability) {
@@ -166,6 +170,8 @@ public final class POL {
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
+        String[] aspectDescriptions = operator.getAspectDescriptions();
+
         nsga_ii.addObserver(populationData -> {
             currentGenerationChart.setNotify(false);
             currentGenerationCollection.removeAllSeries();
@@ -195,49 +201,39 @@ public final class POL {
         nsga_ii.addObserver(populationData -> {
             double elapsedTimeMS = (populationData.getElapsedTime() / 1000000d);
             double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
-            System.out.print("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
+            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
 
-            for (int i = 0; i < properties.getInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT); i++) {
+            for (int i = 0; i < ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length; i++) {
+                YIntervalSeries aspectSeries;
+                DescriptiveStatistics aspectSummary;
+
+                try {
+                    aspectSeries = averageAspectCollection.getSeries(i);
+                } catch (IllegalArgumentException e) {
+                    aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
+                    averageAspectCollection.addSeries(aspectSeries);
+                }
+
                 final int finalI = i;
-                YIntervalSeries aspectStrengthSeries, aspectProbabilitySeries;
-                DescriptiveStatistics aspectStrengthSummary, aspectProbabilitySummary;
-
-                try {
-                    aspectStrengthSeries = averageAspectStrengthCollection.getSeries(i);
-                } catch (IllegalArgumentException e) {
-                    aspectStrengthSeries = new YIntervalSeries("Median Aspect " + i + " Strength");
-                    averageAspectStrengthCollection.addSeries(aspectStrengthSeries);
-                }
-                try {
-                    aspectProbabilitySeries = averageAspectProbabilityCollection.getSeries(i);
-                } catch (IllegalArgumentException e) {
-                    aspectProbabilitySeries = new YIntervalSeries("Median Aspect " + i + " Probability");
-                    averageAspectProbabilityCollection.addSeries(aspectProbabilitySeries);
-                }
-
-                aspectStrengthSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[(finalI * 2)]).toArray());
-                aspectProbabilitySummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[(finalI * 2) + 1]).toArray());
-
-                //double aspectStrengthMedian = aspectStrengthSummary.getPercentile(50);
-                //double aspectProbabilityMedian = aspectProbabilitySummary.getPercentile(50);
-                aspectStrengthSeries.add(populationData.getCurrentGeneration(), aspectStrengthSummary.getPercentile(50), aspectStrengthSummary.getPercentile(25), aspectStrengthSummary.getPercentile(75));
-                aspectProbabilitySeries.add(populationData.getCurrentGeneration(), aspectProbabilitySummary.getPercentile(50), aspectProbabilitySummary.getPercentile(25), aspectProbabilitySummary.getPercentile(75));
+                aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
+                //noinspection MagicNumber
+                aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
             }
         });
 
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
-            long startTime = System.nanoTime();
+            //long startTime = System.nanoTime();
             EventQueue.invokeAndWait(nsga_ii::runGeneration);
-            long elapsedTime = System.nanoTime() - startTime;
-            System.out.println("; Total elapsed time: " + String.format("%.4f", elapsedTime / 1000000d) + "ms");
+            //long elapsedTime = System.nanoTime() - startTime;
+            //System.out.println("; Total elapsed time: " + String.format("%.4f", elapsedTime / 1000000d) + "ms");
             //noinspection MagicNumber
             //Thread.sleep(200);
         }
     }
 
-    static class Function1 extends DefaultOptimizationFunction<double[]> {
+    private static class Function1 extends DefaultOptimizationFunction<double[]> {
         @SuppressWarnings("MagicNumber")
         @Override
         public double evaluateIndividual(double[] vector, Properties properties) {
@@ -274,7 +270,7 @@ public final class POL {
 
     }
 
-    static class Function2 extends DefaultOptimizationFunction<double[]> {
+    private static class Function2 extends DefaultOptimizationFunction<double[]> {
         @Override
         public double evaluateIndividual(double[] object, Properties properties) {
             assert object.length == 2;
@@ -302,7 +298,7 @@ public final class POL {
         }
     }
 
-    static class Function3 extends DefaultOptimizationFunction<double[]> {
+    private static class Function3 extends DefaultOptimizationFunction<double[]> {
         @Override
         public double evaluateIndividual(double[] object, Properties properties) {
             assert object.length == 3;
@@ -334,7 +330,7 @@ public final class POL {
         }
     }
 
-    static class Function4 extends DefaultOptimizationFunction<double[]> {
+    private static class Function4 extends DefaultOptimizationFunction<double[]> {
         @Override
         public double evaluateIndividual(double[] object, Properties properties) {
             assert object.length == 3;

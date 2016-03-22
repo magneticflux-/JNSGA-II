@@ -4,11 +4,7 @@ import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.multiobjective.population.FrontedPopulation;
 import org.skaggs.ec.population.Population;
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.HasAspectRequirements;
-import org.skaggs.ec.properties.HasPropertyRequirements;
-import org.skaggs.ec.properties.Key;
-import org.skaggs.ec.properties.Properties;
-import org.skaggs.ec.properties.Requirement;
+import org.skaggs.ec.properties.*;
 import org.skaggs.ec.util.Utils;
 
 import java.util.ArrayList;
@@ -33,6 +29,14 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         this.recombiner = recombiner;
         this.selector = selector;
         this.speciator = speciator;
+    }
+
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
     }
 
     @SuppressWarnings("unchecked")
@@ -67,14 +71,6 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         return new Population<>(newPopulation);
     }
 
-    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
-        int currentIndex = 0;
-        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
-            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
-        }
-        return currentIndex;
-    }
-
     private HasAspectRequirements[] getHasAspectRequirementses() {
         return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
     }
@@ -100,15 +96,14 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 speciator.requestDetailedRequirements(),
                 new Requirement[]{
                         new Requirement() {
+                            int size = setAspectIndices(getHasAspectRequirementses());
                             @Override
                             public String describe() {
-                                int size = setAspectIndices(getHasAspectRequirementses());
                                 return size + " aspect data slots required.";
                             }
 
                             @Override
                             public boolean test(Properties properties) {
-                                int size = setAspectIndices(getHasAspectRequirementses());
                                 return ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length == size;
                             }
                         }
@@ -117,7 +112,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
     @Override
     public int requestAspectLocation(int startIndex) {
-        throw new UnsupportedOperationException("This only supports the descriptions.");
+        throw new UnsupportedOperationException("This object only supports the descriptions of the aspects used by it.");
     }
 
     @Override

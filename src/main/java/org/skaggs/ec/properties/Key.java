@@ -9,7 +9,8 @@ public interface Key {
         enum DefaultIntKey implements Key {
             POPULATION_SIZE,
             ASPECT_COUNT,
-            DOUBLE_ARRAY_GENERATION_LENGTH
+            DOUBLE_ARRAY_GENERATION_LENGTH,
+            OBSERVER_UPDATE_SKIP_NUM
         }
     }
 

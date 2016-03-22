@@ -14,18 +14,22 @@ public abstract class PopulationMember {
         this.aspects = populationMember.aspects.clone();
     }
 
+    @Deprecated
     public double getMutationStrength() {
         return aspects[2];
     }
 
+    @Deprecated
     public double getMutationProbability() {
         return aspects[3];
     }
 
+    @Deprecated
     public double getCrossoverStrength() {
         return aspects[0];
     }
 
+    @Deprecated
     public double getCrossoverProbability() {
         return aspects[1];
     }

@@ -82,7 +82,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
                 boolean result = false;
                 try {
                     result = requirement.test(properties);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
                 if (!result) {
                     failedRequirements.add(requirement.describe());
@@ -156,7 +156,9 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     }
 
     private void update(PopulationData<E> populationData) {
-        this.observers.forEach(observer -> observer.update(populationData));
+        if (this.currentGeneration % properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) == 0) {
+            this.observers.forEach(observer -> observer.update(populationData));
+        }
     }
 
     public boolean addObserver(EvolutionObserver<E> observer) {
@@ -172,7 +174,8 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     public Key[] requestProperties() {
         return new Key[]{
                 Key.IntKey.DefaultIntKey.POPULATION_SIZE,
-                Key.BooleanKey.DefaultBooleanKey.THREADED
+                Key.BooleanKey.DefaultBooleanKey.THREADED,
+                Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM
         };
     }
 
@@ -188,6 +191,17 @@ public class NSGA_II<E> implements HasPropertyRequirements {
                     @Override
                     public boolean test(Properties properties) {
                         return properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE) > 0;
+                    }
+                },
+                new Requirement() {
+                    @Override
+                    public String describe() {
+                        return "Observer update skip number must be >= 1";
+                    }
+
+                    @Override
+                    public boolean test(Properties properties) {
+                        return properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) >= 1;
                     }
                 }
         };

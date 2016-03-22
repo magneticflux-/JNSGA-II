@@ -1,11 +1,7 @@
 package org.skaggs.ec.operators;
 
 import org.skaggs.ec.population.individual.Individual;
-import org.skaggs.ec.properties.HasAspectRequirements;
-import org.skaggs.ec.properties.HasPropertyRequirements;
-import org.skaggs.ec.properties.Key;
-import org.skaggs.ec.properties.LateUpdatingProperties;
-import org.skaggs.ec.properties.Properties;
+import org.skaggs.ec.properties.*;
 import org.skaggs.ec.util.Range;
 
 import java.util.Random;
@@ -43,7 +39,7 @@ public abstract class Recombiner<E> implements BiFunction<Individual<E>, Individ
 
         double[] newAspects = t.aspects.clone();
 
-        boolean doCrossover = r.nextDouble() < t.getCrossoverProbability();
+        boolean doCrossover = r.nextDouble() < newAspects[startIndex + 1];
 
         if (r.nextDouble() < aspectModificationArray[startIndex * 2 + 1])
             newAspects[startIndex] = Mutator.mutate(newAspects[startIndex], r, aspectModificationArray[startIndex * 2]);

@@ -19,6 +19,7 @@ public class Properties {
         Map<Key, Object> v = new HashMap<>();
 
         v.put(Key.BooleanKey.DefaultBooleanKey.THREADED, true);
+        v.put(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 1);
 
         defaultValues = Collections.unmodifiableMap(v);
     }
