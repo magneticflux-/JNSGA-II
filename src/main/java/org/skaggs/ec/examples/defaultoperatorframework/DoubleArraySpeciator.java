@@ -1,12 +1,11 @@
 package org.skaggs.ec.examples.defaultoperatorframework;
 
 import org.apache.commons.math3.util.FastMath;
-import org.skaggs.ec.operators.Mutator;
 import org.skaggs.ec.operators.Speciator;
 import org.skaggs.ec.population.individual.Individual;
+import org.skaggs.ec.properties.AspectUser;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
-import org.skaggs.ec.util.Range;
 import org.skaggs.ec.util.Utils;
 
 import java.util.Random;
@@ -56,10 +55,7 @@ public class DoubleArraySpeciator extends Speciator<double[]> {
     @Override
     public void modifyAspects(Individual<double[]> individual, Random r) {
         double[] aspects = individual.aspects;
-        if (r.nextDouble() < aspectModificationArray[startIndex * 2 + 1])
-            aspects[startIndex] = Mutator.mutate(aspects[startIndex], r, aspectModificationArray[startIndex * 2]);
-
-        aspects[startIndex] = Range.clip(0, aspects[startIndex], Double.POSITIVE_INFINITY);
+        AspectUser.mutateAspect(aspectModificationArray, aspects, startIndex, r, 0, Double.POSITIVE_INFINITY);
     }
 
     @Override

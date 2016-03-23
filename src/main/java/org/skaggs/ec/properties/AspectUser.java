@@ -1,6 +1,8 @@
 package org.skaggs.ec.properties;
 
+import org.skaggs.ec.operators.Mutator;
 import org.skaggs.ec.population.individual.Individual;
+import org.skaggs.ec.util.Range;
 
 import java.util.Random;
 
@@ -10,6 +12,11 @@ import java.util.Random;
 public abstract class AspectUser<E> implements HasAspectRequirements, HasPropertyRequirements {
     protected int startIndex;
     protected double[] aspectModificationArray;
+
+    public static void mutateAspect(double[] aspectModificationArray, double[] aspects, int index, Random r, double min, double max) {
+        if (r.nextDouble() < aspectModificationArray[index * 2 + 1])
+            aspects[index] = Range.clip(min, Mutator.mutate(aspects[index], r, aspectModificationArray[index * 2]), max);
+    }
 
     @Override
     public int requestAspectLocation(int startIndex) {

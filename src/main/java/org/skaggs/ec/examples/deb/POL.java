@@ -110,14 +110,14 @@ public final class POL {
 
                 .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{
                         0, 1, // Crossover STR/PROB
-                        .5,   // Speciator DISTANCE
+                        .25,   // Speciator DISTANCE
                         0, 1, // Mutation 1 STR/PROB
                         0, 1  // Mutation 2
                 })
                 .setValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY, new double[]{
                         .125 / 4, 1, // Crossover STR
                         .125 / 16, 1, // Crossover PROB
-                        .125 / 64, 1, // Speciator DISTANCE
+                        .125 / 16, 1, // Speciator DISTANCE
                         .125 / 16, 1, // Mutation 1 STR
                         .125 / 16, 1, // Mutation 1 PROB
                         .125 / 16, 1, // Mutation 2 STR
@@ -143,7 +143,9 @@ public final class POL {
                         Random r = ThreadLocalRandom.current();
                         double[] newObject = new double[object.length];
                         for (int i = 0; i < newObject.length; i++) {
-                            newObject[i] = (r.nextGaussian() * mutationStrength) + object[i];
+                            if (r.nextDouble() < mutationProbability) {
+                                newObject[i] = (r.nextGaussian() * mutationStrength) + object[i];
+                            }
                             //newObject[i] = Mutator.mutate(object[i], r, mutationStrength);
                         }
                         return newObject;
@@ -155,7 +157,9 @@ public final class POL {
                         Random r = ThreadLocalRandom.current();
                         double[] newObject = new double[object.length];
                         for (int i = 0; i < newObject.length; i++) {
-                            newObject[i] = Mutator.mutate(object[i], r, mutationStrength);
+                            if (r.nextDouble() < mutationProbability) {
+                                newObject[i] = Mutator.mutate(object[i], r, mutationStrength);
+                            }
                         }
                         return newObject;
                     }
