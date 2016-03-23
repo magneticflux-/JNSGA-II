@@ -101,26 +101,27 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
-                .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 100)
+                .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 10)
                 .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
-                .setInt(Key.IntKey.DefaultIntKey.ASPECT_COUNT, 3)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
                 .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
+                //.setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
                 .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{
                         0, 1, // Crossover STR/PROB
-                        0, 1, // Mutation 1
-                        0, 1 // Mutation 2
+                        .5,   // Speciator DISTANCE
+                        0, 1, // Mutation 1 STR/PROB
+                        0, 1  // Mutation 2
                 })
                 .setValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY, new double[]{
-                        .125 / 16, 1, // Crossover STR
+                        .125 / 4, 1, // Crossover STR
                         .125 / 16, 1, // Crossover PROB
+                        .125 / 64, 1, // Speciator DISTANCE
                         .125 / 16, 1, // Mutation 1 STR
                         .125 / 16, 1, // Mutation 1 PROB
                         .125 / 16, 1, // Mutation 2 STR
-                        .125 / 16, 1 // Mutation 2 PROB
+                        .125 / 16, 1, // Mutation 2 PROB
                 })
 /*
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)

@@ -2,6 +2,7 @@ package org.skaggs.ec.examples.defaultoperatorframework;
 
 import org.skaggs.ec.multiobjective.population.FrontedIndividual;
 import org.skaggs.ec.operators.Selector;
+import org.skaggs.ec.population.individual.Individual;
 import org.skaggs.ec.properties.Key;
 import org.skaggs.ec.properties.Properties;
 
@@ -42,6 +43,10 @@ public class RouletteWheelLinearSelection<E> extends Selector<E> {
     @Override
     public int requestAspectLocation(int startIndex) {
         return 0;
+    }
+
+    @Override
+    public void modifyAspects(Individual<E> individual, Random r) {
     }
 
     @Override

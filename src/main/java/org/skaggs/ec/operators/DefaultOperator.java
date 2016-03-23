@@ -10,6 +10,7 @@ import org.skaggs.ec.util.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,11 +69,20 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
         IntStream.range(0, mutators.size()).forEach(value -> newPopulation.replaceAll(mutators.get(value)::apply));
 
+        for (AspectUser<E> aspectUser : getAspectUsers()) {
+            newPopulation.forEach(individual -> aspectUser.modifyAspects(individual, ThreadLocalRandom.current()));
+        }
+
         return new Population<>(newPopulation);
     }
 
     private HasAspectRequirements[] getHasAspectRequirementses() {
         return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
+    }
+
+    private AspectUser<E>[] getAspectUsers() {
+        //noinspection unchecked
+        return Utils.concat(new AspectUser[]{recombiner, selector, speciator}, mutators.toArray(new AspectUser[mutators.size()]));
     }
 
     @Override
