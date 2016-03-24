@@ -21,6 +21,7 @@ import org.jnsgaii.properties.Properties;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -130,7 +131,7 @@ public class Main {
             }
         };
         @SuppressWarnings("unchecked")
-        OptimizationFunction<Double>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
+        List<OptimizationFunction<Double>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<Double> populationGenerator = new DoublePopulationGenerator();
 
         NSGA_II<Double> nsgaii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);

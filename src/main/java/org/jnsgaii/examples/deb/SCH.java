@@ -24,6 +24,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -58,7 +60,7 @@ public final class SCH {
         OptimizationFunction<Double> function1 = new Function1();
         OptimizationFunction<Double> function2 = new Function2();
         @SuppressWarnings("unchecked")
-        OptimizationFunction<Double>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
+        List<OptimizationFunction<Double>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<Double> populationGenerator = new DoublePopulationGenerator();
 
         NSGA_II<Double> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);

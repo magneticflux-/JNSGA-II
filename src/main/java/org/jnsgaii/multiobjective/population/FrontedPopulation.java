@@ -24,7 +24,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.population = population;
     }
 
-    public FrontedPopulation(EvaluatedPopulation<E> population, OptimizationFunction<E>[] optimizationFunctions, Properties properties) {
+    public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
 
         this.fronts = new ArrayList<>();
@@ -49,17 +49,17 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         // Start computing the crowding distance
 
         //for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
-        for (int i = 0; i < optimizationFunctions.length; i++) {
+        for (int i = 0; i < optimizationFunctions.size(); i++) {
             // Sorts the population according to the comparator
             final int finalI = i; // To satisfy the lambda
-            Collections.sort(castPopulationView, (o1, o2) -> -optimizationFunctions[finalI].compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
+            Collections.sort(castPopulationView, (o1, o2) -> -optimizationFunctions.get(finalI).compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
             // First and last have priority with the crowding score
             castPopulationView.get(0).crowdingScore = Double.POSITIVE_INFINITY;
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;
 
             for (int j = 1; j < (castPopulationView.size() - 1); j++) { // Don't check the outside ones
                 if (Double.isFinite(castPopulationView.get(j).crowdingScore)) // Only add to it if it isn't an outlier on another function
-                    castPopulationView.get(j).crowdingScore += (castPopulationView.get(j + 1).getScore(i) - castPopulationView.get(j - 1).getScore(i)) / (optimizationFunctions[i].max(properties) - optimizationFunctions[i].min(properties));
+                    castPopulationView.get(j).crowdingScore += (castPopulationView.get(j + 1).getScore(i) - castPopulationView.get(j - 1).getScore(i)) / (optimizationFunctions.get(i).max(properties) - optimizationFunctions.get(i).min(properties));
             }
         }
 

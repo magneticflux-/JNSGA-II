@@ -36,6 +36,7 @@ import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.text.AttributedString;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -169,8 +170,8 @@ public final class POL {
         OptimizationFunction<double[]> function2 = new Function2();
         OptimizationFunction<double[]> function3 = new Function3();
         OptimizationFunction<double[]> function4 = new Function4();
-        @SuppressWarnings("unchecked")
-        OptimizationFunction<double[]>[] optimizationFunctions = new OptimizationFunction[]{function1, function2};
+
+        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);

@@ -23,15 +23,15 @@ public class EvaluatedPopulation<E> extends Population<E> {
      * @param optimizationFunctions the functions to use to evaluate the population
      */
     @SuppressWarnings("AssignmentToSuperclassField")
-    public EvaluatedPopulation(Population<E> population, OptimizationFunction<E>[] optimizationFunctions, Properties properties) {
+    public EvaluatedPopulation(Population<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
 
-        double[][] scores = new double[population.size()][optimizationFunctions.length];
+        double[][] scores = new double[population.size()][optimizationFunctions.size()];
 
-        for (int i = 0; i < optimizationFunctions.length; i++) {
+        for (int i = 0; i < optimizationFunctions.size(); i++) {
             @SuppressWarnings("unchecked")
-            double[] functionScores = optimizationFunctions[i].evaluate((List<Individual<E>>) population.getPopulation(), properties);
-            final int finalI = i; // It _is_ effectively final! Ugh.
+            double[] functionScores = optimizationFunctions.get(i).evaluate((List<Individual<E>>) population.getPopulation(), properties);
+            final int finalI = i; // It _is_ effectively final! Ugh.s
             IntStream.range(0, scores.length).parallel().forEach(
                     value -> scores[value][finalI] = functionScores[value]
             );

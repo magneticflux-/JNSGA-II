@@ -22,7 +22,7 @@ import java.util.*;
 public class NSGA_II<E> implements HasPropertyRequirements {
 
     private final List<EvolutionObserver<E>> observers;
-    private final OptimizationFunction<E>[] optimizationFunctions;
+    private final List<OptimizationFunction<E>> optimizationFunctions;
     private final Operator<E> operator;
     private final org.jnsgaii.properties.Properties properties;
     private final PopulationGenerator<E> populationGenerator;
@@ -31,15 +31,15 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     private long previousObservationTime;
 
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public NSGA_II(org.jnsgaii.properties.Properties properties, Operator<E> operator, OptimizationFunction<E>[] optimizationFunctions, PopulationGenerator<E> populationGenerator) {
-        if (optimizationFunctions.length < 1)
+    public NSGA_II(org.jnsgaii.properties.Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
+        if (optimizationFunctions.size() < 1)
             throw new IllegalArgumentException("There must be at least one optimization function!");
 
         if (!properties.locked())
             properties.lock();
 
         this.observers = new LinkedList<>();
-        this.optimizationFunctions = optimizationFunctions.clone();
+        this.optimizationFunctions = new ArrayList<>(optimizationFunctions);
         this.operator = operator;
         this.properties = properties;
         this.populationGenerator = populationGenerator;
@@ -68,7 +68,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
 
         //noinspection SpellCheckingInspection
         Collection<HasPropertyRequirements> hasPropertyRequirementses = new LinkedList<>(Arrays.asList(this.operator, this, this.populationGenerator)); // Hobbitses...
-        hasPropertyRequirementses.addAll(Arrays.asList(this.optimizationFunctions));
+        hasPropertyRequirementses.addAll(this.optimizationFunctions);
 
         for (HasPropertyRequirements hasPropertyRequirements : hasPropertyRequirementses) {
             for (Key key : hasPropertyRequirements.requestProperties())

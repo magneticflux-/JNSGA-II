@@ -3,17 +3,18 @@ package org.jnsgaii.population.individual;
 import org.jnsgaii.OptimizationFunction;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/25/2015.
  */
 public class EvaluatedIndividual<E> extends Individual<E> {
 
-    protected final OptimizationFunction<E>[] optimizationFunctions;
+    protected final List<OptimizationFunction<E>> optimizationFunctions;
     protected final double[] scores;
 
-    @SuppressWarnings({"unchecked", "AssignmentToCollectionOrArrayFieldFromParameter"})
-    public EvaluatedIndividual(Individual<E> individual, OptimizationFunction<E>[] optimizationFunctions, double[] scores) {
+    @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "MethodCanBeVariableArityMethod"})
+    public EvaluatedIndividual(Individual<E> individual, List<OptimizationFunction<E>> optimizationFunctions, double[] scores) {
         super(individual);
         this.optimizationFunctions = optimizationFunctions;
         this.scores = scores;
@@ -33,8 +34,8 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         boolean thisDominatesInAtLeastOne = false;
         boolean otherDominatesInAtLeastOne = false;
 
-        for (int i = 0; i < optimizationFunctions.length; i++) {
-            int val = optimizationFunctions[i].compare(this.getScore(i), other.getScore(i));
+        for (int i = 0; i < optimizationFunctions.size(); i++) {
+            int val = optimizationFunctions.get(i).compare(this.getScore(i), other.getScore(i));
             if (val < 0) {
                 otherDominatesInAtLeastOne = true;
             } else if (val > 0) {
@@ -55,14 +56,6 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     }
 
     @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + Arrays.hashCode(optimizationFunctions);
-        result = 31 * result + Arrays.hashCode(scores);
-        return result;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -70,9 +63,18 @@ public class EvaluatedIndividual<E> extends Individual<E> {
 
         EvaluatedIndividual<?> that = (EvaluatedIndividual<?>) o;
 
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        if (!Arrays.equals(optimizationFunctions, that.optimizationFunctions)) return false;
+        if (optimizationFunctions != null ? !optimizationFunctions.equals(that.optimizationFunctions) : that.optimizationFunctions != null)
+            return false;
         return Arrays.equals(scores, that.scores);
 
     }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (optimizationFunctions != null ? optimizationFunctions.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(scores);
+        return result;
+    }
 }
+
