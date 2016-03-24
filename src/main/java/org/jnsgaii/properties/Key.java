@@ -6,7 +6,7 @@ package org.jnsgaii.properties;
 public interface Key {
 
     interface IntKey extends Key {
-        enum DefaultIntKey implements Key {
+        enum DefaultIntKey implements IntKey {
             POPULATION_SIZE,
             ASPECT_COUNT,
             DOUBLE_ARRAY_GENERATION_LENGTH,
@@ -15,7 +15,7 @@ public interface Key {
     }
 
     interface DoubleKey extends Key {
-        enum DefaultDoubleKey implements Key {
+        enum DefaultDoubleKey implements DoubleKey {
             INITIAL_ASPECT_ARRAY, // Stored as an array, needs to be cast. Hack-y, but works.
             ASPECT_MODIFICATION_ARRAY, // Aspect1Str, Aspect1Prob, Aspect2Str, Aspect2Prob...
 
@@ -53,7 +53,7 @@ public interface Key {
     }
 
     interface BooleanKey extends Key {
-        enum DefaultBooleanKey implements Key {
+        enum DefaultBooleanKey implements BooleanKey {
             THREADED
         }
     }
