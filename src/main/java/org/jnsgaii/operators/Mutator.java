@@ -30,6 +30,7 @@ public abstract class Mutator<E> extends AspectUser<E> implements Function<Indiv
         if (r.nextDouble() < aspects[startIndex + 1])
             individual = mutate(e.getIndividual(), aspects[startIndex], aspects[startIndex + 1]);
 
+
         return new Individual<>(individual, aspects);
     }
 

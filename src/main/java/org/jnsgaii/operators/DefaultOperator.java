@@ -51,17 +51,20 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         setAspectIndices(getHasAspectRequirementses());
 
         List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
-
         for (int i = 0; i < population.getPopulation().size(); i++) {
             FrontedIndividual<E> individual = selector.apply((List<FrontedIndividual<E>>) population.getPopulation());
 
             final FrontedIndividual<E> finalIndividual = individual;
-            List<FrontedIndividual<E>> compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream().filter(eFrontedIndividual -> speciator.apply(finalIndividual, eFrontedIndividual)).collect(Collectors.toList());
+            List<FrontedIndividual<E>> compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream()
+                    .filter(eFrontedIndividual -> speciator.apply(finalIndividual, eFrontedIndividual) && !finalIndividual.equals(eFrontedIndividual))
+                    .collect(Collectors.toList());
             while (compatibleIndividuals.size() == 0) {
                 individual = selector.choose((List<FrontedIndividual<E>>) population.getPopulation());
 
                 final FrontedIndividual<E> finalIndividual1 = individual;
-                compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream().filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual)).collect(Collectors.toList());
+                compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream()
+                        .filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual) && !finalIndividual1.equals(eFrontedIndividual))
+                        .collect(Collectors.toList());
             }
             FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
             newPopulation.add(recombiner.apply(individual, otherIndividual));
