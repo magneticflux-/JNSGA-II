@@ -14,6 +14,7 @@ import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jnsgaii.DefaultOptimizationFunction;
 import org.jnsgaii.OptimizationFunction;
+import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArrayAverageRecombiner;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArraySpeciator;
 import org.jnsgaii.examples.defaultoperatorframework.RouletteWheelLinearSelection;
@@ -27,10 +28,6 @@ import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import javax.swing.GroupLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -39,6 +36,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -50,7 +55,9 @@ public final class POL {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
         //Thread.sleep(5000);
 
-        XYErrorRenderer averagePlotRenderer = new XYErrorRenderer();
+        Box histogramPanel = new Box(BoxLayout.Y_AXIS);
+        JScrollPane histogramScrollPane = new JScrollPane(histogramPanel);
+        histogramScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
         JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, false, false);
@@ -65,7 +72,7 @@ public final class POL {
 
         YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
         JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageAspectChart.getXYPlot().setRenderer(averagePlotRenderer);
+        averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
         ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
 
         JFrame windowFrame = new JFrame("Evolutionary Algorithm");
@@ -78,42 +85,38 @@ public final class POL {
         groupLayout.setAutoCreateGaps(true);
         groupLayout.setAutoCreateContainerGaps(true);
 
-        groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup()
-                        .addComponent(currentGenerationPanel)
-                        .addComponent(currentPopulationPanel))
-                .addGroup(groupLayout.createParallelGroup()
-                        .addComponent(averageAspectPanel))
+        groupLayout.setHorizontalGroup(
+                groupLayout.createSequentialGroup()
+                        .addComponent(histogramScrollPane)
+                                //.addGroup(groupLayout.createParallelGroup()
+                                //        .addComponent(currentGenerationPanel)
+                                //        .addComponent(currentPopulationPanel))
+                        .addComponent(averageAspectPanel)
         );
-        groupLayout.setVerticalGroup(groupLayout.createParallelGroup()
-                .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(currentGenerationPanel)
-                        .addComponent(currentPopulationPanel))
-                .addComponent(averageAspectPanel)
+        groupLayout.setVerticalGroup(
+                groupLayout.createParallelGroup()
+                        .addComponent(histogramScrollPane)
+                                //.addGroup(groupLayout.createSequentialGroup()
+                                //        .addComponent(currentGenerationPanel)
+                                //        .addComponent(currentPopulationPanel))
+                        .addComponent(averageAspectPanel)
         );
-
-        //noinspection MagicNumber
-        windowFrame.setSize(1400, 1000);
-        //noinspection MagicNumber
-        windowFrame.setLocation(0, 0);
-        windowFrame.setVisible(true);
-        windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
                 .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 10)
-                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
+                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 100)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
-                .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 2)
-                //.setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
+                .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
+                        //.setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
                 .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{
                         0, 1, // Crossover STR/PROB
                         .25,   // Speciator DISTANCE
                         0, 1, // Mutation 1 STR/PROB
-                        0, 1  // Mutation 2
+                        1, 0  // Mutation 2
                 })
                 .setValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY, new double[]{
                         .125 / 4, 1, // Crossover STR
@@ -174,9 +177,34 @@ public final class POL {
         List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
-        NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
         String[] aspectDescriptions = operator.getAspectDescriptions();
+
+        UpdatableHistogramDataset[] datasets = new UpdatableHistogramDataset[optimizationFunctions.size()];
+        for (int i = 0; i < datasets.length; i++) {
+            System.out.println("Creating histogram " + i);
+
+            datasets[i] = new UpdatableHistogramDataset();
+            datasets[i].addSeries("Test", ThreadLocalRandom.current().doubles(10).toArray(), 10);
+
+            ChartPanel panel = new ChartPanel(ChartFactory.createHistogram(optimizationFunctions.get(i).getClass().getSimpleName(), "X", "Y", datasets[i], PlotOrientation.HORIZONTAL, true, false, false));
+            histogramPanel.add(panel);
+
+            System.out.println("Created histogram " + i);
+        }
+
+
+        //noinspection MagicNumber
+        windowFrame.setSize(1400, 1000);
+        //noinspection MagicNumber
+        windowFrame.setLocation(0, 0);
+        windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        windowFrame.setVisible(true);
+
+        System.out.println(histogramPanel.getPreferredSize().toString());
+        System.out.println(histogramScrollPane.getPreferredSize().toString());
+
+        NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
         nsga_ii.addObserver(populationData -> {
             currentGenerationChart.setNotify(false);
@@ -226,7 +254,6 @@ public final class POL {
                 aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
             }
         });
-
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {

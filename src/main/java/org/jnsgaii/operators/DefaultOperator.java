@@ -4,7 +4,12 @@ import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.*;
+import org.jnsgaii.properties.AspectUser;
+import org.jnsgaii.properties.HasAspectRequirements;
+import org.jnsgaii.properties.HasPropertyRequirements;
+import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.Properties;
+import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
@@ -32,14 +37,6 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         this.speciator = speciator;
     }
 
-    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
-        int currentIndex = 0;
-        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
-            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
-        }
-        return currentIndex;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
@@ -63,7 +60,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
                 final FrontedIndividual<E> finalIndividual1 = individual;
                 compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream()
-                        .filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual) && !finalIndividual1.equals(eFrontedIndividual))
+                        .filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual))
                         .collect(Collectors.toList());
             }
             FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
@@ -77,6 +74,14 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         }
 
         return new Population<>(newPopulation);
+    }
+
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
     }
 
     private HasAspectRequirements[] getHasAspectRequirementses() {
@@ -97,7 +102,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 speciator.requestProperties(),
                 new Key[]{
                         Key.BooleanKey.DefaultBooleanKey.THREADED
-        });
+                });
     }
 
     @Override
@@ -110,6 +115,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 new Requirement[]{
                         new Requirement() {
                             int size = setAspectIndices(getHasAspectRequirementses());
+
                             @Override
                             public String describe() {
                                 return size + " aspect data slots required.";
