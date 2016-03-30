@@ -1,49 +1,26 @@
 package org.jnsgaii.examples.deb;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.FastMath;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.xy.XYErrorRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.data.xy.YIntervalSeries;
-import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jnsgaii.DefaultOptimizationFunction;
 import org.jnsgaii.OptimizationFunction;
-import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArrayAverageRecombiner;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArraySpeciator;
 import org.jnsgaii.examples.defaultoperatorframework.RouletteWheelLinearSelection;
 import org.jnsgaii.examples.numarical.DoubleArrayPopulationGenerator;
 import org.jnsgaii.multiobjective.NSGA_II;
-import org.jnsgaii.multiobjective.population.Front;
-import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.operators.Mutator;
 import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
+import org.jnsgaii.visualization.DefaultVisualization;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
-import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
 
 /**
  * Created by skaggsm on 12/27/15.
@@ -52,65 +29,15 @@ public final class POL {
     private POL() {
     }
 
-    public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-        //Thread.sleep(5000);
-
-        Box histogramPanel = new Box(BoxLayout.Y_AXIS);
-        JScrollPane histogramScrollPane = new JScrollPane(histogramPanel);
-        histogramScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
-        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, false, false);
-        currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
-        ChartPanel currentGenerationPanel = new ChartPanel(currentGenerationChart);
-
-        XYSeriesCollection currentPopulationCollection = new XYSeriesCollection();
-        JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, false, false);
-        currentPopulationChart.getXYPlot().getDomainAxis().setAttributedLabel(new AttributedString("X\u2081"));
-        currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
-        ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
-
-        YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
-        JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
-        averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
-        ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
-
-        JFrame windowFrame = new JFrame("Evolutionary Algorithm");
-        JPanel mainPanel = new JPanel();
-        windowFrame.setLayout(new BorderLayout());
-        windowFrame.add(mainPanel, BorderLayout.CENTER);
-
-        GroupLayout groupLayout = new GroupLayout(mainPanel);
-        mainPanel.setLayout(groupLayout);
-        groupLayout.setAutoCreateGaps(true);
-        groupLayout.setAutoCreateContainerGaps(true);
-
-        groupLayout.setHorizontalGroup(
-                groupLayout.createSequentialGroup()
-                        .addComponent(histogramScrollPane)
-                                //.addGroup(groupLayout.createParallelGroup()
-                                //        .addComponent(currentGenerationPanel)
-                                //        .addComponent(currentPopulationPanel))
-                        .addComponent(averageAspectPanel)
-        );
-        groupLayout.setVerticalGroup(
-                groupLayout.createParallelGroup()
-                        .addComponent(histogramScrollPane)
-                                //.addGroup(groupLayout.createSequentialGroup()
-                                //        .addComponent(currentGenerationPanel)
-                                //        .addComponent(currentPopulationPanel))
-                        .addComponent(averageAspectPanel)
-        );
-
+    public static void main(String[] args) throws InvocationTargetException, InterruptedException {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
                 .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 10)
-                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 100)
+                .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
                 .setInt(Key.IntKey.DefaultIntKey.DOUBLE_ARRAY_GENERATION_LENGTH, 3)
-                        //.setDouble(Key.DoubleKey.DefaultDoubleKey.DOUBLE_SPECIATION_MAX_DISTANCE, .5)
 
                 .setValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY, new double[]{
                         0, 1, // Crossover STR/PROB
@@ -126,19 +53,7 @@ public final class POL {
                         .125 / 16, 1, // Mutation 1 PROB
                         .125 / 16, 1, // Mutation 2 STR
                         .125 / 16, 1, // Mutation 2 PROB
-                })
-/*
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_STRENGTH_MUTATION_PROBABILITY, 1)
-
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.MUTATION_PROBABILITY_MUTATION_PROBABILITY, 1)
-
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_STRENGTH_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_STRENGTH_MUTATION_PROBABILITY, 1)
-
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_STRENGTH, .125 / 16)
-                .setDouble(Key.DoubleKey.DefaultDoubleKey.CROSSOVER_PROBABILITY_MUTATION_PROBABILITY, 1)*/;
+                });
 
         DefaultOperator<double[]> operator = new DefaultOperator<>(Arrays.asList(
                 new Mutator<double[]>() {
@@ -177,83 +92,9 @@ public final class POL {
         List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
-
-        String[] aspectDescriptions = operator.getAspectDescriptions();
-
-        UpdatableHistogramDataset[] datasets = new UpdatableHistogramDataset[optimizationFunctions.size()];
-        for (int i = 0; i < datasets.length; i++) {
-            System.out.println("Creating histogram " + i);
-
-            datasets[i] = new UpdatableHistogramDataset();
-            datasets[i].addSeries("Test", ThreadLocalRandom.current().doubles(10).toArray(), 10);
-
-            ChartPanel panel = new ChartPanel(ChartFactory.createHistogram(optimizationFunctions.get(i).getClass().getSimpleName(), "X", "Y", datasets[i], PlotOrientation.HORIZONTAL, true, false, false));
-            histogramPanel.add(panel);
-
-            System.out.println("Created histogram " + i);
-        }
-
-
-        //noinspection MagicNumber
-        windowFrame.setSize(1400, 1000);
-        //noinspection MagicNumber
-        windowFrame.setLocation(0, 0);
-        windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        windowFrame.setVisible(true);
-
-        System.out.println(histogramPanel.getPreferredSize().toString());
-        System.out.println(histogramScrollPane.getPreferredSize().toString());
-
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        nsga_ii.addObserver(populationData -> {
-            currentGenerationChart.setNotify(false);
-            currentGenerationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
-                XYSeries frontSeries = new XYSeries(front.toString());
-                for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getScore(0), individual.getScore(1));
-                }
-                currentGenerationCollection.addSeries(frontSeries);
-            }
-            currentGenerationChart.setNotify(true);
-        });
-
-        nsga_ii.addObserver(populationData -> {
-            currentPopulationChart.setNotify(false);
-            currentPopulationCollection.removeAllSeries();
-            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
-                XYSeries frontSeries = new XYSeries(front.toString());
-                for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
-                }
-                currentPopulationCollection.addSeries(frontSeries);
-            }
-            currentPopulationChart.setNotify(true);
-        });
-
-        nsga_ii.addObserver(populationData -> {
-            double elapsedTimeMS = (populationData.getElapsedTime() / 1000000d);
-            double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
-            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
-
-            for (int i = 0; i < ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length; i++) {
-                YIntervalSeries aspectSeries;
-                DescriptiveStatistics aspectSummary;
-
-                try {
-                    aspectSeries = averageAspectCollection.getSeries(i);
-                } catch (IllegalArgumentException e) {
-                    aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
-                    averageAspectCollection.addSeries(aspectSeries);
-                }
-
-                final int finalI = i;
-                aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
-                //noinspection MagicNumber
-                aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
-            }
-        });
+        DefaultVisualization.startInterface(operator, optimizationFunctions, nsga_ii, properties);
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
