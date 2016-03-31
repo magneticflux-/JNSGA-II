@@ -103,7 +103,7 @@ public final class DefaultVisualization {
                 final int finalI = i;
                 datasets[i].addSeries("Individuals", populationData.getTruncatedPopulation().getPopulation().parallelStream()
                         .mapToDouble((ToDoubleFunction<FrontedIndividual<E>>) value -> value.getScore(finalI))
-                        .toArray(), 100);
+                        .toArray(), populationData.getTruncatedPopulation().size() / 5);
             }
         });
 /*
