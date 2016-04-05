@@ -15,7 +15,6 @@ import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 import org.jnsgaii.visualization.DefaultVisualization;
 
-import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +32,7 @@ public final class POL {
         //noinspection MagicNumber
         Properties properties = new Properties()
                 .setBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED, true)
-                .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 10)
+                .setInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM, 5)
                 .setInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE, 1000)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM, -10)//-FastMath.PI)
                 .setDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM, 10)//FastMath.PI)
@@ -48,7 +47,7 @@ public final class POL {
                 .setValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY, new double[]{
                         .125 / 4, 1, // Crossover STR
                         .125 / 16, 1, // Crossover PROB
-                        .125 / 16, 1, // Speciator DISTANCE
+                        .125 / 4, 1, // Speciator DISTANCE
                         .125 / 16, 1, // Mutation 1 STR
                         .125 / 16, 1, // Mutation 1 PROB
                         .125 / 16, 1, // Mutation 2 STR
@@ -89,7 +88,7 @@ public final class POL {
         OptimizationFunction<double[]> function3 = new Function3();
         OptimizationFunction<double[]> function4 = new Function4();
 
-        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
+        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2, function3, function4);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
@@ -99,7 +98,7 @@ public final class POL {
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
             //long startTime = System.nanoTime();
-            EventQueue.invokeAndWait(nsga_ii::runGeneration);
+            nsga_ii.runGeneration();
             //long elapsedTime = System.nanoTime() - startTime;
             //System.out.println("; Total elapsed time: " + String.format("%.4f", elapsedTime / 1000000d) + "ms");
             //noinspection MagicNumber

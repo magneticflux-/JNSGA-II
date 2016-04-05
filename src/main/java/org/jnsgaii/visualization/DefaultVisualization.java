@@ -11,15 +11,22 @@ import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.multiobjective.NSGA_II;
-import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.function.ToDoubleFunction;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 /**
  * Created by Mitchell on 3/30/2016.
@@ -98,12 +105,16 @@ public final class DefaultVisualization {
         windowFrame.setVisible(true);
 
         nsga_ii.addObserver(populationData -> {
-            for (int i = 0; i < datasets.length; i++) {
-                datasets[i].removeAllSeries();
-                final int finalI = i;
-                datasets[i].addSeries("Individuals", populationData.getTruncatedPopulation().getPopulation().parallelStream()
-                        .mapToDouble((ToDoubleFunction<FrontedIndividual<E>>) value -> value.getScore(finalI))
-                        .toArray(), populationData.getTruncatedPopulation().size() / 5);
+            try {
+                EventQueue.invokeAndWait(() -> {
+                    for (int i = 0; i < datasets.length; i++) {
+                        datasets[i].removeAllSeries();
+                        final int finalI = i;
+                        datasets[i].addSeries("Individuals", populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.getScore(finalI)).toArray(), 20);
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
             }
         });
 /*
@@ -134,25 +145,31 @@ public final class DefaultVisualization {
         });
 */
         nsga_ii.addObserver(populationData -> {
-            double elapsedTimeMS = (populationData.getElapsedTime() / 1000000d);
-            double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
-            System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
+            try {
+                EventQueue.invokeAndWait(() -> {
+                    double elapsedTimeMS = (populationData.getElapsedTime() / 1000000d);
+                    double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
+                    System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
 
-            for (int i = 0; i < ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length; i++) {
-                YIntervalSeries aspectSeries;
-                DescriptiveStatistics aspectSummary;
+                    for (int i = 0; i < ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length; i++) {
+                        YIntervalSeries aspectSeries;
+                        DescriptiveStatistics aspectSummary;
 
-                try {
-                    aspectSeries = averageAspectCollection.getSeries(i);
-                } catch (IllegalArgumentException e) {
-                    aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
-                    averageAspectCollection.addSeries(aspectSeries);
-                }
+                        try {
+                            aspectSeries = averageAspectCollection.getSeries(i);
+                        } catch (IllegalArgumentException e) {
+                            aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
+                            averageAspectCollection.addSeries(aspectSeries);
+                        }
 
-                final int finalI = i;
-                aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
-                //noinspection MagicNumber
-                aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
+                        final int finalI = i;
+                        aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
+                        //noinspection MagicNumber
+                        aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
             }
         });
     }
