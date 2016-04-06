@@ -20,4 +20,8 @@ public class UpdatableHistogramDataset extends HistogramDataset {
             e.printStackTrace();
         }
     }
+
+    public UpdatableHistogramDataset clone() throws CloneNotSupportedException {
+        return (UpdatableHistogramDataset) super.clone();
+    }
 }
