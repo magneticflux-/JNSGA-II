@@ -14,6 +14,11 @@ public class PopulationData<E> {
     private final long previousObservationTime;
     private final int currentGeneration;
 
+    @SuppressWarnings("unused")
+    private PopulationData() {
+        this(null, null, -1, -1, -1);
+    }
+
     public PopulationData(FrontedPopulation<E> frontedPopulation, FrontedPopulation<E> truncatedPopulation, long elapsedTime, long previousObservationTime, int currentGeneration) {
         this.frontedPopulation = frontedPopulation;
         this.truncatedPopulation = truncatedPopulation;

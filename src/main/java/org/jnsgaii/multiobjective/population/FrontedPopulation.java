@@ -24,6 +24,11 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.population = population;
     }
 
+    @SuppressWarnings("unused")
+    private FrontedPopulation() {
+        this(null, null);
+    }
+
     public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
 

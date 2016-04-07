@@ -14,6 +14,10 @@ public abstract class PopulationMember {
         this.aspects = populationMember.aspects.clone();
     }
 
+    PopulationMember() {
+        aspects = new double[0];
+    }
+
     @Deprecated
     public double getMutationStrength() {
         return aspects[2];

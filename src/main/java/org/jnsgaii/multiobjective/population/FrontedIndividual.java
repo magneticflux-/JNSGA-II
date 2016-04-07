@@ -2,6 +2,7 @@ package org.jnsgaii.multiobjective.population;
 
 import org.jnsgaii.population.individual.EvaluatedIndividual;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         this.dominatedIndividuals = new LinkedList<>(dominatedIndividuals);
         this.crowdingScore = crowdingScore;
         this.dominationCount = dominationCount;
+    }
+
+    @SuppressWarnings("unused")
+    private FrontedIndividual() {
+        super();
+        dominatedIndividuals = new ArrayList<>();
     }
 
     protected FrontedIndividual(EvaluatedIndividual<E> individual) {

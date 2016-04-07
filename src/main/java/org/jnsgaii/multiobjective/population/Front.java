@@ -10,6 +10,11 @@ public class Front<E> implements Comparable<Front<E>> {
     final SortedSet<FrontedIndividual<E>> members;
     private final int rank;
 
+    @SuppressWarnings("unused")
+    private Front() {
+        this(null, -1);
+    }
+
     public Front(SortedSet<FrontedIndividual<E>> members, int rank) {
         this.members = members;
         this.rank = rank;

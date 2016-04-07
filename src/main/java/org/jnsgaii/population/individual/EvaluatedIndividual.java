@@ -2,6 +2,7 @@ package org.jnsgaii.population.individual;
 
 import org.jnsgaii.OptimizationFunction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +25,12 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         super(evaluatedIndividual);
         optimizationFunctions = evaluatedIndividual.optimizationFunctions;
         scores = evaluatedIndividual.scores;
+    }
+
+    protected EvaluatedIndividual() {
+        super();
+        optimizationFunctions = new ArrayList<>();
+        scores = new double[0];
     }
 
     /**

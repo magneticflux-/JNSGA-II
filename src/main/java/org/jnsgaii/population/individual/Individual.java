@@ -30,6 +30,12 @@ public class Individual<E> extends PopulationMember {
         //this.individual = individual;
     }
 
+    @SuppressWarnings("AssignmentToNull")
+    protected Individual() {
+        super();
+        individual = null;
+    }
+
     @SuppressWarnings("unused")
     @Deprecated
     public boolean oldEquals(Object obj) {
