@@ -62,6 +62,10 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         return this.scores[i];
     }
 
+    public double[] getScores() {
+        return this.scores.clone();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
