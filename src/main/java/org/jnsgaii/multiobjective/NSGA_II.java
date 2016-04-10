@@ -61,6 +61,11 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         System.out.println("Initialization time: " + (elapsedTime / 1000000f) + "ms");
     }
 
+    public NSGA_II(org.jnsgaii.properties.Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration) {
+        this(properties, operator, optimizationFunctions, populationGenerator);
+        currentGeneration = startGeneration;
+    }
+
     private void checkKeyAvailability() {
         Collection<Key> missingKeys = new LinkedHashSet<>();
         Collection<String> failedRequirements = new LinkedHashSet<>();
