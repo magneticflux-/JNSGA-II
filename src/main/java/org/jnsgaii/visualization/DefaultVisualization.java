@@ -12,6 +12,7 @@ import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.operators.DefaultOperator;
+import org.jnsgaii.population.PopulationData;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
@@ -33,6 +34,72 @@ import javax.swing.WindowConstants;
  */
 public final class DefaultVisualization {
     private DefaultVisualization() {
+    }
+
+    public static <E> void displayGenerationGraph(String[] aspectDescriptions, String[] scoreDescriptions, Iterable<PopulationData<E>> generationData) {
+        JFrame window = new JFrame("Generations");
+        GroupLayout layout = new GroupLayout(window);
+        window.setLayout(layout);
+
+        YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
+        JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
+        averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
+        ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
+
+        YIntervalSeriesCollection averageScoreCollection = new YIntervalSeriesCollection();
+        JFreeChart averageScoreChart = ChartFactory.createScatterPlot("Average Scores", "Generation", "Scores", averageScoreCollection, PlotOrientation.VERTICAL, true, false, false);
+        averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
+        ChartPanel averageScorePanel = new ChartPanel(averageScoreChart);
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup()
+                        .addComponent(averageScorePanel)
+                        .addComponent(averageAspectPanel)
+        );
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(averageScorePanel)
+                        .addComponent(averageAspectPanel)
+        );
+
+        for (PopulationData<E> populationData : generationData) {
+            for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
+                YIntervalSeries aspectSeries;
+                DescriptiveStatistics aspectSummary;
+
+                try {
+                    aspectSeries = averageAspectCollection.getSeries(i);
+                } catch (IllegalArgumentException e) {
+                    aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
+                    averageAspectCollection.addSeries(aspectSeries);
+                }
+
+                final int finalI = i;
+                aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
+                //noinspection MagicNumber
+                aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
+            }
+
+            for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).getScores().length; i++) {
+                YIntervalSeries scoreSeries;
+                DescriptiveStatistics scoreSummary;
+
+                try {
+                    scoreSeries = averageScoreCollection.getSeries(i);
+                } catch (IllegalArgumentException e) {
+                    scoreSeries = new YIntervalSeries(scoreDescriptions[i]);
+                    averageScoreCollection.addSeries(scoreSeries);
+                }
+
+                final int finalI = i;
+                scoreSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.getScore(finalI)).toArray());
+                scoreSeries.add(populationData.getCurrentGeneration(), scoreSummary.getPercentile(50), scoreSummary.getPercentile(25), scoreSummary.getPercentile(75));
+            }
+        }
+
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        window.pack();
+        window.setVisible(true);
     }
 
     public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii, Properties properties) {
