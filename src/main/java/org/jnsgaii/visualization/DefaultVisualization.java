@@ -16,18 +16,12 @@ import org.jnsgaii.population.PopulationData;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
+import java.util.stream.Stream;
 
 /**
  * Created by Mitchell on 3/30/2016.
@@ -36,10 +30,10 @@ public final class DefaultVisualization {
     private DefaultVisualization() {
     }
 
-    public static <E> void displayGenerationGraph(String[] aspectDescriptions, String[] scoreDescriptions, Iterable<PopulationData<E>> generationData) {
+    public static <E> void displayGenerationGraph(String[] aspectDescriptions, String[] scoreDescriptions, Stream<PopulationData<E>> generationData) {
         JFrame window = new JFrame("Generations");
-        GroupLayout layout = new GroupLayout(window);
-        window.setLayout(layout);
+        GroupLayout layout = new GroupLayout(window.getContentPane());
+        window.getContentPane().setLayout(layout);
 
         YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
         JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
@@ -47,7 +41,7 @@ public final class DefaultVisualization {
         ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
 
         YIntervalSeriesCollection averageScoreCollection = new YIntervalSeriesCollection();
-        JFreeChart averageScoreChart = ChartFactory.createScatterPlot("Average Scores", "Generation", "Scores", averageScoreCollection, PlotOrientation.VERTICAL, true, false, false);
+        JFreeChart averageScoreChart = ChartFactory.createScatterPlot("Max Scores", "Generation", "Scores", averageScoreCollection, PlotOrientation.VERTICAL, true, false, false);
         averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
         ChartPanel averageScorePanel = new ChartPanel(averageScoreChart);
 
@@ -62,7 +56,11 @@ public final class DefaultVisualization {
                         .addComponent(averageAspectPanel)
         );
 
-        for (PopulationData<E> populationData : generationData) {
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        window.pack();
+        window.setVisible(true);
+
+        generationData.forEach(populationData -> EventQueue.invokeLater(() -> {
             for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
                 YIntervalSeries aspectSeries;
                 DescriptiveStatistics aspectSummary;
@@ -93,13 +91,10 @@ public final class DefaultVisualization {
 
                 final int finalI = i;
                 scoreSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.getScore(finalI)).toArray());
-                scoreSeries.add(populationData.getCurrentGeneration(), scoreSummary.getPercentile(50), scoreSummary.getPercentile(25), scoreSummary.getPercentile(75));
+                double scoreSummaryMax = scoreSummary.getMax();
+                scoreSeries.add(populationData.getCurrentGeneration(), scoreSummaryMax, scoreSummaryMax, scoreSummaryMax);
             }
-        }
-
-        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window.pack();
-        window.setVisible(true);
+        }));
     }
 
     public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii, Properties properties) {
