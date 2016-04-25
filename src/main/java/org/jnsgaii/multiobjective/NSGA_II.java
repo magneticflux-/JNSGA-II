@@ -141,7 +141,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
          */
         long startTime = System.nanoTime();
         Population<E> offspring = this.operator.apply(this.population, this.properties);
-        Population<E> merged = Population.merge(this.population, offspring);
+        Population<E> merged = Population.merge(offspring, this.population);
         EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
         FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
         FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
