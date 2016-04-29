@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/magneticflux-/JNSGA-II.svg)](https://jitpack.io/#magneticflux-/JNSGA-II)
+
 # JNSGA-II
 An easy-to-use Java library for performing and visualizing multi-objective optimization problems using the NSGA-II algorithm.
 
