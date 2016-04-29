@@ -35,5 +35,5 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.0'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'com.miglayout:miglayout-swing:5.0'
-    compile 'com.github.magneticflux-:JNSGA-II:-SNAPSHOT'
+    //compile "com.github.magneticflux-:JNSGA-II:master-SNAPSHOT"
 }
