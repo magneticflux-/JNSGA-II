@@ -21,6 +21,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 /**
@@ -60,6 +62,8 @@ public final class DefaultVisualization {
         window.pack();
         window.setVisible(true);
 
+        Executor forkJoinPool = new ForkJoinPool(16);
+        forkJoinPool.execute(() ->
         generationData.forEach(populationData -> EventQueue.invokeLater(() -> {
             for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
                 YIntervalSeries aspectSeries;
@@ -94,7 +98,7 @@ public final class DefaultVisualization {
                 double scoreSummaryMax = scoreSummary.getMax();
                 scoreSeries.add(populationData.getCurrentGeneration(), scoreSummaryMax, scoreSummaryMax, scoreSummaryMax);
             }
-        }));
+        })));
     }
 
     public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii, Properties properties) {

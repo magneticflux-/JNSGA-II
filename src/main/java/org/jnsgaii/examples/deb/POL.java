@@ -88,7 +88,7 @@ public final class POL {
         OptimizationFunction<double[]> function3 = new Function3();
         OptimizationFunction<double[]> function4 = new Function4();
 
-        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2, function3, function4);
+        List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
