@@ -13,8 +13,6 @@ import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.population.PopulationData;
-import org.jnsgaii.properties.Key;
-import org.jnsgaii.properties.Properties;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -62,25 +60,11 @@ public final class DefaultVisualization {
         window.pack();
         window.setVisible(true);
 
-        Executor forkJoinPool = new ForkJoinPool(16);
+        Executor forkJoinPool = new ForkJoinPool(64);
         forkJoinPool.execute(() ->
         generationData.forEach(populationData -> EventQueue.invokeLater(() -> {
-            for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
-                YIntervalSeries aspectSeries;
-                DescriptiveStatistics aspectSummary;
 
-                try {
-                    aspectSeries = averageAspectCollection.getSeries(i);
-                } catch (IllegalArgumentException e) {
-                    aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
-                    averageAspectCollection.addSeries(aspectSeries);
-                }
-
-                final int finalI = i;
-                aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
-                //noinspection MagicNumber
-                aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
-            }
+            updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData);
 
             for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).getScores().length; i++) {
                 YIntervalSeries scoreSeries;
@@ -101,7 +85,7 @@ public final class DefaultVisualization {
         })));
     }
 
-    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii, Properties properties) {
+    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii) {
         //Thread.sleep(5000);
 
         Box histogramPanel = new Box(BoxLayout.Y_AXIS);
@@ -217,26 +201,30 @@ public final class DefaultVisualization {
                     double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
                     System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
 
-                    for (int i = 0; i < ((double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY)).length; i++) {
-                        YIntervalSeries aspectSeries;
-                        DescriptiveStatistics aspectSummary;
-
-                        try {
-                            aspectSeries = averageAspectCollection.getSeries(i);
-                        } catch (IllegalArgumentException e) {
-                            aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
-                            averageAspectCollection.addSeries(aspectSeries);
-                        }
-
-                        final int finalI = i;
-                        aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
-                        //noinspection MagicNumber
-                        aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
-                    }
+                    updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData);
                 });
             } catch (InterruptedException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static <E> void updateAverageAspectCollection(YIntervalSeriesCollection averageAspectCollection, String[] aspectDescriptions, PopulationData<E> populationData) {
+        for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
+            YIntervalSeries aspectSeries;
+            DescriptiveStatistics aspectSummary;
+
+            try {
+                aspectSeries = averageAspectCollection.getSeries(i);
+            } catch (IllegalArgumentException e) {
+                aspectSeries = new YIntervalSeries(aspectDescriptions[i]);
+                averageAspectCollection.addSeries(aspectSeries);
+            }
+
+            final int finalI = i;
+            aspectSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.aspects[finalI]).toArray());
+            //noinspection MagicNumber
+            aspectSeries.add(populationData.getCurrentGeneration(), aspectSummary.getPercentile(50), aspectSummary.getPercentile(25), aspectSummary.getPercentile(75));
+        }
     }
 }

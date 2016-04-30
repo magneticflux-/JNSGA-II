@@ -93,7 +93,7 @@ public final class POL {
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        DefaultVisualization.startInterface(operator, optimizationFunctions, nsga_ii, properties);
+        DefaultVisualization.startInterface(operator, optimizationFunctions, nsga_ii);
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
