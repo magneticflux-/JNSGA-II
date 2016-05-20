@@ -19,8 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 /**
@@ -60,8 +58,8 @@ public final class DefaultVisualization {
         window.pack();
         window.setVisible(true);
 
-        Executor forkJoinPool = new ForkJoinPool(64);
-        forkJoinPool.execute(() ->
+        //Executor forkJoinPool = new ForkJoinPool(8);
+        //forkJoinPool.execute(() ->)
         generationData.forEach(populationData -> EventQueue.invokeLater(() -> {
 
             updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData);
@@ -80,9 +78,11 @@ public final class DefaultVisualization {
                 final int finalI = i;
                 scoreSummary = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().parallelStream().mapToDouble(value -> value.getScore(finalI)).toArray());
                 double scoreSummaryMax = scoreSummary.getMax();
-                scoreSeries.add(populationData.getCurrentGeneration(), scoreSummaryMax, scoreSummaryMax, scoreSummaryMax);
+                double scoreSummaryMin = scoreSummary.getMin();
+                double scoreSummaryMedian = scoreSummary.getPercentile(.5);
+                scoreSeries.add(populationData.getCurrentGeneration(), scoreSummaryMin, scoreSummaryMedian, scoreSummaryMax);
             }
-        })));
+        }));
     }
 
     public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii) {
