@@ -18,7 +18,7 @@ public class DoubleArraySpeciator extends Speciator<double[]> {
     //private double maxDistance;
 
     @Override
-    protected double getDistance(Individual<double[]> individual, Individual<double[]> individual2) {
+    public double getDistance(Individual<double[]> individual, Individual<double[]> individual2) {
         double distance = 0;
         for (int i = 0; i < doubleArrayGenerationLength; i++) {
             distance += FastMath.abs(individual.getIndividual()[i] - individual2.getIndividual()[i]);

@@ -1,12 +1,12 @@
 package org.jnsgaii.examples.deb;
 
 import org.apache.commons.math3.util.FastMath;
-import org.jnsgaii.DefaultOptimizationFunction;
-import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArrayAverageRecombiner;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArraySpeciator;
 import org.jnsgaii.examples.defaultoperatorframework.RouletteWheelLinearSelection;
 import org.jnsgaii.examples.numarical.DoubleArrayPopulationGenerator;
+import org.jnsgaii.functions.DefaultOptimizationFunction;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.operators.Mutator;
@@ -16,9 +16,7 @@ import org.jnsgaii.properties.Properties;
 import org.jnsgaii.visualization.DefaultVisualization;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -93,7 +91,7 @@ public final class POL {
 
         NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        DefaultVisualization.startInterface(operator, optimizationFunctions, nsga_ii);
+        DefaultVisualization.startInterface(operator, optimizationFunctions, Collections.emptyList(), nsga_ii);
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
@@ -109,7 +107,7 @@ public final class POL {
     private static class Function1 extends DefaultOptimizationFunction<double[]> {
         @SuppressWarnings("MagicNumber")
         @Override
-        public double evaluateIndividual(double[] vector, Properties properties) {
+        public double evaluateIndividual(double[] vector, HashMap<String, Object> computationResults, Properties properties) {
             assert vector.length == 2;
             final double A1 = (((.5 * FastMath.sin(1)) - (2 * FastMath.cos(1))) + FastMath.sin(2)) - (1.5 * FastMath.cos(2));
             final double A2 = (((1.5 * FastMath.sin(1)) - FastMath.cos(1)) + (2 * FastMath.sin(2))) - (.5 * FastMath.cos(2));
@@ -145,7 +143,7 @@ public final class POL {
 
     private static class Function2 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluateIndividual(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 2;
             return FastMath.pow(object[0] + 3, 2) + FastMath.pow(object[1] + 1, 2);
         }
@@ -173,7 +171,7 @@ public final class POL {
 
     private static class Function3 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluateIndividual(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 3;
             double result = 0;
             for (int i = 0; i < object.length - 1; i++) {
@@ -205,7 +203,7 @@ public final class POL {
 
     private static class Function4 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluateIndividual(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 3;
             double result = 0;
             for (int i = 0; i < object.length; i++) {

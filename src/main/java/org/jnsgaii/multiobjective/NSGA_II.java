@@ -1,8 +1,12 @@
 package org.jnsgaii.multiobjective;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.EvolutionObserver;
-import org.jnsgaii.OptimizationFunction;
+import org.jnsgaii.computations.Computation;
 import org.jnsgaii.exceptions.NoValueSetException;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.operators.Operator;
 import org.jnsgaii.population.EvaluatedPopulation;
@@ -11,6 +15,7 @@ import org.jnsgaii.population.PopulationData;
 import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.properties.HasPropertyRequirements;
 import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.Properties;
 import org.jnsgaii.properties.Requirement;
 
 import java.util.*;
@@ -22,16 +27,29 @@ import java.util.*;
 public class NSGA_II<E> implements HasPropertyRequirements {
 
     private final List<EvolutionObserver<E>> observers;
+    private final List<Computation<E, ?>> computations;
     private final List<OptimizationFunction<E>> optimizationFunctions;
     private final Operator<E> operator;
-    private final org.jnsgaii.properties.Properties properties;
+    private final Properties properties;
     private final PopulationGenerator<E> populationGenerator;
     private FrontedPopulation<E> population;
     private int currentGeneration;
     private long previousObservationTime;
 
+    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
+        this(properties, operator, optimizationFunctions, populationGenerator, 1, new ArrayList<>());
+    }
+
+    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration) {
+        this(properties, operator, optimizationFunctions, populationGenerator, startGeneration, new ArrayList<>());
+    }
+
+    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, List<Computation<E, ?>> computations) {
+        this(properties, operator, optimizationFunctions, populationGenerator, 1, computations);
+    }
+
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public NSGA_II(org.jnsgaii.properties.Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
+    public NSGA_II(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration, List<Computation<E, ?>> computations) {
         if (optimizationFunctions.size() < 1)
             throw new IllegalArgumentException("There must be at least one optimization function!");
 
@@ -39,31 +57,26 @@ public class NSGA_II<E> implements HasPropertyRequirements {
             properties.lock();
 
         this.observers = new LinkedList<>();
+        this.computations = computations;
         this.optimizationFunctions = new ArrayList<>(optimizationFunctions);
         this.operator = operator;
         this.properties = properties;
         this.populationGenerator = populationGenerator;
-        this.currentGeneration = 0;
+        this.currentGeneration = startGeneration;
 
         this.checkKeyAvailability();
 
         long startTime = System.nanoTime();
 
-        Population<E> initialPopulation = new Population<>(2 * properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), populationGenerator, properties);
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, optimizationFunctions, properties);
-        //noinspection UnnecessaryLocalVariable
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
+        Population<E> initialPopulation = new Population<>(2 * this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), this.populationGenerator, this.properties);
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(initialPopulation, this.optimizationFunctions, this.computations, this.properties);
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, this.optimizationFunctions, this.properties);
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
         this.population = truncatedPopulation;
 
         long elapsedTime = System.nanoTime() - startTime;
         //noinspection MagicNumber
-        System.out.println("Initialization time: " + (elapsedTime / 1000000f) + "ms");
-    }
-
-    public NSGA_II(org.jnsgaii.properties.Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration) {
-        this(properties, operator, optimizationFunctions, populationGenerator);
-        currentGeneration = startGeneration;
+        System.out.println("Initialization time: " + DurationFormatUtils.formatDurationWords(FastMath.round(elapsedTime / 1000000d), true, true));
     }
 
     private void checkKeyAvailability() {
@@ -115,7 +128,6 @@ public class NSGA_II<E> implements HasPropertyRequirements {
     @SuppressWarnings("UnnecessaryLocalVariable")
     public void runGeneration() {
         /*
-
         DONE!
 
         The plan:
@@ -139,30 +151,62 @@ public class NSGA_II<E> implements HasPropertyRequirements {
         [X] 2. Write Population.merge() method
         [X] 3. Write proper Double classes
          */
-        long startTime = System.nanoTime();
-        Population<E> offspring = this.operator.apply(this.population, this.properties);
-        Population<E> merged = Population.merge(offspring, this.population);
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.properties);
-        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
-        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
-        this.population = truncatedPopulation;
-        long elapsedTime = System.nanoTime() - startTime;
+        StopWatch stopWatch = new StopWatch();
 
+        stopWatch.start();
+        //System.err.println("Parent size: " + this.population.size());
+        Population<E> offspring = this.operator.apply(this.population, this.properties);
+        stopWatch.stop();
+
+        long operatorApplyingTime = stopWatch.getNanoTime();
+        stopWatch.reset();
+
+        stopWatch.start();
+        //System.err.println("Offspring size: " + offspring.size());
+        Population<E> merged = Population.merge(offspring, this.population);
+        stopWatch.stop();
+
+        long mergingTime = stopWatch.getNanoTime();
+        stopWatch.reset();
+
+        //System.err.println("Merged size: " + merged.size());
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(merged, this.optimizationFunctions, this.computations, this.properties);
+
+        long[] computationTimes = evaluatedPopulation.getComputationTimes();
+        long[] optimizationFunctionTimes = evaluatedPopulation.getOptimizationFunctionTimes();
+
+        stopWatch.start();
+        //System.err.println("Evaluated size: " + evaluatedPopulation.size());
+        FrontedPopulation<E> frontedPopulation = new FrontedPopulation<>(evaluatedPopulation, optimizationFunctions, this.properties);
+        stopWatch.stop();
+
+        long frontingTime = stopWatch.getNanoTime();
+        stopWatch.reset();
+
+        stopWatch.start();
+        //System.err.println("Fronted size: " + frontedPopulation.size());
+        FrontedPopulation<E> truncatedPopulation = frontedPopulation.truncate(this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
+        stopWatch.stop();
+
+        long truncationTime = stopWatch.getNanoTime();
+        stopWatch.reset();
+
+        //System.err.println("Truncated size: " + truncatedPopulation.size());
+        this.population = truncatedPopulation;
         this.currentGeneration++;
 
-        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, elapsedTime, previousObservationTime, this.currentGeneration);
+        PopulationData<E> populationData = new PopulationData<>(frontedPopulation, truncatedPopulation, operatorApplyingTime, mergingTime, computationTimes, optimizationFunctionTimes, frontingTime, truncationTime, previousObservationTime, this.currentGeneration);
 
-        startTime = System.nanoTime();
+        stopWatch.start();
         this.update(populationData);
-        elapsedTime = System.nanoTime() - startTime;
-
-        previousObservationTime = elapsedTime;
+        stopWatch.stop();
+        previousObservationTime = stopWatch.getNanoTime();
     }
 
     private void update(PopulationData<E> populationData) {
-        if (this.currentGeneration % properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) == 0) {
+        if (properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) == 1
+                || this.currentGeneration % properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) == 0)
             this.observers.forEach(observer -> observer.update(populationData));
-        }
     }
 
     public boolean addObserver(EvolutionObserver<E> observer) {
@@ -193,7 +237,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
                     }
 
                     @Override
-                    public boolean test(org.jnsgaii.properties.Properties properties) {
+                    public boolean test(Properties properties) {
                         return properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE) > 0;
                     }
                 },
@@ -204,7 +248,7 @@ public class NSGA_II<E> implements HasPropertyRequirements {
                     }
 
                     @Override
-                    public boolean test(org.jnsgaii.properties.Properties properties) {
+                    public boolean test(Properties properties) {
                         return properties.getInt(Key.IntKey.DefaultIntKey.OBSERVER_UPDATE_SKIP_NUM) >= 1;
                     }
                 }

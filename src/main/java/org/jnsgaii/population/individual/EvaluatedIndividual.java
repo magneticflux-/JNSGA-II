@@ -1,6 +1,6 @@
 package org.jnsgaii.population.individual;
 
-import org.jnsgaii.OptimizationFunction;
+import org.jnsgaii.functions.OptimizationFunction;
 
 import java.util.ArrayList;
 import java.util.Arrays;

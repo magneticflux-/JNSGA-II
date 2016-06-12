@@ -17,7 +17,7 @@ public abstract class Speciator<E> extends AspectUser<E> implements BiFunction<I
         return getDistance(individual, individual2) < getMaxDistance(individual, individual2);
     }
 
-    protected abstract double getDistance(Individual<E> individual, Individual<E> individual2);
+    public abstract double getDistance(Individual<E> individual, Individual<E> individual2);
 
     protected abstract double getMaxDistance(Individual<E> individual, Individual<E> individual2);
 }

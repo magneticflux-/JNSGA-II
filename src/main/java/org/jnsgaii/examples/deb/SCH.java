@@ -8,10 +8,10 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jnsgaii.DefaultOptimizationFunction;
-import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.examples.numarical.DoublePopulationGenerator;
 import org.jnsgaii.examples.numarical.SimpleDoubleMutationOperator;
+import org.jnsgaii.functions.DefaultOptimizationFunction;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.multiobjective.population.Front;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -96,19 +97,19 @@ public final class SCH {
         }
 
         @Override
-        public double evaluateIndividual(Double object, Properties properties) {
+        public double evaluateIndividual(Double object, HashMap<String, Object> computationResults, Properties properties) {
             return FastMath.pow(object, 2);
         }
 
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), null, properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), null, properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), null, properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), null, properties)));
         }
 
 
@@ -116,18 +117,18 @@ public final class SCH {
 
     static class Function2 extends DefaultOptimizationFunction<Double> {
         @Override
-        public double evaluateIndividual(Double object, Properties properties) {
+        public double evaluateIndividual(Double object, HashMap<String, Object> computationResults, Properties properties) {
             return FastMath.pow(object - 2, 2);
         }
 
         @Override
         public double min(Properties properties) {
-            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.min(0, FastMath.min(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), null, properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), null, properties)));
         }
 
         @Override
         public double max(Properties properties) {
-            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), properties)));
+            return FastMath.max(0, FastMath.max(this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM), null, properties), this.evaluateIndividual(properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM), null, properties)));
         }
 
         @Override

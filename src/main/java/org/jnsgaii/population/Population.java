@@ -4,7 +4,6 @@ import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Properties;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,6 +40,6 @@ public class Population<E> {
     }
 
     public List<? extends Individual<E>> getPopulation() {
-        return Collections.unmodifiableList(this.population);
+        return this.population;
     }
 }

@@ -1,12 +1,15 @@
 package org.jnsgaii.multiobjective.population;
 
-import org.jnsgaii.OptimizationFunction;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.population.EvaluatedPopulation;
 import org.jnsgaii.population.individual.EvaluatedIndividual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,7 +27,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.population = population;
     }
 
-    @SuppressWarnings("unused")
     private FrontedPopulation() {
         this(null, null);
     }
@@ -48,7 +50,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
         boolean threaded = properties.getBoolean(Key.BooleanKey.DefaultBooleanKey.THREADED);
 
-        Front<E> firstFront = new Front<>(new TreeSet<>(), 0);
+        Front<E> firstFront = new Front<>(new SortedArrayList<>(), 0);
         this.fronts.add(0, firstFront);
 
         // Start computing the crowding distance
@@ -94,12 +96,11 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             this.fronts.get(0).members.add(individual);
         });
 
-
         // Start establishing Fronts from ranked individuals
 
         int currentFrontRank = 0;
         while (!this.fronts.get(currentFrontRank).members.isEmpty()) {
-            TreeSet<FrontedIndividual<E>> nextFront = new TreeSet<>();
+            SortedArrayList<FrontedIndividual<E>> nextFront = new SortedArrayList<>();
             final int finalCurrentFrontRank = currentFrontRank;
 
             Stream<FrontedIndividual<E>> frontStream;
@@ -151,10 +152,11 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     public List<? extends FrontedIndividual<E>> getPopulation() {
         // This SHOULD work, since the only constructor fills the List<> with FrontedIndividual<>s
         //noinspection unchecked
-        return Collections.unmodifiableList((List<FrontedIndividual<E>>) this.population);
+        return (List<FrontedIndividual<E>>) this.population;
     }
 
     public FrontedPopulation<E> truncate(int limit) {
+        System.err.println("Truncating population of " + this.getPopulation().size() + " to " + limit);
         this.sort();
         List<Front<E>> newFronts = new ArrayList<>();
         List<FrontedIndividual<E>> newPopulation = new ArrayList<>(limit);
@@ -171,7 +173,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         }
         assert numIndividuals == newPopulation.size();
         if (currentFront < this.fronts.size() && limit - numIndividuals > 0) {
-            TreeSet<FrontedIndividual<E>> individuals = new TreeSet<>();
+            SortedArrayList<FrontedIndividual<E>> individuals = new SortedArrayList<>();
             Iterator<FrontedIndividual<E>> iterator = this.fronts.get(currentFront).members.iterator();
             for (int i = 0; i < limit - numIndividuals; i++) {
                 FrontedIndividual<E> individual = iterator.next();
@@ -181,10 +183,17 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             }
             newFronts.add(currentFront, new Front<>(individuals, currentFront));
         }
+
+        System.err.println("Truncated to " + newPopulation.size());
+        if (newPopulation.size() != limit) {
+            System.err.println("Population: " + newPopulation);
+            System.err.println("Fronts: " + newFronts);
+            throw new Error();
+        }
         return new FrontedPopulation<>(newPopulation, newFronts);
     }
 
-    public void sort() {
+    private void sort() {
         //noinspection unchecked
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
     }

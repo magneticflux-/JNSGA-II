@@ -8,10 +8,10 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jnsgaii.DefaultOptimizationFunction;
-import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.examples.numarical.DoubleArrayPopulationGenerator;
 import org.jnsgaii.examples.numarical.SimpleDoubleArrayMutationOperator;
+import org.jnsgaii.functions.DefaultOptimizationFunction;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.multiobjective.population.Front;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,7 +88,7 @@ public final class FON {
 
     static class Function1 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluateIndividual(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 3;
             return 1 - FastMath.exp(-(this.f(object[0]) + this.f(object[1]) + this.f(object[2])));
         }
@@ -122,7 +123,7 @@ public final class FON {
 
     static class Function2 extends DefaultOptimizationFunction<double[]> {
         @Override
-        public double evaluateIndividual(double[] object, Properties properties) {
+        public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 3;
             return 1 - FastMath.exp(-(this.f(object[0]) + this.f(object[1]) + this.f(object[2])));
         }

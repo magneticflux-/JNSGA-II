@@ -1,13 +1,13 @@
 package org.jnsgaii.multiobjective.population;
 
 import java.util.Collections;
-import java.util.SortedSet;
+import java.util.List;
 
 /**
  * Created by Mitchell on 11/28/2015.
  */
 public class Front<E> implements Comparable<Front<E>> {
-    final SortedSet<FrontedIndividual<E>> members;
+    final SortedArrayList<FrontedIndividual<E>> members;
     private final int rank;
 
     @SuppressWarnings("unused")
@@ -15,7 +15,7 @@ public class Front<E> implements Comparable<Front<E>> {
         this(null, -1);
     }
 
-    public Front(SortedSet<FrontedIndividual<E>> members, int rank) {
+    public Front(SortedArrayList<FrontedIndividual<E>> members, int rank) {
         this.members = members;
         this.rank = rank;
     }
@@ -49,7 +49,7 @@ public class Front<E> implements Comparable<Front<E>> {
         return result;
     }
 
-    public SortedSet<FrontedIndividual<E>> getMembers() {
-        return Collections.unmodifiableSortedSet(members);
+    public List<FrontedIndividual<E>> getMembers() {
+        return Collections.unmodifiableList(this.members);
     }
 }

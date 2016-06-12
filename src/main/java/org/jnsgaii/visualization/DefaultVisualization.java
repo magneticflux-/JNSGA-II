@@ -1,15 +1,22 @@
 package org.jnsgaii.visualization;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StackedXYBarRenderer;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
+import org.jfree.data.xy.CategoryTableXYDataset;
 import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
-import org.jnsgaii.OptimizationFunction;
 import org.jnsgaii.UpdatableHistogramDataset;
+import org.jnsgaii.computations.Computation;
+import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.NSGA_II;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.population.PopulationData;
@@ -19,12 +26,14 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
  * Created by Mitchell on 3/30/2016.
  */
 public final class DefaultVisualization {
+
     private DefaultVisualization() {
     }
 
@@ -85,57 +94,44 @@ public final class DefaultVisualization {
         }));
     }
 
-    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, NSGA_II<E> nsga_ii) {
-        //Thread.sleep(5000);
-
+    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, NSGA_II<E> nsga_ii) {
         Box histogramPanel = new Box(BoxLayout.Y_AXIS);
         JScrollPane histogramScrollPane = new JScrollPane(histogramPanel);
         histogramScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        /*
-        XYSeriesCollection currentGenerationCollection = new XYSeriesCollection();
-        JFreeChart currentGenerationChart = ChartFactory.createScatterPlot("Functions", "Function 1", "Function 2", currentGenerationCollection, PlotOrientation.VERTICAL, true, false, false);
-        currentGenerationChart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, true));
-        ChartPanel currentGenerationPanel = new ChartPanel(currentGenerationChart);
+        JTabbedPane jTabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        XYSeriesCollection currentPopulationCollection = new XYSeriesCollection();
-        JFreeChart currentPopulationChart = ChartFactory.createScatterPlot("Individuals", "", "", currentPopulationCollection, PlotOrientation.VERTICAL, true, false, false);
-        currentPopulationChart.getXYPlot().getDomainAxis().setAttributedLabel(new AttributedString("X\u2081"));
-        currentPopulationChart.getXYPlot().getRangeAxis().setAttributedLabel(new AttributedString("X\u2082"));
-        ChartPanel currentPopulationPanel = new ChartPanel(currentPopulationChart);
-        */
+        YIntervalSeriesCollection priorScoresCollection = new YIntervalSeriesCollection();
+        JFreeChart priorScoresChart = ChartFactory.createScatterPlot("Prior Scores", "Generation", "Scores (max/mean/min)", priorScoresCollection, PlotOrientation.VERTICAL, true, false, false);
+        priorScoresChart.getXYPlot().setRenderer(new XYErrorRenderer());
+        ChartPanel priorScoresPanel = new ChartPanel(priorScoresChart);
 
         YIntervalSeriesCollection averageAspectCollection = new YIntervalSeriesCollection();
-        JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
+        JFreeChart averageAspectChart = ChartFactory.createScatterPlot("Average Aspect Values", "Generation", "Aspect Values (25/50/75)", averageAspectCollection, PlotOrientation.VERTICAL, true, false, false);
         averageAspectChart.getXYPlot().setRenderer(new XYErrorRenderer());
         ChartPanel averageAspectPanel = new ChartPanel(averageAspectChart);
+
+        CategoryTableXYDataset elapsedTimesDataset = new CategoryTableXYDataset();
+        NumberAxis elapsedTimesChartDomainAxis = new NumberAxis("Generation");
+        NumberAxis elapsedTimesChartRangeAxis = new NumberAxis("Elapsed Time (ms)");
+        XYPlot elapsedTimesChartPlot = new XYPlot(elapsedTimesDataset, elapsedTimesChartDomainAxis, elapsedTimesChartRangeAxis, new StackedXYBarRenderer(.25));
+        elapsedTimesChartPlot.setOrientation(PlotOrientation.VERTICAL);
+        JFreeChart elapsedTimesChart = new JFreeChart("Elapsed Times", JFreeChart.DEFAULT_TITLE_FONT, elapsedTimesChartPlot, true);//ChartFactory.createStackedBarChart3D("Elapsed Times", "Generation", "Elapsed Time (ms)", elapsedTimesDataset, PlotOrientation.VERTICAL, true, false, false);
+        StandardChartTheme.createJFreeTheme().apply(elapsedTimesChart);
+        ChartPanel elapsedTimesPanel = new ChartPanel(elapsedTimesChart);
 
         JFrame windowFrame = new JFrame("Evolutionary Algorithm");
         JPanel mainPanel = new JPanel();
         windowFrame.setLayout(new BorderLayout());
         windowFrame.add(mainPanel, BorderLayout.CENTER);
 
-        GroupLayout groupLayout = new GroupLayout(mainPanel);
-        mainPanel.setLayout(groupLayout);
-        groupLayout.setAutoCreateGaps(true);
-        groupLayout.setAutoCreateContainerGaps(true);
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(jTabbedPane, BorderLayout.CENTER);
 
-        groupLayout.setHorizontalGroup(
-                groupLayout.createSequentialGroup()
-                        .addComponent(histogramScrollPane)
-                        //.addGroup(groupLayout.createParallelGroup()
-                        //        .addComponent(currentGenerationPanel)
-                        //        .addComponent(currentPopulationPanel))
-                        .addComponent(averageAspectPanel)
-        );
-        groupLayout.setVerticalGroup(
-                groupLayout.createParallelGroup()
-                        .addComponent(histogramScrollPane)
-                        //.addGroup(groupLayout.createSequentialGroup()
-                        //        .addComponent(currentGenerationPanel)
-                        //        .addComponent(currentPopulationPanel))
-                        .addComponent(averageAspectPanel)
-        );
+        jTabbedPane.addTab("Current Score Distributions", histogramScrollPane);
+        jTabbedPane.addTab("Prior Scores", priorScoresPanel);
+        jTabbedPane.addTab("Median Aspect Values", averageAspectPanel);
+        jTabbedPane.addTab("Elapsed Times", elapsedTimesPanel);
 
         String[] aspectDescriptions = operator.getAspectDescriptions();
 
@@ -146,15 +142,14 @@ public final class DefaultVisualization {
             histogramPanel.add(panel);
         }
 
-
         //noinspection MagicNumber
-        windowFrame.setSize(1400, 1000);
+        windowFrame.setSize(1000, 1000);
         //noinspection MagicNumber
         windowFrame.setLocation(0, 0);
         windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         windowFrame.setVisible(true);
 
-        nsga_ii.addObserver(populationData -> {
+        nsga_ii.addObserver(populationData -> { // Current score histograms
             try {
                 EventQueue.invokeAndWait(() -> {
                     for (int i = 0; i < datasets.length; i++) {
@@ -167,41 +162,61 @@ public final class DefaultVisualization {
                 e.printStackTrace();
             }
         });
-/*
-        nsga_ii.addObserver(populationData -> {
-            currentGenerationChart.setNotify(false);
-            currentGenerationCollection.removeAllSeries();
-            for (Front<E> front : populationData.getTruncatedPopulation().getFronts()) {
-                XYSeries frontSeries = new XYSeries(front.toString());
-                for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getScore(0), individual.getScore(1));
-                }
-                currentGenerationCollection.addSeries(frontSeries);
-            }
-            currentGenerationChart.setNotify(true);
-        });
 
-        nsga_ii.addObserver(populationData -> {
-            currentPopulationChart.setNotify(false);
-            currentPopulationCollection.removeAllSeries();
-            for (Front<E> front : populationData.getTruncatedPopulation().getFronts()) {
-                XYSeries frontSeries = new XYSeries(front.toString());
-                for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                    frontSeries.add(individual.getIndividual()[0], individual.getIndividual()[1]);
-                }
-                currentPopulationCollection.addSeries(frontSeries);
-            }
-            currentPopulationChart.setNotify(true);
-        });
-*/
-        nsga_ii.addObserver(populationData -> {
+        nsga_ii.addObserver(populationData -> { // Prior scores
             try {
                 EventQueue.invokeAndWait(() -> {
-                    double elapsedTimeMS = (populationData.getElapsedTime() / 1000000d);
-                    double observationTimeMS = (populationData.getPreviousObservationTime() / 1000000d);
-                    System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " + String.format("%.4f", elapsedTimeMS) + "ms, with " + String.format("%.4f", observationTimeMS) + "ms observation time");
+                    for (int i = 0; i < optimizationFunctions.size(); i++) {
+                        YIntervalSeries scoreSeries;
+                        try {
+                            scoreSeries = priorScoresCollection.getSeries(i);
+                        } catch (IllegalArgumentException e) {
+                            scoreSeries = new YIntervalSeries(optimizationFunctions.get(i).getClass().getSimpleName());
+                            priorScoresCollection.addSeries(scoreSeries);
+                        }
+                        final int finalI = i;
+                        DescriptiveStatistics scores = new DescriptiveStatistics(populationData.getTruncatedPopulation().getPopulation().stream().mapToDouble(value -> value.getScore(finalI)).toArray());
+                        scoreSeries.add(populationData.getCurrentGeneration(), scores.getMean(), scores.getMin(), scores.getMax());
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
 
-                    updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData);
+        nsga_ii.addObserver(populationData -> { // Average Aspects
+            try {
+                EventQueue.invokeAndWait(() -> updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData));
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
+
+        nsga_ii.addObserver(populationData -> { // Elapsed Times
+            try {
+                EventQueue.invokeAndWait(() ->
+                {
+                    System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " +
+                            DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getTotalTime()), true, true) +
+                            ", with " +
+                            DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), true, true) +
+                            " observation time. Population size: " + populationData.getFrontedPopulation().getPopulation().size());
+
+                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getOperatorApplyingTime()), "Operator Applying Time (ms)");
+                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getMergingTime()), "Merging Time (ms)");
+                    long[] computationTimes = populationData.getComputationTimes();
+                    for (int i = 0; i < computationTimes.length; i++) {
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(computationTimes[i]), "Computation Time of \"" + computations.get(i).getComputationID() + "\" (ms)");
+                    }
+                    long[] optimizationFunctionTimes = populationData.getOptimizationFunctionTimes();
+                    for (int i = 0; i < optimizationFunctionTimes.length; i++) {
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(optimizationFunctionTimes[i]), "Optimization Function Time of \"" + optimizationFunctions.get(i).getClass().getSimpleName() + "\" (ms)");
+                    }
+                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getFrontingTime()), "Fronting Time (ms)");
+                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getTruncationTime()), "Truncation Time (ms)");
+                    if (populationData.getPreviousObservationTime() > 0) {
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration() - 1, TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), "Previous Observation Time (ms)");
+                    }
                 });
             } catch (InterruptedException | InvocationTargetException e) {
                 e.printStackTrace();
