@@ -156,7 +156,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     }
 
     public FrontedPopulation<E> truncate(int limit) {
-        System.err.println("Truncating population of " + this.getPopulation().size() + " to " + limit);
+        //System.err.println("Truncating population of " + this.getPopulation().size() + " to " + limit);
         this.sort();
         List<Front<E>> newFronts = new ArrayList<>();
         List<FrontedIndividual<E>> newPopulation = new ArrayList<>(limit);
@@ -184,7 +184,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             newFronts.add(currentFront, new Front<>(individuals, currentFront));
         }
 
-        System.err.println("Truncated to " + newPopulation.size());
+        //System.err.println("Truncated to " + newPopulation.size());
         if (newPopulation.size() != limit) {
             System.err.println("Population: " + newPopulation);
             System.err.println("Fronts: " + newFronts);
