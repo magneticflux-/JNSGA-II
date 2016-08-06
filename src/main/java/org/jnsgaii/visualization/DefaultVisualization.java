@@ -17,15 +17,25 @@ import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.computations.Computation;
 import org.jnsgaii.functions.OptimizationFunction;
-import org.jnsgaii.multiobjective.NSGA_II;
+import org.jnsgaii.observation.EvolutionObservable;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.population.PopulationData;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.event.ClientQueueEvent;
+import org.jppf.client.event.ClientQueueListener;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListener;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -94,7 +104,7 @@ public final class DefaultVisualization {
         }));
     }
 
-    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, NSGA_II<E> nsga_ii) {
+    public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, EvolutionObservable<E> evolutionObservable, JPPFClient jppfClient) {
         Box histogramPanel = new Box(BoxLayout.Y_AXIS);
         JScrollPane histogramScrollPane = new JScrollPane(histogramPanel);
         histogramScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -113,12 +123,21 @@ public final class DefaultVisualization {
 
         CategoryTableXYDataset elapsedTimesDataset = new CategoryTableXYDataset();
         NumberAxis elapsedTimesChartDomainAxis = new NumberAxis("Generation");
+        elapsedTimesChartDomainAxis.setAutoRangeIncludesZero(false);
         NumberAxis elapsedTimesChartRangeAxis = new NumberAxis("Elapsed Time (ms)");
         XYPlot elapsedTimesChartPlot = new XYPlot(elapsedTimesDataset, elapsedTimesChartDomainAxis, elapsedTimesChartRangeAxis, new StackedXYBarRenderer(.25));
         elapsedTimesChartPlot.setOrientation(PlotOrientation.VERTICAL);
         JFreeChart elapsedTimesChart = new JFreeChart("Elapsed Times", JFreeChart.DEFAULT_TITLE_FONT, elapsedTimesChartPlot, true);//ChartFactory.createStackedBarChart3D("Elapsed Times", "Generation", "Elapsed Time (ms)", elapsedTimesDataset, PlotOrientation.VERTICAL, true, false, false);
         StandardChartTheme.createJFreeTheme().apply(elapsedTimesChart);
         ChartPanel elapsedTimesPanel = new ChartPanel(elapsedTimesChart);
+
+        JPanel jppfJobProgressPanel = new JPanel();
+        jppfJobProgressPanel.setLayout(new BoxLayout(jppfJobProgressPanel, BoxLayout.Y_AXIS));
+        Map<String, JProgressBar> progressBarMap = new HashMap<>();
+        JLabel jppfJobProgressLabel = new JLabel("Currently Executing Tasks Queue:", SwingConstants.CENTER);
+        jppfJobProgressPanel.add(jppfJobProgressLabel);
+        jppfJobProgressLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        jppfJobProgressLabel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
         JFrame windowFrame = new JFrame("Evolutionary Algorithm");
         JPanel mainPanel = new JPanel();
@@ -132,6 +151,7 @@ public final class DefaultVisualization {
         jTabbedPane.addTab("Prior Scores", priorScoresPanel);
         jTabbedPane.addTab("Median Aspect Values", averageAspectPanel);
         jTabbedPane.addTab("Elapsed Times", elapsedTimesPanel);
+        jTabbedPane.addTab("JPPF Job Progress", jppfJobProgressPanel);
 
         String[] aspectDescriptions = operator.getAspectDescriptions();
 
@@ -149,7 +169,66 @@ public final class DefaultVisualization {
         windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         windowFrame.setVisible(true);
 
-        nsga_ii.addObserver(populationData -> { // Current score histograms
+        jppfClient.addClientQueueListener(new ClientQueueListener() {
+            @Override
+            public void jobAdded(ClientQueueEvent event) {
+                event.getJob().addJobListener(new JobListener() {
+                    @Override
+                    public void jobStarted(JobEvent event) {
+                    }
+
+                    @Override
+                    public void jobEnded(JobEvent event) {
+                        Thread t = new Thread(() -> {
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            EventQueue.invokeLater(() ->
+                            {
+                                JProgressBar progressBar = progressBarMap.get(event.getJob().getName());
+                                if (progressBar.getPercentComplete() == 1)
+                                    progressBar.setVisible(false);
+                            });
+                        });
+                        t.setDaemon(true);
+                        t.start();
+                    }
+
+                    @Override
+                    public void jobDispatched(JobEvent event) {
+                    }
+
+                    @Override
+                    public void jobReturned(JobEvent event) {
+                        EventQueue.invokeLater(() ->
+                        {
+                            if (!progressBarMap.containsKey(event.getJob().getName())) {
+                                progressBarMap.put(event.getJob().getName(), new JProgressBar());
+                                jppfJobProgressPanel.add(progressBarMap.get(event.getJob().getName()));
+                            }
+                            JProgressBar progressBar = progressBarMap.get(event.getJob().getName());
+                            progressBar.setVisible(true);
+                            progressBar.setMinimum(0);
+                            progressBar.setMaximum(event.getJob().getTaskCount());
+                            progressBar.setValue(event.getJob().executedTaskCount());
+                            progressBar.setStringPainted(true);
+                            progressBar.setString(event.getJob().getName() + " - " + (int) (progressBar.getPercentComplete() * 100) + "%");
+                            progressBar.setBorderPainted(true);
+                            progressBar.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
+                            //System.out.println(event.getJob().executedTaskCount() + "/" + event.getJob().getTaskCount() + " tasks completed for " + event.getJob().getName());
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void jobRemoved(ClientQueueEvent event) {
+            }
+        });
+
+        evolutionObservable.addObserver(populationData -> { // Current score histograms
             try {
                 EventQueue.invokeAndWait(() -> {
                     for (int i = 0; i < datasets.length; i++) {
@@ -163,7 +242,7 @@ public final class DefaultVisualization {
             }
         });
 
-        nsga_ii.addObserver(populationData -> { // Prior scores
+        evolutionObservable.addObserver(populationData -> { // Prior scores
             try {
                 EventQueue.invokeAndWait(() -> {
                     for (int i = 0; i < optimizationFunctions.size(); i++) {
@@ -184,7 +263,7 @@ public final class DefaultVisualization {
             }
         });
 
-        nsga_ii.addObserver(populationData -> { // Average Aspects
+        evolutionObservable.addObserver(populationData -> { // Average Aspects
             try {
                 EventQueue.invokeAndWait(() -> updateAverageAspectCollection(averageAspectCollection, aspectDescriptions, populationData));
             } catch (InterruptedException | InvocationTargetException e) {
@@ -192,11 +271,11 @@ public final class DefaultVisualization {
             }
         });
 
-        nsga_ii.addObserver(populationData -> { // Elapsed Times
+        evolutionObservable.addObserver(populationData -> { // Elapsed Times
             try {
                 EventQueue.invokeAndWait(() ->
                 {
-                    System.out.println("Elapsed time in generation " + populationData.getCurrentGeneration() + ": " +
+                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME) + " Elapsed time in generation " + populationData.getCurrentGeneration() + ": " +
                             DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getTotalTime()), true, true) +
                             ", with " +
                             DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), true, true) +

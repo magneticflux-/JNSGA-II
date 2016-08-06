@@ -36,54 +36,26 @@ public class Individual<E> extends PopulationMember {
         individual = null;
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public boolean oldEquals(Object obj) {
-        return obj instanceof Individual &&
-                ((Individual) obj).getIndividual().equals(this.getIndividual()) &&
-                ((PopulationMember) obj).getMutationProbability() == this.getMutationProbability() &&
-                ((PopulationMember) obj).getCrossoverProbability() == this.getCrossoverProbability();
-    }
-
     public E getIndividual() {
         return this.individual;
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public int oldHashCode() {
-        return this.individual.hashCode() ^
-                Double.hashCode(getMutationProbability()) ^
-                Double.hashCode(getCrossoverProbability());
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        result = individual != null ? individual.hashCode() : 0;
-        temp = Double.doubleToLongBits(getMutationProbability());
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(getCrossoverProbability());
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        return result;
-    }
-
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-        Individual that = (Individual) o;
+        Individual<?> that = (Individual<?>) o;
 
-        if (Double.compare(that.getCrossoverProbability(), getCrossoverProbability()) != 0)
-            return false;
-        if (Double.compare(that.getMutationProbability(), getMutationProbability()) != 0)
-            return false;
-        if (individual != null ? !individual.equals(that.individual) : that.individual != null)
-            return false;
+        return individual != null ? individual.equals(that.individual) : that.individual == null;
 
-        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (individual != null ? individual.hashCode() : 0);
+        return result;
     }
 }

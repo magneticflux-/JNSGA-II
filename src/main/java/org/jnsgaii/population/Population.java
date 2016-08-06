@@ -29,9 +29,9 @@ public class Population<E> {
     }
 
     public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
-        ArrayList<Individual<E>> individuals = new ArrayList<>(population1.population.size() + population2.population.size());
-        individuals.addAll(population1.population);
-        individuals.addAll(population2.population);
+        ArrayList<Individual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
+        individuals.addAll(population1.getPopulation());
+        individuals.addAll(population2.getPopulation());
         return new Population<>(individuals);
     }
 

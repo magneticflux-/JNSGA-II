@@ -11,6 +11,7 @@ import org.jnsgaii.properties.Properties;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
@@ -39,32 +40,63 @@ public class EvaluatedPopulation<E> extends Population<E> {
         @SuppressWarnings("unchecked")
         HashMap<String, Object>[] computationResults = new HashMap[population.size()];
 
-        for (int i = 0; i < computations.size(); i++) {
+        for (int computationIndex = 0; computationIndex < computations.size(); computationIndex++) {
             stopWatch.start();
 
-            Computation<E, ?> computation = computations.get(i);
-            @SuppressWarnings("unchecked")
-            Object[] results = computation.compute((List<Individual<E>>) population.getPopulation(), properties);
+            Computation<E, ?> computation = computations.get(computationIndex);
 
-            IntStream.range(0, results.length).parallel().forEach(value -> {
-                if (computationResults[value] == null)
-                    computationResults[value] = new HashMap<>();
-                computationResults[value].put(computation.getComputationID(), results[value]);
+            Map<Integer, Integer> toBeComputedIndexes = new HashMap<>(); // Population index -> result index
+            List<Individual<E>> individualsToBeComputed = new ArrayList<>();
+            for (int resultIndex = 0, populationIndex = 0; populationIndex < population.size(); populationIndex++) {
+                if (!computation.isDeterministic() || !(population.getPopulation().get(populationIndex) instanceof EvaluatedIndividual)) {
+                    toBeComputedIndexes.put(populationIndex, resultIndex++);
+                    individualsToBeComputed.add(population.getPopulation().get(populationIndex));
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            Object[] results = computation.compute(individualsToBeComputed, properties);
+
+            IntStream.range(0, population.size()).parallel().forEach(populationIndex -> {
+                if (computationResults[populationIndex] == null)
+                    computationResults[populationIndex] = new HashMap<>();
+
+                if (toBeComputedIndexes.containsKey(populationIndex)) { // It needed to be computed
+                    computationResults[populationIndex].put(computation.getComputationID(), results[toBeComputedIndexes.get(populationIndex)]); // Look up where it was stored in the results array
+                } else { // The data can be reused
+                    computationResults[populationIndex].put(computation.getComputationID(), ((EvaluatedIndividual<E>) population.getPopulation().get(populationIndex)).getComputation(computation.getComputationID())); // The individual must have been EvaluatedIndividual, cast and retrieve the data
+                }
             });
 
             stopWatch.stop();
-            computationTimes[i] = stopWatch.getNanoTime();
+            computationTimes[computationIndex] = stopWatch.getNanoTime();
             stopWatch.reset();
         }
 
         for (int i = 0; i < optimizationFunctions.size(); i++) {
             stopWatch.start();
 
-            @SuppressWarnings("unchecked")
-            double[] functionScores = optimizationFunctions.get(i).evaluate((List<Individual<E>>) population.getPopulation(), computationResults, properties);
+            OptimizationFunction<E> optimizationFunction = optimizationFunctions.get(i);
+
+            Map<Integer, Integer> toBeComputedIndexes = new HashMap<>(); // Population index -> result index
+            List<Individual<E>> individualsToBeComputed = new ArrayList<>();
+            for (int resultIndex = 0, populationIndex = 0; populationIndex < population.size(); populationIndex++) {
+                if (!optimizationFunction.isDeterministic() || !(population.getPopulation().get(populationIndex) instanceof EvaluatedIndividual)) {
+                    toBeComputedIndexes.put(populationIndex, resultIndex++);
+                    individualsToBeComputed.add(population.getPopulation().get(populationIndex));
+                }
+            }
+
+            double[] results = optimizationFunction.evaluate(individualsToBeComputed, computationResults, properties); // See the computation section for details
             final int finalI = i;
-            IntStream.range(0, scores.length).parallel().forEach(
-                    value -> scores[value][finalI] = functionScores[value]
+            IntStream.range(0, scores.length).parallel().forEach(populationIndex -> {
+                        //scores[populationIndex][finalI] = results[populationIndex];
+                        if (toBeComputedIndexes.containsKey(populationIndex)) {
+                            scores[populationIndex][finalI] = results[toBeComputedIndexes.get(populationIndex)];
+                        } else {
+                            scores[populationIndex][finalI] = ((EvaluatedIndividual<E>) population.getPopulation().get(populationIndex)).getScore(finalI);
+                        }
+                    }
             );
 
             stopWatch.stop();
@@ -74,15 +106,28 @@ public class EvaluatedPopulation<E> extends Population<E> {
         }
         List<EvaluatedIndividual<E>> newPopulation = new ArrayList<>(properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
         for (int i = 0; i < population.size(); i++) {
-            newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctions, scores[i]));
+            //noinspection unchecked
+            newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctions, scores[i], computationResults[i]));
         }
 
         this.population = newPopulation;
     }
 
+    private EvaluatedPopulation(List<EvaluatedIndividual<E>> individuals) {
+        this();
+        this.population = new ArrayList<>(individuals);
+    }
+
     protected EvaluatedPopulation() {
         computationTimes = new long[0];
         optimizationFunctionTimes = new long[0];
+    }
+
+    public static <E> EvaluatedPopulation<E> merge(EvaluatedPopulation<E> population1, EvaluatedPopulation<E> population2) {
+        ArrayList<EvaluatedIndividual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
+        individuals.addAll(population1.getPopulation());
+        individuals.addAll(population2.getPopulation());
+        return new EvaluatedPopulation<>(individuals);
     }
 
     @Override

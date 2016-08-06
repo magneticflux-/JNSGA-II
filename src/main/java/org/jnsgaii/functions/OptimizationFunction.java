@@ -12,13 +12,13 @@ import java.util.List;
 /**
  * Created by Mitchell on 11/25/2015.
  * <p>
- *     This class is a comparator on its own function. It decides which score bests which other score, which affects the algorithm's choices.
+ * This class is a comparator on its own function. It decides which score bests which other score, which affects the algorithm's choices.
  * </p>
  * <p>
- *     Functions are near-instant and utilize computation results, while computations are designed to be long-running processes
+ * Functions are near-instant and utilize computation results, while computations are designed to be long-running processes
  * </p>
  * <p>
- *     NOTE: An implementor must also implement the <code>equals</code> method.
+ * NOTE: An implementor must also implement the <code>equals</code> method.
  * </p>
  *
  * @see java.util.Comparator
@@ -38,4 +38,11 @@ public interface OptimizationFunction<E> extends Comparator<Double>, HasProperty
      * @return the maximum value this function can return
      */
     double max(Properties properties);
+
+    /**
+     * Does this OptimizationFunction's result change for each evaluation?
+     *
+     * @return the answer
+     */
+    boolean isDeterministic();
 }

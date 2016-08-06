@@ -2,9 +2,7 @@ package org.jnsgaii.population.individual;
 
 import org.jnsgaii.functions.OptimizationFunction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -13,24 +11,29 @@ public class EvaluatedIndividual<E> extends Individual<E> {
 
     protected final List<OptimizationFunction<E>> optimizationFunctions;
     protected final double[] scores;
+    protected final Map<String, Object> computationResults;
 
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "MethodCanBeVariableArityMethod"})
-    public EvaluatedIndividual(Individual<E> individual, List<OptimizationFunction<E>> optimizationFunctions, double[] scores) {
+    public EvaluatedIndividual(Individual<E> individual, List<OptimizationFunction<E>> optimizationFunctions, double[] scores, Map<String, Object> computationResults) {
         super(individual);
         this.optimizationFunctions = optimizationFunctions;
         this.scores = scores;
+        this.computationResults = computationResults;
     }
 
     public EvaluatedIndividual(EvaluatedIndividual<E> evaluatedIndividual) {
         super(evaluatedIndividual);
-        optimizationFunctions = evaluatedIndividual.optimizationFunctions;
-        scores = evaluatedIndividual.scores;
+        this.optimizationFunctions = evaluatedIndividual.optimizationFunctions;
+        this.scores = evaluatedIndividual.scores;
+        this.computationResults = evaluatedIndividual.computationResults;
     }
 
     protected EvaluatedIndividual() {
         super();
         optimizationFunctions = new ArrayList<>();
         scores = new double[0];
+        //noinspection unchecked
+        computationResults = new HashMap<>();
     }
 
     /**
@@ -76,7 +79,8 @@ public class EvaluatedIndividual<E> extends Individual<E> {
 
         if (optimizationFunctions != null ? !optimizationFunctions.equals(that.optimizationFunctions) : that.optimizationFunctions != null)
             return false;
-        return Arrays.equals(scores, that.scores);
+        if (!Arrays.equals(scores, that.scores)) return false;
+        return computationResults != null ? computationResults.equals(that.computationResults) : that.computationResults == null;
 
     }
 
@@ -85,7 +89,12 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         int result = super.hashCode();
         result = 31 * result + (optimizationFunctions != null ? optimizationFunctions.hashCode() : 0);
         result = 31 * result + Arrays.hashCode(scores);
+        result = 31 * result + (computationResults != null ? computationResults.hashCode() : 0);
         return result;
+    }
+
+    public Object getComputation(String computationID) {
+        return computationResults.get(computationID);
     }
 }
 

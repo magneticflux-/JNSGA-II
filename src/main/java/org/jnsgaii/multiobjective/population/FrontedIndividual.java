@@ -56,10 +56,9 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         //Negative if THIS object is LESS THAN o
         if (this.rank != o.rank) {
             return Integer.compare(this.rank, o.rank); // Lowest to highest
-        } else if (this.crowdingScore != o.crowdingScore) {
+        } else {//if (this.crowdingScore != o.crowdingScore) {
             return -Double.compare(this.crowdingScore, o.crowdingScore); // Highest to lowest
-        } else {
-            return this.toString().compareTo(o.toString());
+            //} else { return this.toString().compareTo(o.toString()); }
         }
     }
 
@@ -68,23 +67,23 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         return "{" + this.individual.toString() + " " + this.crowdingScore + "}";
     }
 
-    @SuppressWarnings("RedundantIfStatement")
+    public double getCrowdingScore() {
+        return this.crowdingScore;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        //noinspection unchecked
-        FrontedIndividual<E> that = (FrontedIndividual<E>) o;
+        FrontedIndividual<?> that = (FrontedIndividual<?>) o;
 
         if (Double.compare(that.crowdingScore, crowdingScore) != 0) return false;
         if (dominationCount != that.dominationCount) return false;
         if (rank != that.rank) return false;
-        if (dominatedIndividuals != null ? !dominatedIndividuals.equals(that.dominatedIndividuals) : that.dominatedIndividuals != null)
-            return false;
+        return dominatedIndividuals != null ? dominatedIndividuals.equals(that.dominatedIndividuals) : that.dominatedIndividuals == null;
 
-        return true;
     }
 
     @Override
@@ -97,9 +96,5 @@ public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comp
         result = 31 * result + dominationCount;
         result = 31 * result + rank;
         return result;
-    }
-
-    public double getCrowdingScore() {
-        return this.crowdingScore;
     }
 }

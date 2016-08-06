@@ -74,4 +74,9 @@ public class JPPFJobComputation<E, F> extends DefaultComputation<E, F> {
     public String getComputationID() {
         return wrapped.getComputationID();
     }
+
+    @Override
+    public boolean isDeterministic() {
+        return wrapped.isDeterministic();
+    }
 }

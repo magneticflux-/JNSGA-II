@@ -1,4 +1,4 @@
-package org.jnsgaii;
+package org.jnsgaii.observation;
 
 import org.jnsgaii.population.PopulationData;
 

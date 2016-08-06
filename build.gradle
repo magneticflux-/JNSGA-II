@@ -29,7 +29,7 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile 'org.jzy3d:jzy3d-api:1.0.0-SNAPSHOT'
+    compile 'org.jzy3d:jzy3d-api:0.9.1'
     compile 'org.jfree:jfreechart:1.0.19'
     compile 'net.sf.jung:jung2:2.0.1'
     compile 'net.sf.jung:jung-graph-impl:2.1'

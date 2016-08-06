@@ -50,6 +50,11 @@ public class SpeciesFitnessReward<E> implements OptimizationFunction<E> {
     }
 
     @Override
+    public boolean isDeterministic() {
+        return false;
+    }
+
+    @Override
     public int compare(Double o1, Double o2) {
         return wrapped.compare(o1, o2);
     }

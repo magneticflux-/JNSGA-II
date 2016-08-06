@@ -7,7 +7,7 @@ import org.jnsgaii.examples.defaultoperatorframework.RouletteWheelLinearSelectio
 import org.jnsgaii.examples.numarical.DoubleArrayPopulationGenerator;
 import org.jnsgaii.functions.DefaultOptimizationFunction;
 import org.jnsgaii.functions.OptimizationFunction;
-import org.jnsgaii.multiobjective.NSGA_II;
+import org.jnsgaii.multiobjective.NSGAII;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.operators.Mutator;
 import org.jnsgaii.population.PopulationGenerator;
@@ -89,14 +89,14 @@ public final class POL {
         List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
-        NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
+        NSGAII<double[]> nsgaii = new NSGAII<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        DefaultVisualization.startInterface(operator, optimizationFunctions, Collections.emptyList(), nsga_ii);
+        DefaultVisualization.startInterface(operator, optimizationFunctions, Collections.emptyList(), nsgaii, null);
 
         //noinspection MagicNumber
         for (int i = 0; i < 1000000; i++) {
             //long startTime = System.nanoTime();
-            nsga_ii.runGeneration();
+            nsgaii.runGeneration();
             //long elapsedTime = System.nanoTime() - startTime;
             //System.out.println("; Total elapsed time: " + String.format("%.4f", elapsedTime / 1000000d) + "ms");
             //noinspection MagicNumber
@@ -138,6 +138,11 @@ public final class POL {
             return 30;
         }
 
+        @Override
+        public boolean isDeterministic() {
+            return true;
+        }
+
 
     }
 
@@ -156,6 +161,11 @@ public final class POL {
         @Override
         public double max(Properties properties) {
             return FastMath.pow(FastMath.PI + 3, 2) + FastMath.pow(FastMath.PI + 1, 2);
+        }
+
+        @Override
+        public boolean isDeterministic() {
+            return true;
         }
 
         @Override
@@ -191,6 +201,11 @@ public final class POL {
         }
 
         @Override
+        public boolean isDeterministic() {
+            return true;
+        }
+
+        @Override
         public int compare(Double o1, Double o2) {
             return -Double.compare(o1, o2);
         }
@@ -220,6 +235,11 @@ public final class POL {
         @Override
         public double max(Properties properties) {
             return 1;
+        }
+
+        @Override
+        public boolean isDeterministic() {
+            return true;
         }
 
         @Override

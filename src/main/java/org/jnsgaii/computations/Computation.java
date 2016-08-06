@@ -14,4 +14,6 @@ public interface Computation<E, F> {
     F[] compute(List<Individual<E>> individuals, Properties properties);
 
     String getComputationID();
+
+    boolean isDeterministic();
 }

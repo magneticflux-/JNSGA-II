@@ -12,7 +12,7 @@ import org.jnsgaii.examples.numarical.DoubleArrayPopulationGenerator;
 import org.jnsgaii.examples.numarical.SimpleDoubleArrayMutationOperator;
 import org.jnsgaii.functions.DefaultOptimizationFunction;
 import org.jnsgaii.functions.OptimizationFunction;
-import org.jnsgaii.multiobjective.NSGA_II;
+import org.jnsgaii.multiobjective.NSGAII;
 import org.jnsgaii.multiobjective.population.Front;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.operators.Operator;
@@ -65,22 +65,22 @@ public final class FON {
         List<OptimizationFunction<double[]>> optimizationFunctions = Arrays.asList(function1, function2);
         PopulationGenerator<double[]> populationGenerator = new DoubleArrayPopulationGenerator();
 
-        NSGA_II<double[]> nsga_ii = new NSGA_II<>(properties, operator, optimizationFunctions, populationGenerator);
+        NSGAII<double[]> nsgaii = new NSGAII<>(properties, operator, optimizationFunctions, populationGenerator);
 
-        nsga_ii.addObserver(populationData -> {
-                collection.removeAllSeries();
-                for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
-                    XYSeries frontSeries = new XYSeries(front.toString());
-                    for (FrontedIndividual<double[]> individual : front.getMembers()) {
-                        frontSeries.add(individual.getScore(0), individual.getScore(1));
-                    }
-                    collection.addSeries(frontSeries);
+        nsgaii.addObserver(populationData -> {
+            collection.removeAllSeries();
+            for (Front<double[]> front : populationData.getTruncatedPopulation().getFronts()) {
+                XYSeries frontSeries = new XYSeries(front.toString());
+                for (FrontedIndividual<double[]> individual : front.getMembers()) {
+                    frontSeries.add(individual.getScore(0), individual.getScore(1));
                 }
-            });
+                collection.addSeries(frontSeries);
+            }
+        });
 
         //noinspection MagicNumber
         for (int i = 0; i < 10000; i++) {
-            SwingUtilities.invokeAndWait(nsga_ii::runGeneration);
+            SwingUtilities.invokeAndWait(nsgaii::runGeneration);
             //noinspection MagicNumber
             Thread.sleep(250);
         }
@@ -118,6 +118,11 @@ public final class FON {
             return 1;
         }
 
+        @Override
+        public boolean isDeterministic() {
+            return true;
+        }
+
 
     }
 
@@ -140,6 +145,11 @@ public final class FON {
         @Override
         public double max(Properties properties) {
             return 1;
+        }
+
+        @Override
+        public boolean isDeterministic() {
+            return true;
         }
 
         @Override

@@ -1,15 +1,11 @@
 package org.jnsgaii.operators;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.AspectUser;
-import org.jnsgaii.properties.HasAspectRequirements;
-import org.jnsgaii.properties.HasPropertyRequirements;
-import org.jnsgaii.properties.Key;
-import org.jnsgaii.properties.Properties;
-import org.jnsgaii.properties.Requirement;
+import org.jnsgaii.properties.*;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
@@ -37,16 +33,31 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         this.speciator = speciator;
     }
 
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start();
         mutators.forEach(mutator -> mutator.updateProperties(properties));
         recombiner.updateProperties(properties);
         speciator.updateProperties(properties);
         selector.updateProperties(properties);
 
         setAspectIndices(getHasAspectRequirementses());
+        stopWatch.stop();
+        System.out.println("Property/Aspect Update Time: " + stopWatch.getTime() + "ms");
+        stopWatch.reset();
 
+        stopWatch.start();
         List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
         for (int i = 0; i < population.getPopulation().size(); i++) {
             FrontedIndividual<E> individual = selector.apply((List<FrontedIndividual<E>>) population.getPopulation());
@@ -66,22 +77,25 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
             FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
             newPopulation.add(recombiner.apply(individual, otherIndividual));
         }
+        stopWatch.stop();
+        System.out.println("Mating Time: " + stopWatch.getTime() + "ms");
+        stopWatch.reset();
 
+        stopWatch.start();
         IntStream.range(0, mutators.size()).forEach(value -> newPopulation.replaceAll(mutators.get(value)::apply));
+        stopWatch.stop();
+        System.out.println("Mutation Time: " + stopWatch.getTime() + "ms");
+        stopWatch.reset();
 
+        stopWatch.start();
         for (AspectUser<E> aspectUser : getAspectUsers()) {
             newPopulation.forEach(individual -> aspectUser.modifyAspects(individual, ThreadLocalRandom.current()));
         }
+        stopWatch.stop();
+        System.out.println("Aspect Modification Time: " + stopWatch.getTime());
+        stopWatch.reset();
 
         return new Population<>(newPopulation);
-    }
-
-    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
-        int currentIndex = 0;
-        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
-            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
-        }
-        return currentIndex;
     }
 
     private HasAspectRequirements[] getHasAspectRequirementses() {

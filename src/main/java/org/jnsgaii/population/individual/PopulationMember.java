@@ -1,5 +1,7 @@
 package org.jnsgaii.population.individual;
 
+import java.util.Arrays;
+
 /**
  * Created by Mitchell on 1/15/2016.
  */
@@ -36,5 +38,21 @@ public abstract class PopulationMember {
     @Deprecated
     public double getCrossoverProbability() {
         return aspects[1];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PopulationMember that = (PopulationMember) o;
+
+        return Arrays.equals(aspects, that.aspects);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(aspects);
     }
 }
