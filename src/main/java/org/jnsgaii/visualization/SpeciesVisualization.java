@@ -4,17 +4,18 @@ import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.OrderedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.Graphs;
-import edu.uci.ics.jung.visualization.VisualizationImageServer;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;
+import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.operators.Speciator;
 
-import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+import java.awt.BasicStroke;
 import java.awt.Dimension;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.RenderingHints;
 
 /**
  * Created by Mitchell on 5/21/2016.
@@ -40,9 +41,9 @@ public final class SpeciesVisualization {
 
         FRLayout<Integer, Edge> layout = new FRLayout<>(graph);
         layout.setSize(new Dimension(10000, 10000));
-        layout.setRepulsionMultiplier(.1);
+        //layout.setRepulsionMultiplier(.1);
         //layout.setAttractionMultiplier(2);
-        layout.setMaxIterations(5000);
+        layout.setMaxIterations(10000);
         layout.initialize();
 
         //VisualizationViewer<Integer, Edge> vv = new VisualizationViewer<>(layout);
@@ -50,39 +51,21 @@ public final class SpeciesVisualization {
         //vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(graph));
         //vv.setGraphMouse(new DefaultModalGraphMouse(.9f, 1 / .9f));
 
-        System.out.println("Starting layout...");
-        VisualizationImageServer<Integer, Edge> visualizationImageServer = new VisualizationImageServer<>(layout, layout.getSize());
-        visualizationImageServer.getModel().getRelaxer().setSleepTime(0);
-        visualizationImageServer.getRenderContext().setPickedVertexState(new MultiPickedState<>());
-        visualizationImageServer.getRenderContext().setPickedEdgeState(new MultiPickedState<>());
-        while (!layout.done()) layout.step();
-        System.out.println("Finished layout!");
-        System.out.println("Starting rendering...");
-        BufferedImage result = (BufferedImage) visualizationImageServer.getImage(new Point2D.Double(0, 0), layout.getSize());
-        System.out.println("Finished rendering!");
+        VisualizationViewer<Integer, Edge> vv = new VisualizationViewer<>(layout, layout.getSize());
+        //vv.getModel().getRelaxer().setSleepTime(0);
+        vv.getRenderContext().setPickedVertexState(new MultiPickedState<>());
+        vv.getRenderContext().setPickedEdgeState(new MultiPickedState<>());
+        vv.getRenderingHints().remove(RenderingHints.KEY_ANTIALIASING);
+        vv.getRenderContext().setEdgeStrokeTransformer(input -> new BasicStroke(FastMath.abs((float) (input.distance))));
+        vv.setGraphMouse(new DefaultModalGraphMouse(.9f, 1 / .9f));
 
-        /*
         JFrame frame = new JFrame("Simple Graph View");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.getContentPane().add(new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                //g.drawImage(result, 0, 0, this);
-            }
-        });
+        frame.add(vv);
         frame.pack();
         frame.setVisible(true);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        */
 
-        System.out.println("Starting write...");
-        try {
-            File outputFile = new File(generation + ".jpg");
-            ImageIO.write(result, "jpg", outputFile);
-        } catch (IOException e) {
-        }
-        System.out.println("Finished write!");
     }
 
     private static final class Edge {
