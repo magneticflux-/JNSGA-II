@@ -40,7 +40,7 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.0'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'com.miglayout:miglayout-swing:5.0'
-    compile group: 'org.jppf', name: 'jppf-client', version: '5.1.3'
+    compile group: 'org.jppf', name: 'jppf-client', version: '5.2.1'
 
     //compile "com.github.magneticflux-:JNSGA-II:master-SNAPSHOT"
 }
