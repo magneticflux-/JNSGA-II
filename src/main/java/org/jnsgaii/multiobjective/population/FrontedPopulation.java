@@ -56,17 +56,18 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         // Start computing the crowding distance
 
         //for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
-        for (int i = 0; i < optimizationFunctions.size(); i++) {
+        for (int optimizationFunctionIndex = 0; optimizationFunctionIndex < optimizationFunctions.size(); optimizationFunctionIndex++) {
             // Sorts the population according to the comparator
-            final int finalI = i; // To satisfy the lambda
-            Collections.sort(castPopulationView, (o1, o2) -> -optimizationFunctions.get(finalI).compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
+            final int finalI = optimizationFunctionIndex; // To satisfy the lambda
+            OptimizationFunction<E> currentOptimizationFunction = optimizationFunctions.get(optimizationFunctionIndex);
+            Collections.sort(castPopulationView, (o1, o2) -> -currentOptimizationFunction.compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
             // First and last have priority with the crowding score
             castPopulationView.get(0).crowdingScore = Double.POSITIVE_INFINITY;
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;
 
-            for (int j = 1; j < (castPopulationView.size() - 1); j++) { // Don't check the outside ones
-                if (Double.isFinite(castPopulationView.get(j).crowdingScore)) // Only add to it if it isn't an outlier on another function
-                    castPopulationView.get(j).crowdingScore += (castPopulationView.get(j + 1).getScore(i) - castPopulationView.get(j - 1).getScore(i)) / (optimizationFunctions.get(i).max(properties) - optimizationFunctions.get(i).min(properties));
+            for (int innerPopulationIndex = 1; innerPopulationIndex < (castPopulationView.size() - 1); innerPopulationIndex++) { // Don't check the outside ones
+                if (Double.isFinite(castPopulationView.get(innerPopulationIndex).crowdingScore)) // Only add to it if it isn't an outlier on another function
+                    castPopulationView.get(innerPopulationIndex).crowdingScore += (castPopulationView.get(innerPopulationIndex + 1).getScore(optimizationFunctionIndex) - castPopulationView.get(innerPopulationIndex - 1).getScore(optimizationFunctionIndex)) / (currentOptimizationFunction.max(properties) - currentOptimizationFunction.min(properties));
             }
         }
 

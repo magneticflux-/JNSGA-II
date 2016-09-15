@@ -6,6 +6,7 @@ import edu.uci.ics.jung.graph.OrderedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.Graphs;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;
 import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
@@ -56,6 +57,7 @@ public final class SpeciesVisualization {
         vv.getRenderContext().setPickedVertexState(new MultiPickedState<>());
         vv.getRenderContext().setPickedEdgeState(new MultiPickedState<>());
         vv.getRenderingHints().remove(RenderingHints.KEY_ANTIALIASING);
+        vv.getRenderContext().setEdgeShapeTransformer(EdgeShape.line(graph));
         vv.getRenderContext().setEdgeStrokeTransformer(input -> new BasicStroke(FastMath.abs((float) (input.distance))));
         vv.setGraphMouse(new DefaultModalGraphMouse(.9f, 1 / .9f));
 
