@@ -1,4 +1,4 @@
-package org.jnsgaii.cluster;
+package org.jnsgaii.cluster.computations;
 
 import org.jnsgaii.computations.DefaultComputation;
 import org.jnsgaii.population.individual.Individual;
