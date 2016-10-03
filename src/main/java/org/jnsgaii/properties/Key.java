@@ -10,7 +10,8 @@ public interface Key {
             POPULATION_SIZE,
             ASPECT_COUNT,
             DOUBLE_ARRAY_GENERATION_LENGTH,
-            OBSERVER_UPDATE_SKIP_NUM
+            OBSERVER_UPDATE_SKIP_NUM,
+            ROUND_ROBIN_BEST_OF
         }
     }
 
@@ -19,16 +20,24 @@ public interface Key {
             INITIAL_ASPECT_ARRAY, // Stored as an array, needs to be cast. Hack-y, but works.
             ASPECT_MODIFICATION_ARRAY, // Aspect1Str, Aspect1Prob, Aspect2Str, Aspect2Prob...
 
+            @Deprecated
             MUTATION_STRENGTH_MUTATION_PROBABILITY,
+            @Deprecated
             MUTATION_STRENGTH_MUTATION_STRENGTH,
 
+            @Deprecated
             MUTATION_PROBABILITY_MUTATION_PROBABILITY,
+            @Deprecated
             MUTATION_PROBABILITY_MUTATION_STRENGTH,
 
+            @Deprecated
             CROSSOVER_PROBABILITY_MUTATION_PROBABILITY,
+            @Deprecated
             CROSSOVER_PROBABILITY_MUTATION_STRENGTH,
 
+            @Deprecated
             CROSSOVER_STRENGTH_MUTATION_PROBABILITY,
+            @Deprecated
             CROSSOVER_STRENGTH_MUTATION_STRENGTH,
 
             RANDOM_DOUBLE_GENERATION_MINIMUM,
