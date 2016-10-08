@@ -41,7 +41,10 @@ import java.util.stream.Stream;
 
 /**
  * Created by Mitchell on 3/30/2016.
+ *
+ * @deprecated Soon to be completely replicated modularly by {@link TabbedVisualizationWindow}
  */
+@Deprecated
 public final class DefaultVisualization {
 
     private DefaultVisualization() {
@@ -104,6 +107,11 @@ public final class DefaultVisualization {
         }));
     }
 
+    /**
+     * @deprecated Use {@link TabbedVisualizationWindow} instead.
+     */
+    @SuppressWarnings("Duplicates")
+    @Deprecated
     public static <E> void startInterface(@SuppressWarnings("TypeMayBeWeakened") DefaultOperator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, EvolutionObservable<E> evolutionObservable, JPPFClient jppfClient) {
         Box histogramPanel = new Box(BoxLayout.Y_AXIS);
         JScrollPane histogramScrollPane = new JScrollPane(histogramPanel);
@@ -303,6 +311,7 @@ public final class DefaultVisualization {
         });
     }
 
+    @SuppressWarnings("Duplicates")
     private static <E> void updateAverageAspectCollection(YIntervalSeriesCollection averageAspectCollection, String[] aspectDescriptions, PopulationData<E> populationData) {
         for (int i = 0; i < populationData.getTruncatedPopulation().getPopulation().get(0).aspects.length; i++) {
             YIntervalSeries aspectSeries;
