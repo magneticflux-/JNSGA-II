@@ -9,11 +9,11 @@ public class Individual<E> extends PopulationMember {
 
     @Deprecated
     public Individual(E individual) {
-        this(individual, new double[0]);
+        this(individual, new double[0], -1);
     }
 
-    public Individual(E individual, double[] aspects) {
-        super(aspects);
+    public Individual(E individual, double[] aspects, long id) {
+        super(aspects, id);
         this.individual = individual;
     }
 
@@ -24,7 +24,7 @@ public class Individual<E> extends PopulationMember {
 
     @Deprecated
     public Individual(E individual, double mutationStrength, double mutationProbability, double crossoverStrength, double crossoverProbability) {
-        super(new double[0]);
+        super(new double[0], -1);
         throw new UnsupportedOperationException("Do not use mutation/crossover. Aspects only");
         //super(mutationStrength, mutationProbability, crossoverStrength, crossoverProbability);
         //this.individual = individual;

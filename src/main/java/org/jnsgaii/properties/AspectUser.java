@@ -1,7 +1,6 @@
 package org.jnsgaii.properties;
 
 import org.jnsgaii.operators.Mutator;
-import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.util.Range;
 
 import java.util.Random;
@@ -9,7 +8,7 @@ import java.util.Random;
 /**
  * Created by Mitchell on 3/22/2016.
  */
-public abstract class AspectUser<E> implements HasAspectRequirements, HasPropertyRequirements {
+public abstract class AspectUser implements HasAspectRequirements, HasPropertyRequirements {
     protected int startIndex;
     protected double[] aspectModificationArray;
 
@@ -24,7 +23,7 @@ public abstract class AspectUser<E> implements HasAspectRequirements, HasPropert
         return 0;
     }
 
-    public abstract void modifyAspects(Individual<E> individual, Random r);
+    public abstract void modifyAspects(double[] aspects, Random r);
 
     public void updateProperties(Properties properties) {
         aspectModificationArray = (double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.ASPECT_MODIFICATION_ARRAY);

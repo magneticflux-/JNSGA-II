@@ -2,7 +2,6 @@ package org.jnsgaii.examples.defaultoperatorframework;
 
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.operators.Selector;
-import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
@@ -57,7 +56,7 @@ public abstract class RouletteWheelSelection<E> extends Selector<E> {
     }
 
     @Override
-    public void modifyAspects(Individual<E> individual, Random r) {
+    public void modifyAspects(double[] aspects, Random r) {
     }
 
     @Override

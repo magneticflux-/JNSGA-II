@@ -53,8 +53,7 @@ public class DoubleArraySpeciator extends Speciator<double[]> {
     }
 
     @Override
-    public void modifyAspects(Individual<double[]> individual, Random r) {
-        double[] aspects = individual.aspects;
+    public void modifyAspects(double[] aspects, Random r) {
         AspectUser.mutateAspect(aspectModificationArray, aspects, startIndex, r, 0, Double.POSITIVE_INFINITY);
     }
 

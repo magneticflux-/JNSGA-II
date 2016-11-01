@@ -22,13 +22,14 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     protected List<Front<E>> fronts;
 
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
-    protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts) {
+    protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts, long currentID) {
         this.fronts = fronts;
         this.population = population;
+        this.currentID = currentID;
     }
 
     private FrontedPopulation() {
-        this(null, null);
+        this(null, null, -1);
     }
 
     public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
@@ -189,9 +190,9 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         if (newPopulation.size() != limit) {
             System.err.println("Population: " + newPopulation);
             System.err.println("Fronts: " + newFronts);
-            throw new Error();
+            throw new Error("Unknown truncation error!");
         }
-        return new FrontedPopulation<>(newPopulation, newFronts);
+        return new FrontedPopulation<>(newPopulation, newFronts, currentID);
     }
 
     private void sort() {

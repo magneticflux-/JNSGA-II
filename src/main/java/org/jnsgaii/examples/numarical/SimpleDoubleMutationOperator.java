@@ -36,7 +36,7 @@ public class SimpleDoubleMutationOperator implements Operator<Double> {
                 individuals.add(new Individual<>(d.getIndividual()));
         }
 
-        return new Population<>(individuals);
+        return new Population<>(individuals, -1);
     }
 
     private double mutate(double d, Random r, double range) {

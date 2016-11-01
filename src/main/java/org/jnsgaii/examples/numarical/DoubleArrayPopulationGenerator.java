@@ -1,5 +1,7 @@
 package org.jnsgaii.examples.numarical;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
@@ -16,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class DoubleArrayPopulationGenerator implements PopulationGenerator<double[]> {
     @Override
-    public List<Individual<double[]>> generatePopulation(int num, Properties properties) {
+    public Pair<List<Individual<double[]>>, Long> generatePopulation(int num, Properties properties) {
         Random r = ThreadLocalRandom.current();
         double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
@@ -26,9 +28,9 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
 
         List<Individual<double[]>> individuals = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialAspects.clone()));
+            individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialAspects.clone(), -1));
         }
-        return individuals;
+        return new ImmutablePair<>(individuals, -1L);
     }
 
     private double[] getIndividual(Random r, int length, double min, double max) {

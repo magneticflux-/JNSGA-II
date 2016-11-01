@@ -1,5 +1,6 @@
 package org.jnsgaii.population;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.HasPropertyRequirements;
 import org.jnsgaii.properties.Properties;
@@ -11,5 +12,5 @@ import java.util.List;
  */
 public interface PopulationGenerator<E> extends HasPropertyRequirements {
 
-    List<Individual<E>> generatePopulation(int num, Properties properties);
+    Pair<List<Individual<E>>, Long> generatePopulation(int num, Properties properties);
 }

@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 /**
  * Created by skaggsm on 2/3/16.
  */
-public abstract class Speciator<E> extends AspectUser<E> implements BiFunction<Individual<E>, Individual<E>, Boolean>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
+public abstract class Speciator<E> extends AspectUser implements BiFunction<Individual<E>, Individual<E>, Boolean>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
     @Override
     public Boolean apply(Individual<E> individual, Individual<E> individual2) {
         return getDistance(individual, individual2) < getMaxDistance(individual, individual2);

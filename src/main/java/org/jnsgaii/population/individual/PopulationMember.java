@@ -7,17 +7,21 @@ import java.util.Arrays;
  */
 public abstract class PopulationMember {
     public final double[] aspects; // Strength1, Probability1, Strength2, Probability2...
+    public final long id;
 
-    public PopulationMember(double[] aspects) {
+    public PopulationMember(double[] aspects, long id) {
         this.aspects = aspects.clone();
+        this.id = id;
     }
 
     public PopulationMember(PopulationMember populationMember) {
         this.aspects = populationMember.aspects.clone();
+        this.id = populationMember.id;
     }
 
     PopulationMember() {
         aspects = new double[0];
+        id = -1;
     }
 
     @Deprecated
@@ -47,12 +51,15 @@ public abstract class PopulationMember {
 
         PopulationMember that = (PopulationMember) o;
 
+        if (id != that.id) return false;
         return Arrays.equals(aspects, that.aspects);
 
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(aspects);
+        int result = Arrays.hashCode(aspects);
+        result = 31 * result + (int) (id ^ (id >>> 32));
+        return result;
     }
 }

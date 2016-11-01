@@ -1,6 +1,7 @@
 package org.jnsgaii.population;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.computations.Computation;
 import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.population.individual.EvaluatedIndividual;
@@ -30,6 +31,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
     @SuppressWarnings("AssignmentToSuperclassField")
     public EvaluatedPopulation(Population<E> population, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, Properties properties) {
         super();
+        this.currentID = population.currentID;
 
         StopWatch stopWatch = new StopWatch();
         computationTimes = new long[computations.size()];
@@ -113,9 +115,10 @@ public class EvaluatedPopulation<E> extends Population<E> {
         this.population = newPopulation;
     }
 
-    private EvaluatedPopulation(List<EvaluatedIndividual<E>> individuals) {
+    private EvaluatedPopulation(List<EvaluatedIndividual<E>> individuals, long currentID) {
         this();
         this.population = new ArrayList<>(individuals);
+        this.currentID = currentID;
     }
 
     protected EvaluatedPopulation() {
@@ -127,7 +130,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
         ArrayList<EvaluatedIndividual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
         individuals.addAll(population1.getPopulation());
         individuals.addAll(population2.getPopulation());
-        return new EvaluatedPopulation<>(individuals);
+        return new EvaluatedPopulation<>(individuals, FastMath.max(population1.getCurrentID(), population2.getCurrentID()));
     }
 
     @Override

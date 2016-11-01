@@ -5,7 +5,12 @@ import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.*;
+import org.jnsgaii.properties.AspectUser;
+import org.jnsgaii.properties.HasAspectRequirements;
+import org.jnsgaii.properties.HasPropertyRequirements;
+import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.Properties;
+import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
@@ -13,7 +18,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Created by skaggsm on 1/22/16.
@@ -58,7 +62,9 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         stopWatch.reset();
 
         stopWatch.start();
-        List<Individual<E>> newPopulation = new ArrayList<>(population.getPopulation().size());
+        List<E> newPopulation = new ArrayList<>(population.getPopulation().size());
+        List<double[]> newAspects = new ArrayList<>(population.getPopulation().size());
+
         for (int i = 0; i < population.getPopulation().size(); i++) {
             FrontedIndividual<E> individual = selector.apply((List<FrontedIndividual<E>>) population.getPopulation());
 
@@ -75,34 +81,45 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                         .collect(Collectors.toList());
             }
             FrontedIndividual<E> otherIndividual = selector.apply(compatibleIndividuals);
-            newPopulation.add(recombiner.apply(individual, otherIndividual));
+
+            newAspects.add(recombiner.apply(individual.aspects, otherIndividual.aspects));
+            newPopulation.add(recombiner.apply(individual.getIndividual(), otherIndividual.getIndividual(), newAspects.get(i)));
         }
         stopWatch.stop();
         System.out.println("Mating Time: " + stopWatch.getTime() + "ms");
         stopWatch.reset();
 
         stopWatch.start();
-        IntStream.range(0, mutators.size()).forEach(value -> newPopulation.replaceAll(mutators.get(value)::apply));
+        for (Mutator<E> mutator : mutators)
+            for (int i = 0; i < newPopulation.size(); i++)
+                newPopulation.set(i, mutator.apply(newPopulation.get(i), newAspects.get(i)));
         stopWatch.stop();
         System.out.println("Mutation Time: " + stopWatch.getTime() + "ms");
         stopWatch.reset();
 
         stopWatch.start();
-        for (AspectUser<E> aspectUser : getAspectUsers()) {
-            newPopulation.forEach(individual -> aspectUser.modifyAspects(individual, ThreadLocalRandom.current()));
-        }
+        for (AspectUser aspectUser : getAspectUsers())
+            for (int i = 0; i < newPopulation.size(); i++)
+                aspectUser.modifyAspects(newAspects.get(i), ThreadLocalRandom.current());
         stopWatch.stop();
         System.out.println("Aspect Modification Time: " + stopWatch.getTime());
         stopWatch.reset();
 
-        return new Population<>(newPopulation);
+        List<Individual<E>> newIndividuals = new ArrayList<>();
+        long currentID = population.getCurrentID();
+
+        for (int i = 0; i < newPopulation.size(); i++) {
+            newIndividuals.add(new Individual<>(newPopulation.get(i), newAspects.get(i), currentID++));
+        }
+
+        return new Population<>(newIndividuals, currentID);
     }
 
     private HasAspectRequirements[] getHasAspectRequirementses() {
         return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
     }
 
-    private AspectUser<E>[] getAspectUsers() {
+    private AspectUser[] getAspectUsers() {
         //noinspection unchecked
         return Utils.concat(new AspectUser[]{recombiner, selector, speciator}, mutators.toArray(new AspectUser[mutators.size()]));
     }
