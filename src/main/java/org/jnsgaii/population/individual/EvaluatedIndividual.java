@@ -2,7 +2,11 @@ package org.jnsgaii.population.individual;
 
 import org.jnsgaii.functions.OptimizationFunction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Mitchell on 11/25/2015.
@@ -32,7 +36,6 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         super();
         optimizationFunctions = new ArrayList<>();
         scores = new double[0];
-        //noinspection unchecked
         computationResults = new HashMap<>();
     }
 

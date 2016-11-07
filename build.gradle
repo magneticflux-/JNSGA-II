@@ -10,11 +10,21 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'info.solidsoft.pitest'
 
 group 'com.github.magneticflux-'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+pitest {
+    targetClasses = ['org.jnsgaii.properties.*']
+    threads = 4
+}
+
+test {
+    useTestNG()
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -43,4 +53,7 @@ dependencies {
     compile group: 'org.jppf', name: 'jppf-client', version: '5.2.1'
 
     //compile "com.github.magneticflux-:JNSGA-II:master-SNAPSHOT"
+
+    // https://mvnrepository.com/artifact/junit/junit
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }

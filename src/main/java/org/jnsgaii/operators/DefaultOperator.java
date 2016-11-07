@@ -14,7 +14,6 @@ import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -45,10 +44,11 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         return currentIndex;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Population<E> apply(FrontedPopulation<E> population, Properties properties) {
         StopWatch stopWatch = new StopWatch();
+        @SuppressWarnings("unchecked")
+        List<FrontedIndividual<E>> castPopulation = (List<FrontedIndividual<E>>) population.getPopulation();
 
         stopWatch.start();
         mutators.forEach(mutator -> mutator.updateProperties(properties));
@@ -66,17 +66,17 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         List<double[]> newAspects = new ArrayList<>(population.getPopulation().size());
 
         for (int i = 0; i < population.getPopulation().size(); i++) {
-            FrontedIndividual<E> individual = selector.apply((List<FrontedIndividual<E>>) population.getPopulation());
+            FrontedIndividual<E> individual = selector.apply(castPopulation);
 
             final FrontedIndividual<E> finalIndividual = individual;
-            List<FrontedIndividual<E>> compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream()
+            List<FrontedIndividual<E>> compatibleIndividuals = (castPopulation).stream()
                     .filter(eFrontedIndividual -> speciator.apply(finalIndividual, eFrontedIndividual) && !finalIndividual.equals(eFrontedIndividual))
                     .collect(Collectors.toList());
             while (compatibleIndividuals.size() == 0) {
-                individual = selector.choose((List<FrontedIndividual<E>>) population.getPopulation());
+                individual = selector.choose(castPopulation);
 
                 final FrontedIndividual<E> finalIndividual1 = individual;
-                compatibleIndividuals = ((Collection<FrontedIndividual<E>>) population.getPopulation()).stream()
+                compatibleIndividuals = (castPopulation).stream()
                         .filter(eFrontedIndividual -> speciator.apply(finalIndividual1, eFrontedIndividual))
                         .collect(Collectors.toList());
             }
@@ -85,6 +85,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
             newAspects.add(recombiner.apply(individual.aspects, otherIndividual.aspects));
             newPopulation.add(recombiner.apply(individual.getIndividual(), otherIndividual.getIndividual(), newAspects.get(i)));
         }
+
         stopWatch.stop();
         System.out.println("Mating Time: " + stopWatch.getTime() + "ms");
         stopWatch.reset();
