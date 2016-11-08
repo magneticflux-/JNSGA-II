@@ -1,40 +1,33 @@
 package org.jnsgaii.population.individual;
 
-import org.jnsgaii.functions.OptimizationFunction;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/25/2015.
  */
 public class EvaluatedIndividual<E> extends Individual<E> {
 
-    protected final List<OptimizationFunction<E>> optimizationFunctions;
+    protected final List<Comparator<Double>> optimizationFunctionComparators;
     protected final double[] scores;
     protected final Map<String, Object> computationResults;
 
-    @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "MethodCanBeVariableArityMethod"})
-    public EvaluatedIndividual(Individual<E> individual, List<OptimizationFunction<E>> optimizationFunctions, double[] scores, Map<String, Object> computationResults) {
+    public EvaluatedIndividual(Individual<E> individual, List<Comparator<Double>> optimizationFunctionComparators, double[] scores, Map<String, Object> computationResults) {
         super(individual);
-        this.optimizationFunctions = optimizationFunctions;
+        this.optimizationFunctionComparators = optimizationFunctionComparators;
         this.scores = scores;
         this.computationResults = computationResults;
     }
 
     public EvaluatedIndividual(EvaluatedIndividual<E> evaluatedIndividual) {
         super(evaluatedIndividual);
-        this.optimizationFunctions = evaluatedIndividual.optimizationFunctions;
+        this.optimizationFunctionComparators = evaluatedIndividual.optimizationFunctionComparators;
         this.scores = evaluatedIndividual.scores;
         this.computationResults = evaluatedIndividual.computationResults;
     }
 
     protected EvaluatedIndividual() {
         super();
-        optimizationFunctions = new ArrayList<>();
+        optimizationFunctionComparators = new ArrayList<>();
         scores = new double[0];
         computationResults = new HashMap<>();
     }
@@ -47,8 +40,8 @@ public class EvaluatedIndividual<E> extends Individual<E> {
         boolean thisDominatesInAtLeastOne = false;
         boolean otherDominatesInAtLeastOne = false;
 
-        for (int i = 0; i < optimizationFunctions.size(); i++) {
-            int val = optimizationFunctions.get(i).compare(this.getScore(i), other.getScore(i));
+        for (int i = 0; i < optimizationFunctionComparators.size(); i++) {
+            int val = optimizationFunctionComparators.get(i).compare(this.getScore(i), other.getScore(i));
             if (val < 0) {
                 otherDominatesInAtLeastOne = true;
             } else if (val > 0) {
@@ -80,7 +73,7 @@ public class EvaluatedIndividual<E> extends Individual<E> {
 
         EvaluatedIndividual<?> that = (EvaluatedIndividual<?>) o;
 
-        if (optimizationFunctions != null ? !optimizationFunctions.equals(that.optimizationFunctions) : that.optimizationFunctions != null)
+        if (optimizationFunctionComparators != null ? !optimizationFunctionComparators.equals(that.optimizationFunctionComparators) : that.optimizationFunctionComparators != null)
             return false;
         if (!Arrays.equals(scores, that.scores)) return false;
         return computationResults != null ? computationResults.equals(that.computationResults) : that.computationResults == null;
@@ -90,7 +83,7 @@ public class EvaluatedIndividual<E> extends Individual<E> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (optimizationFunctions != null ? optimizationFunctions.hashCode() : 0);
+        result = 31 * result + (optimizationFunctionComparators != null ? optimizationFunctionComparators.hashCode() : 0);
         result = 31 * result + Arrays.hashCode(scores);
         result = 31 * result + (computationResults != null ? computationResults.hashCode() : 0);
         return result;

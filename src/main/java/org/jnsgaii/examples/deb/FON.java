@@ -1,5 +1,6 @@
 package org.jnsgaii.examples.deb;
 
+import org.apache.commons.collections4.comparators.ComparableComparator;
 import org.apache.commons.math3.util.FastMath;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -25,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,8 +100,8 @@ public final class FON {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
         }
 
         @Override
@@ -153,8 +155,8 @@ public final class FON {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
         }
 
         @Override

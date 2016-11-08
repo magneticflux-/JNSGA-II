@@ -3,16 +3,15 @@ package org.jnsgaii.population;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.computations.Computation;
+import org.jnsgaii.functions.HasComparator;
 import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.population.individual.EvaluatedIndividual;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -107,9 +106,9 @@ public class EvaluatedPopulation<E> extends Population<E> {
 
         }
         List<EvaluatedIndividual<E>> newPopulation = new ArrayList<>(properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE));
+        List<Comparator<Double>> optimizationFunctionComparators = optimizationFunctions.stream().map(HasComparator::getComparator).collect(Collectors.toList());
         for (int i = 0; i < population.size(); i++) {
-            //noinspection unchecked
-            newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctions, scores[i], computationResults[i]));
+            newPopulation.add(new EvaluatedIndividual<>(population.getPopulation().get(i), optimizationFunctionComparators, scores[i], computationResults[i]));
         }
 
         this.population = newPopulation;

@@ -56,12 +56,12 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
         // Start computing the crowding distance
 
-        //for (OptimizationFunction<E> optimizationFunction : optimizationFunctions) {
+        //for (OptimizationFunction<E> optimizationFunction : optimizationFunctionComparators) {
         for (int optimizationFunctionIndex = 0; optimizationFunctionIndex < optimizationFunctions.size(); optimizationFunctionIndex++) {
             // Sorts the population according to the comparator
             final int finalI = optimizationFunctionIndex; // To satisfy the lambda
             OptimizationFunction<E> currentOptimizationFunction = optimizationFunctions.get(optimizationFunctionIndex);
-            Collections.sort(castPopulationView, (o1, o2) -> -currentOptimizationFunction.compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
+            Collections.sort(castPopulationView, (o1, o2) -> -currentOptimizationFunction.getComparator().compare(o1.getScore(finalI), o2.getScore(finalI))); // Lowest first
             // First and last have priority with the crowding score
             castPopulationView.get(0).crowdingScore = Double.POSITIVE_INFINITY;
             castPopulationView.get(castPopulationView.size() - 1).crowdingScore = Double.POSITIVE_INFINITY;

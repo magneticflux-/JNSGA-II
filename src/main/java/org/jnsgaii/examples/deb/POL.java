@@ -1,5 +1,6 @@
 package org.jnsgaii.examples.deb;
 
+import org.apache.commons.collections4.comparators.ComparableComparator;
 import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArrayAverageRecombiner;
 import org.jnsgaii.examples.defaultoperatorframework.DoubleArraySpeciator;
@@ -117,11 +118,6 @@ public final class POL {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
-        }
-
-        @Override
         public double min(Properties properties) {
             return 0;
         }
@@ -143,7 +139,10 @@ public final class POL {
             return true;
         }
 
-
+        @Override
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
+        }
     }
 
     private static class Function2 extends DefaultOptimizationFunction<double[]> {
@@ -169,13 +168,13 @@ public final class POL {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
+        public Key[] requestProperties() {
+            return new Key[0];
         }
 
         @Override
-        public Key[] requestProperties() {
-            return new Key[0];
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
         }
     }
 
@@ -206,8 +205,8 @@ public final class POL {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
         }
 
         @Override
@@ -221,8 +220,8 @@ public final class POL {
         public double evaluateIndividual(double[] object, HashMap<String, Object> computationResults, Properties properties) {
             assert object.length == 3;
             double result = 0;
-            for (int i = 0; i < object.length; i++) {
-                result += FastMath.pow(FastMath.abs(object[i]), 0.8) + 5 * FastMath.sin(FastMath.pow(object[i], 3));
+            for (double anObject : object) {
+                result += FastMath.pow(FastMath.abs(anObject), 0.8) + 5 * FastMath.sin(FastMath.pow(anObject, 3));
             }
             return result;
         }
@@ -243,8 +242,8 @@ public final class POL {
         }
 
         @Override
-        public int compare(Double o1, Double o2) {
-            return -Double.compare(o1, o2);
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
         }
 
         @Override

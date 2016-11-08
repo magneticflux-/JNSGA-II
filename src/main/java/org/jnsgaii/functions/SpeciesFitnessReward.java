@@ -7,6 +7,7 @@ import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntFunction;
@@ -55,8 +56,8 @@ public class SpeciesFitnessReward<E> implements OptimizationFunction<E> {
     }
 
     @Override
-    public int compare(Double o1, Double o2) {
-        return wrapped.compare(o1, o2);
+    public Comparator<Double> getComparator() {
+        return wrapped.getComparator();
     }
 
     @Override

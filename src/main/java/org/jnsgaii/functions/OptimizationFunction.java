@@ -5,7 +5,6 @@ import org.jnsgaii.properties.HasPropertyRequirements;
 import org.jnsgaii.properties.Properties;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  *
  * @see java.util.Comparator
  */
-public interface OptimizationFunction<E> extends Comparator<Double>, HasPropertyRequirements, Serializable {
+public interface OptimizationFunction<E> extends HasComparator<Double>, HasPropertyRequirements, Serializable {
 
     double[] evaluate(List<Individual<E>> individuals, HashMap<String, Object>[] computationResults, Properties properties);
 
@@ -45,4 +44,6 @@ public interface OptimizationFunction<E> extends Comparator<Double>, HasProperty
      * @return the answer
      */
     boolean isDeterministic();
+
+
 }
