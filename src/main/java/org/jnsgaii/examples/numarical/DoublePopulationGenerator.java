@@ -29,7 +29,7 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
         for (int i = 0; i < num; i++) {
             pop.add(new Individual<>((r.nextDouble() * difference) + min));
         }
-        return new Population<>(pop, -1L);
+        return new Population<>(pop, -1L, -1L);
     }
 
     @Override

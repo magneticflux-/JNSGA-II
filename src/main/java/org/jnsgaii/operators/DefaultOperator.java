@@ -5,12 +5,7 @@ import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.AspectUser;
-import org.jnsgaii.properties.HasAspectRequirements;
-import org.jnsgaii.properties.HasPropertyRequirements;
-import org.jnsgaii.properties.Key;
-import org.jnsgaii.properties.Properties;
-import org.jnsgaii.properties.Requirement;
+import org.jnsgaii.properties.*;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
@@ -107,13 +102,14 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         stopWatch.reset();
 
         List<Individual<E>> newIndividuals = new ArrayList<>();
-        long currentID = population.getCurrentID();
+        long currentIndividualID = population.getCurrentIndividualID();
+        long currentSpeciesID = population.getCurrentSpeciesID();
 
         for (int i = 0; i < newPopulation.size(); i++) {
-            newIndividuals.add(new Individual<>(newPopulation.get(i), newAspects.get(i), currentID++));
+            newIndividuals.add(new Individual<>(newPopulation.get(i), newAspects.get(i), currentIndividualID++));
         }
 
-        return new Population<>(newIndividuals, currentID);
+        return new Population<>(newIndividuals, currentIndividualID, currentSpeciesID);
     }
 
     private HasAspectRequirements[] getHasAspectRequirementses() {

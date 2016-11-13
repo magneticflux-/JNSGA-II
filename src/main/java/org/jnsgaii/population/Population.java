@@ -1,6 +1,7 @@
 package org.jnsgaii.population;
 
 import org.apache.commons.math3.util.FastMath;
+import org.jnsgaii.operators.SpeciatorEx;
 import org.jnsgaii.population.individual.Individual;
 
 import java.util.*;
@@ -12,27 +13,23 @@ public class Population<E> {
 
     protected List<? extends Individual<E>> population;
     protected Map<Long, Integer> idToPopulationIndexMap = new IdentityHashMap<>();
-    protected long currentID;
+    protected long currentIndividualID, currentSpeciesID;
+    protected Set<SpeciatorEx.Species> species;
 
     protected Population() {
     }
-/*
-    public Population(int size, PopulationGenerator<E> populationGenerator, Properties properties) {
-        Pair<List<Individual<E>>, Long> pair = populationGenerator.generatePopulation(size, properties);
-        this.population = pair.getLeft();
-        this.currentID = pair.getRight();
-        updateIDMap();
-    }*/
 
     public Population(Population<E> population) {
         this.population = new ArrayList<>(population.population);
-        this.currentID = population.currentID;
+        this.currentIndividualID = population.currentIndividualID;
+        this.currentSpeciesID = population.currentSpeciesID;
         this.idToPopulationIndexMap = new HashMap<>(population.idToPopulationIndexMap);
     }
 
-    public Population(List<? extends Individual<E>> individuals, long currentID) {
+    public Population(List<? extends Individual<E>> individuals, long currentIndividualID, long currentSpeciesID) {
         this.population = new ArrayList<>(individuals);
-        this.currentID = currentID;
+        this.currentIndividualID = currentIndividualID;
+        this.currentSpeciesID = currentSpeciesID;
         updateIDMap();
     }
 
@@ -40,7 +37,17 @@ public class Population<E> {
         ArrayList<Individual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
         individuals.addAll(population1.getPopulation());
         individuals.addAll(population2.getPopulation());
-        return new Population<>(individuals, FastMath.max(population1.getCurrentID(), population2.getCurrentID()));
+        return new Population<>(individuals,
+                FastMath.max(population1.getCurrentIndividualID(), population2.getCurrentIndividualID()),
+                FastMath.max(population1.getCurrentSpeciesID(), population2.getCurrentSpeciesID()));
+    }
+
+    public Set<SpeciatorEx.Species> getSpecies() {
+        return species;
+    }
+
+    public long getCurrentSpeciesID() {
+        return currentSpeciesID;
     }
 
     public Map<Long, Integer> getIdToPopulationIndexMap() {
@@ -53,8 +60,8 @@ public class Population<E> {
             idToPopulationIndexMap.put(population.get(i).id, i);
     }
 
-    public long getCurrentID() {
-        return currentID;
+    public long getCurrentIndividualID() {
+        return currentIndividualID;
     }
 
     public int size() {

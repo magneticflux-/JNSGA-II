@@ -30,7 +30,9 @@ public class EvaluatedPopulation<E> extends Population<E> {
     @SuppressWarnings("AssignmentToSuperclassField")
     public EvaluatedPopulation(Population<E> population, List<OptimizationFunction<E>> optimizationFunctions, List<Computation<E, ?>> computations, Properties properties) {
         super();
-        this.currentID = population.currentID;
+        this.currentIndividualID = population.currentIndividualID;
+        this.currentSpeciesID = population.currentSpeciesID;
+        this.species = population.species;
 
         StopWatch stopWatch = new StopWatch();
         computationTimes = new long[computations.size()];
@@ -119,7 +121,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
     private EvaluatedPopulation(List<EvaluatedIndividual<E>> individuals, long currentID) {
         this();
         this.population = new ArrayList<>(individuals);
-        this.currentID = currentID;
+        this.currentIndividualID = currentID;
 
         updateIDMap();
     }
@@ -133,7 +135,7 @@ public class EvaluatedPopulation<E> extends Population<E> {
         ArrayList<EvaluatedIndividual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
         individuals.addAll(population1.getPopulation());
         individuals.addAll(population2.getPopulation());
-        return new EvaluatedPopulation<>(individuals, FastMath.max(population1.getCurrentID(), population2.getCurrentID()));
+        return new EvaluatedPopulation<>(individuals, FastMath.max(population1.getCurrentIndividualID(), population2.getCurrentIndividualID()));
     }
 
     @Override

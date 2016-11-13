@@ -12,13 +12,15 @@ import java.util.Set;
  * Replaces {@link Speciator}.
  */
 public abstract class SpeciatorEx<E> extends AspectUser {
-    public abstract Set<Species<E>> getSpecies();
+    public abstract Set<Species> getSpecies();
 
-    public static class Species<E> {
-        private final Set<E> individuals;
+    public static class Species {
+        private final long id;
+        private final Set<Long> individualIDs;
 
-        public Species(Set<E> individuals) {
-            this.individuals = Collections.unmodifiableSet(individuals);
+        public Species(Set<Long> individualIDs, long id) {
+            this.individualIDs = Collections.unmodifiableSet(individualIDs);
+            this.id = id;
         }
     }
 }

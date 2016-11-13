@@ -25,7 +25,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts, long currentID) {
         this.fronts = fronts;
         this.population = population;
-        this.currentID = currentID;
+        this.currentIndividualID = currentID;
 
         updateIDMap();
     }
@@ -36,6 +36,9 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
     public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
         super();
+        this.currentIndividualID = population.getCurrentIndividualID();
+        this.currentSpeciesID = population.getCurrentSpeciesID();
+        this.species = population.getSpecies();
 
         this.fronts = new ArrayList<>();
         this.population = new ArrayList<FrontedIndividual<E>>();
@@ -196,7 +199,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             System.err.println("Fronts: " + newFronts);
             throw new Error("Unknown truncation error!");
         }
-        return new FrontedPopulation<>(newPopulation, newFronts, currentID);
+        return new FrontedPopulation<>(newPopulation, newFronts, currentIndividualID);
     }
 
     private void sort() {
