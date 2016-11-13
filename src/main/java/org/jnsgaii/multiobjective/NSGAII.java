@@ -163,7 +163,7 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
         //System.err.println("Offspring size: " + offspring.size());
         Population<E> mergedPopulation = initialGeneration ?
                 initialPopulation :
-                Population.merge(offspring, this.population);
+                Population.merge(this.population, offspring);
         stopWatch.stop();
 
         long mergingTime = stopWatch.getNanoTime();

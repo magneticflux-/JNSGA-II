@@ -10,7 +10,10 @@ import java.util.function.BiFunction;
 
 /**
  * Created by skaggsm on 2/3/16.
+ *
+ * @deprecated Use {@link SpeciatorEx} in favor of this
  */
+@Deprecated
 public abstract class Speciator<E> extends AspectUser implements BiFunction<Individual<E>, Individual<E>, Boolean>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
     @Override
     public Boolean apply(Individual<E> individual, Individual<E> individual2) {

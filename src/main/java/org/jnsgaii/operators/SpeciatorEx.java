@@ -1,20 +1,24 @@
 package org.jnsgaii.operators;
 
-import org.apache.commons.collections4.set.UnmodifiableSet;
+import org.jnsgaii.properties.AspectUser;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Created by skaggsm on 10/27/16.
  * <p>
- * This class, rather than only providing tests regarding individuals, provides a set of species containing every individual in the population
+ * This class, rather than only providing tests regarding individuals, provides a set of species containing every individual in the population.
+ * Replaces {@link Speciator}.
  */
-public abstract class SpeciatorEx<E> extends Speciator<E> {
-    public abstract UnmodifiableSet<Species<E>> getSpecies();
+public abstract class SpeciatorEx<E> extends AspectUser {
+    public abstract Set<Species<E>> getSpecies();
 
     public static class Species<E> {
-        private final UnmodifiableSet<E> individuals;
+        private final Set<E> individuals;
 
-        public Species(UnmodifiableSet<E> individuals) {
-            this.individuals = individuals;
+        public Species(Set<E> individuals) {
+            this.individuals = Collections.unmodifiableSet(individuals);
         }
     }
 }
