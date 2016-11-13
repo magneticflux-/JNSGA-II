@@ -1,7 +1,6 @@
 package org.jnsgaii.examples.numarical;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.jnsgaii.population.Population;
 import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
@@ -17,7 +16,7 @@ import java.util.Random;
 public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
     @Override
-    public Pair<List<Individual<Double>>, Long> generatePopulation(int num, Properties properties) {
+    public Population<Double> generatePopulation(int num, Properties properties) {
         final double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         final double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
         final double difference = max - min;
@@ -30,7 +29,7 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
         for (int i = 0; i < num; i++) {
             pop.add(new Individual<>((r.nextDouble() * difference) + min));
         }
-        return new ImmutablePair<List<Individual<Double>>, Long>(pop, -1L);
+        return new Population<>(pop, -1L);
     }
 
     @Override

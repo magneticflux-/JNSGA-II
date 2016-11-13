@@ -136,7 +136,7 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
         [X] 3. Evaluate it into an EvaluatedPopulation
         [X] 4. Turn it into a FrontedPopulation
         [X] 5. Cut off the bottom 50% of the FrontedPopulation into a new FrontedPopulation
-        [X] 6. Assign the .5x-sized FrontedPopulation to the instance's population
+        [X] 6. Assign the 1x-sized FrontedPopulation to the instance's population
 
         Everywhere else:
         [X] 1. Finish FrontedPopulation class
@@ -149,7 +149,7 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
         stopWatch.start();
         //System.err.println("Parent size: " + this.population.size());
         if (initialGeneration)
-            initialPopulation = new Population<>(2 * this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), this.populationGenerator, this.properties);
+            initialPopulation = this.populationGenerator.generatePopulation(2 * this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), this.properties);
 
         Population<E> offspring = initialGeneration ?
                 null :
