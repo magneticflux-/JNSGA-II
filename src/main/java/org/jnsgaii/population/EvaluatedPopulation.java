@@ -112,12 +112,16 @@ public class EvaluatedPopulation<E> extends Population<E> {
         }
 
         this.population = newPopulation;
+
+        updateIDMap();
     }
 
     private EvaluatedPopulation(List<EvaluatedIndividual<E>> individuals, long currentID) {
         this();
         this.population = new ArrayList<>(individuals);
         this.currentID = currentID;
+
+        updateIDMap();
     }
 
     protected EvaluatedPopulation() {

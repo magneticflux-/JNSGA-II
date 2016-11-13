@@ -26,6 +26,8 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         this.fronts = fronts;
         this.population = population;
         this.currentID = currentID;
+
+        updateIDMap();
     }
 
     private FrontedPopulation() {
@@ -134,6 +136,8 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
             this.fronts.add(currentFrontRank + 1, new Front<>(nextFront, currentFrontRank + 1));
             currentFrontRank++;
         }
+
+        updateIDMap();
     }
 
     public List<Front<E>> getFronts() {
@@ -198,5 +202,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     private void sort() {
         //noinspection unchecked
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
+        updateIDMap();
     }
 }
