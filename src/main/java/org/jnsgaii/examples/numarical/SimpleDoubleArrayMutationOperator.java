@@ -8,6 +8,7 @@ import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
+import org.jnsgaii.util.Range;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,14 +21,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @Deprecated
 public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
-
-    public static double clip(double lower, double toClip, double upper) {
-        if (toClip > lower) {
-            if (toClip < upper) {
-                return toClip;
-            } else return upper;
-        } else return lower;
-    }
 
     @Override
     public Population<double[]> apply(FrontedPopulation<double[]> population, Properties properties) {
@@ -46,8 +39,8 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
             double mutationProbability = (r.nextDouble() < mutationProbabilityMutationProbability) ? this.mutate(d.getMutationProbability(), r, mutationProbabilityMutationStrength) : d.getMutationProbability();
 
-            mutationStrength = clip(0, mutationStrength, Double.POSITIVE_INFINITY);
-            mutationProbability = clip(0, mutationProbability, 1);
+            mutationStrength = Range.clip(0, mutationStrength, Double.POSITIVE_INFINITY);
+            mutationProbability = Range.clip(0, mutationProbability, 1);
 
             individuals.add(new Individual<>(newIndividual, mutationStrength, mutationProbability, d.getCrossoverStrength(), d.getCrossoverProbability()));
         }
