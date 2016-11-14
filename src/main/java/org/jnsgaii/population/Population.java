@@ -1,10 +1,15 @@
 package org.jnsgaii.population;
 
 import org.apache.commons.math3.util.FastMath;
-import org.jnsgaii.operators.SpeciatorEx;
+import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.individual.Individual;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -14,7 +19,7 @@ public class Population<E> {
     protected List<? extends Individual<E>> population;
     protected Map<Long, Integer> idToPopulationIndexMap = new IdentityHashMap<>();
     protected long currentIndividualID, currentSpeciesID;
-    protected Set<SpeciatorEx.Species> species;
+    protected Set<Species> species;
 
     protected Population() {
     }
@@ -42,7 +47,7 @@ public class Population<E> {
                 FastMath.max(population1.getCurrentSpeciesID(), population2.getCurrentSpeciesID()));
     }
 
-    public Set<SpeciatorEx.Species> getSpecies() {
+    public Set<Species> getSpecies() {
         return species;
     }
 

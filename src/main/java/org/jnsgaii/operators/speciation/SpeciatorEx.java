@@ -1,8 +1,7 @@
-package org.jnsgaii.operators;
+package org.jnsgaii.operators.speciation;
 
 import org.jnsgaii.properties.AspectUser;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -14,13 +13,4 @@ import java.util.Set;
 public abstract class SpeciatorEx<E> extends AspectUser {
     public abstract Set<Species> getSpecies();
 
-    public static class Species {
-        private final long id;
-        private final Set<Long> individualIDs;
-
-        public Species(Set<Long> individualIDs, long id) {
-            this.individualIDs = Collections.unmodifiableSet(individualIDs);
-            this.id = id;
-        }
-    }
 }

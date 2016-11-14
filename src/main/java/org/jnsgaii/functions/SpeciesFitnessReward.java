@@ -2,7 +2,7 @@ package org.jnsgaii.functions;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jnsgaii.operators.Speciator;
+import org.jnsgaii.operators.speciation.Speciator;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;

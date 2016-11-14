@@ -1,4 +1,4 @@
-package org.jnsgaii.operators;
+package org.jnsgaii.operators.speciation;
 
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.AspectUser;

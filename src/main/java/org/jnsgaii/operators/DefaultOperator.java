@@ -3,9 +3,15 @@ package org.jnsgaii.operators;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
+import org.jnsgaii.operators.speciation.Speciator;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.*;
+import org.jnsgaii.properties.AspectUser;
+import org.jnsgaii.properties.HasAspectRequirements;
+import org.jnsgaii.properties.HasPropertyRequirements;
+import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.Properties;
+import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;

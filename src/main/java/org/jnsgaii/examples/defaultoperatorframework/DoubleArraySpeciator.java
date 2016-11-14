@@ -1,7 +1,7 @@
 package org.jnsgaii.examples.defaultoperatorframework;
 
 import org.apache.commons.math3.util.FastMath;
-import org.jnsgaii.operators.Speciator;
+import org.jnsgaii.operators.speciation.Speciator;
 import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.AspectUser;
 import org.jnsgaii.properties.Key;

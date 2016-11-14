@@ -1,5 +1,16 @@
 package org.jnsgaii.visualization;
 
+import org.apache.commons.math3.util.FastMath;
+import org.jnsgaii.multiobjective.population.FrontedPopulation;
+import org.jnsgaii.operators.speciation.Speciator;
+
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.awt.RenderingHints;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.OrderedSparseMultigraph;
@@ -8,15 +19,6 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;
-import org.apache.commons.math3.util.FastMath;
-import org.jnsgaii.multiobjective.population.FrontedPopulation;
-import org.jnsgaii.operators.Speciator;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-import java.awt.BasicStroke;
-import java.awt.Dimension;
-import java.awt.RenderingHints;
 
 /**
  * Created by Mitchell on 5/21/2016.
