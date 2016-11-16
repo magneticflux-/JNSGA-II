@@ -4,12 +4,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.individual.Individual;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Mitchell on 11/28/2015.
@@ -38,6 +33,7 @@ public class Population<E> {
         updateIDMap();
     }
 
+    @Deprecated
     public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
         ArrayList<Individual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
         individuals.addAll(population1.getPopulation());

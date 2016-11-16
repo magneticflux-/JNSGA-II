@@ -1,7 +1,6 @@
 package org.jnsgaii.population;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.computations.Computation;
 import org.jnsgaii.functions.HasComparator;
 import org.jnsgaii.functions.OptimizationFunction;
@@ -129,13 +128,6 @@ public class EvaluatedPopulation<E> extends Population<E> {
     protected EvaluatedPopulation() {
         computationTimes = new long[0];
         optimizationFunctionTimes = new long[0];
-    }
-
-    public static <E> EvaluatedPopulation<E> merge(EvaluatedPopulation<E> population1, EvaluatedPopulation<E> population2) {
-        ArrayList<EvaluatedIndividual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
-        individuals.addAll(population1.getPopulation());
-        individuals.addAll(population2.getPopulation());
-        return new EvaluatedPopulation<>(individuals, FastMath.max(population1.getCurrentIndividualID(), population2.getCurrentIndividualID()));
     }
 
     @Override
