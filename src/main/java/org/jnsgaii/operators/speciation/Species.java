@@ -14,4 +14,12 @@ public class Species {
         this.individualIDs = Collections.unmodifiableSet(individualIDs);
         this.id = id;
     }
+
+    public Set<Long> getIndividualIDs() {
+        return individualIDs;
+    }
+
+    public long getId() {
+        return id;
+    }
 }

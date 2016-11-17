@@ -151,26 +151,18 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
         if (initialGeneration)
             initialPopulation = this.populationGenerator.generatePopulation(2 * this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), this.properties);
 
-        Population<E> offspring = initialGeneration ?
-                null :
+        Population<E> newPopulation = initialGeneration ?
+                initialPopulation :
                 this.operator.apply(this.population, this.properties);
         stopWatch.stop();
 
         long operatorApplyingTime = stopWatch.getNanoTime();
         stopWatch.reset();
 
-        stopWatch.start();
-        //System.err.println("Offspring size: " + offspring.size());
-        Population<E> mergedPopulation = initialGeneration ?
-                initialPopulation :
-                Population.merge(this.population, offspring);
-        stopWatch.stop();
-
-        long mergingTime = stopWatch.getNanoTime();
-        stopWatch.reset();
+        long mergingTime = 0;
 
         //System.err.println("Merged size: " + merged.size());
-        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(mergedPopulation, this.optimizationFunctions, this.computations, this.properties);
+        EvaluatedPopulation<E> evaluatedPopulation = new EvaluatedPopulation<>(newPopulation, this.optimizationFunctions, this.computations, this.properties);
         long[] computationTimes = evaluatedPopulation.getComputationTimes();
         long[] optimizationFunctionTimes = evaluatedPopulation.getOptimizationFunctionTimes();
 

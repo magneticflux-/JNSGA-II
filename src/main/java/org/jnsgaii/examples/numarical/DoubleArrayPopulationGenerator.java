@@ -29,7 +29,7 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
         for (int i = 0; i < num; i++) {
             individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialAspects.clone(), -1));
         }
-        return new Population<>(individuals, -1L, -1L);
+        return new Population<>(individuals, null, -1L, -1L);
     }
 
     private double[] getIndividual(Random r, int length, double min, double max) {

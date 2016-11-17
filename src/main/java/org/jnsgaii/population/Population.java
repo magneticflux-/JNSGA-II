@@ -1,6 +1,5 @@
 package org.jnsgaii.population;
 
-import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.individual.Individual;
 
@@ -24,23 +23,14 @@ public class Population<E> {
         this.currentIndividualID = population.currentIndividualID;
         this.currentSpeciesID = population.currentSpeciesID;
         this.idToPopulationIndexMap = new HashMap<>(population.idToPopulationIndexMap);
+        this.species = population.species;
     }
 
-    public Population(List<? extends Individual<E>> individuals, long currentIndividualID, long currentSpeciesID) {
+    public Population(List<? extends Individual<E>> individuals, Set<Species> species, long currentSpeciesID, long currentIndividualID) {
         this.population = new ArrayList<>(individuals);
         this.currentIndividualID = currentIndividualID;
         this.currentSpeciesID = currentSpeciesID;
         updateIDMap();
-    }
-
-    @Deprecated
-    public static <E> Population<E> merge(Population<E> population1, Population<E> population2) {
-        ArrayList<Individual<E>> individuals = new ArrayList<>(population1.size() + population2.size());
-        individuals.addAll(population1.getPopulation());
-        individuals.addAll(population2.getPopulation());
-        return new Population<>(individuals,
-                FastMath.max(population1.getCurrentIndividualID(), population2.getCurrentIndividualID()),
-                FastMath.max(population1.getCurrentSpeciesID(), population2.getCurrentSpeciesID()));
     }
 
     public Set<Species> getSpecies() {

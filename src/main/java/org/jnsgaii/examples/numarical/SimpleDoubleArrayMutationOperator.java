@@ -44,7 +44,7 @@ public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {
 
             individuals.add(new Individual<>(newIndividual, mutationStrength, mutationProbability, d.getCrossoverStrength(), d.getCrossoverProbability()));
         }
-        return new Population<>(individuals, -1L, -1L);
+        return new Population<>(individuals, null, -1L, -1L);
     }
 
     private double mutate(double d, Random r, double range) {
