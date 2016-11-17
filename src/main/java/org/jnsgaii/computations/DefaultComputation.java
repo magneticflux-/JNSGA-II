@@ -6,7 +6,7 @@ import org.jnsgaii.properties.Properties;
 import java.util.List;
 
 /**
- * Created by Mitchell on 6/5/2016.
+ * Created by Mitchell Skaggs on 6/5/2016.
  */
 public abstract class DefaultComputation<E, F> implements Computation<E, F> {
     @Override

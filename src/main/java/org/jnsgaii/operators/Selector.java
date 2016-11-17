@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Created by skaggsm on 2/3/16.
+ * Created by Mitchell Skaggs on 2/3/16.
  */
 public abstract class Selector<E> extends AspectUser implements Function<List<FrontedIndividual<E>>, FrontedIndividual<E>>, HasPropertyRequirements, LateUpdatingProperties, HasAspectRequirements {
     @Override

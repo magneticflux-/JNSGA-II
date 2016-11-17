@@ -1,9 +1,14 @@
 package org.jnsgaii.population.individual;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by Mitchell on 11/25/2015.
+ * Created by Mitchell Skaggs on 11/25/2015.
  */
 public class EvaluatedIndividual<E> extends Individual<E> {
 

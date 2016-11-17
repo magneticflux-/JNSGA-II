@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
- * Created by skaggsm on 1/22/16.
+ * Created by Mitchell Skaggs on 1/22/16.
  */
 public class Utils {
     @SafeVarargs

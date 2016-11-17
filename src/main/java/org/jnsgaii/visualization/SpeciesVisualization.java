@@ -21,7 +21,7 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;
 
 /**
- * Created by Mitchell on 5/21/2016.
+ * Created by Mitchell Skaggs on 5/21/2016.
  */
 public final class SpeciesVisualization {
     public static <E> void startVisualization(FrontedPopulation<E> frontedPopulation, Speciator<E> speciator, int generation) {

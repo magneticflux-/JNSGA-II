@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 /**
- * Created by skaggsm on 3/29/16.
+ * Created by Mitchell Skaggs on 3/29/16.
  */
 public class UpdatableHistogramDataset extends HistogramDataset {
 

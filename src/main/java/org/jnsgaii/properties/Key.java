@@ -1,7 +1,7 @@
 package org.jnsgaii.properties;
 
 /**
- * Created by Mitchell on 11/25/2015.
+ * Created by Mitchell Skaggs on 11/25/2015.
  */
 public interface Key {
 

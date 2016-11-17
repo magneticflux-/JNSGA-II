@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Created by skaggsm on 11/14/16.
+ * Created by Mitchell Skaggs on 11/14/16.
  */
 public class Species {
     private final long id;

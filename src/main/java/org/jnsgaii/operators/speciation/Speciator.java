@@ -9,7 +9,7 @@ import org.jnsgaii.properties.LateUpdatingProperties;
 import java.util.function.BiFunction;
 
 /**
- * Created by skaggsm on 2/3/16.
+ * Created by Mitchell Skaggs on 2/3/16.
  *
  * @deprecated Use {@link SpeciatorEx} in favor of this
  */

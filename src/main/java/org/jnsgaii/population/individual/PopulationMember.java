@@ -3,7 +3,7 @@ package org.jnsgaii.population.individual;
 import java.util.Arrays;
 
 /**
- * Created by Mitchell on 1/15/2016.
+ * Created by Mitchell Skaggs on 1/15/2016.
  */
 public abstract class PopulationMember {
     public final double[] aspects; // Strength1, Probability1, Strength2, Probability2...

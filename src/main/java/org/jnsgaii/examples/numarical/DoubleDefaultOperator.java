@@ -7,7 +7,7 @@ import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
 /**
- * Created by Mitchell on 11/29/2015.
+ * Created by Mitchell Skaggs on 11/29/2015.
  */
 public class DoubleDefaultOperator implements Operator<Double> {
     @Override

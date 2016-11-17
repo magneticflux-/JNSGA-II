@@ -5,7 +5,7 @@ import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import java.util.Arrays;
 
 /**
- * Created by Mitchell on 11/25/2015.
+ * Created by Mitchell Skaggs on 11/25/2015.
  * <p>
  * TODO Add stats about the frontedPopulation. Mean, min, max, standard deviation
  */

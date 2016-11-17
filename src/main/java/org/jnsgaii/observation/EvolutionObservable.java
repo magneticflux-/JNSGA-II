@@ -1,7 +1,7 @@
 package org.jnsgaii.observation;
 
 /**
- * Created by Mitchell on 6/18/2016.
+ * Created by Mitchell Skaggs on 6/18/2016.
  */
 public interface EvolutionObservable<E> {
     boolean addObserver(EvolutionObserver<E> observer);

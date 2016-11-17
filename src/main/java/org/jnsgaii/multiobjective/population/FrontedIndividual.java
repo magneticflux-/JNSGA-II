@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Mitchell on 11/28/2015.
+ * Created by Mitchell Skaggs on 11/28/2015.
  */
 public class FrontedIndividual<E> extends EvaluatedIndividual<E> implements Comparable<FrontedIndividual<E>> {
 

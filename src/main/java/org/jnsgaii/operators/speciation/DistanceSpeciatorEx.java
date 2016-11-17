@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by skaggsm on 11/17/16.
+ * Created by Mitchell Skaggs on 11/17/16.
  */
 
 public abstract class DistanceSpeciatorEx<E> extends SpeciatorEx<E> {

@@ -6,7 +6,7 @@ import org.jnsgaii.util.Range;
 import java.util.Random;
 
 /**
- * Created by Mitchell on 3/22/2016.
+ * Created by Mitchell Skaggs on 3/22/2016.
  */
 public abstract class AspectUser implements HasAspectRequirements, HasPropertyRequirements {
     protected int startIndex;

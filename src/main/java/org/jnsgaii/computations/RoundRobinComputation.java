@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Created by Mitchell on 10/2/2016.
+ * Created by Mitchell Skaggs on 10/2/2016.
  */
 public class RoundRobinComputation<E> implements Computation<E, List<Pair<Integer, Integer>>> {
     @Override

@@ -12,7 +12,7 @@ import org.jppf.node.protocol.Task;
 import java.util.List;
 
 /**
- * Created by Mitchell on 5/20/2016.
+ * Created by Mitchell Skaggs on 5/20/2016.
  */
 public class JPPFJobComputation<E, F> extends DefaultComputation<E, F> {
 

@@ -14,7 +14,7 @@ import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
 /**
- * Created by Mitchell on 5/25/2016.
+ * Created by Mitchell Skaggs on 5/25/2016.
  */
 public class SpeciesFitnessReward<E> implements OptimizationFunction<E> {
 

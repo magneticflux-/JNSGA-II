@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 
 /**
- * Created by skaggsm on 1/22/16.
+ * Created by Mitchell Skaggs on 1/22/16.
  */
 public abstract class Mutator<E> extends AspectUser implements BiFunction<E, double[], E>, HasPropertyRequirements, LateUpdatingProperties {
 

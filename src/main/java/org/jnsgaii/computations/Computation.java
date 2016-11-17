@@ -6,7 +6,7 @@ import org.jnsgaii.properties.Properties;
 import java.util.List;
 
 /**
- * Created by Mitchell on 6/4/2016.
+ * Created by Mitchell Skaggs on 6/4/2016.
  * <p>
  * Computations are designed to be long-running processes, while functions are near-instant and utilize computation results
  */

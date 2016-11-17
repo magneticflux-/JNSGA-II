@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Mitchell on 11/25/2015.
+ * Created by Mitchell Skaggs on 11/25/2015.
  * <p>
  * This class is a comparator on its own function. It decides which score bests which other score, which affects the algorithm's choices.
  * </p>

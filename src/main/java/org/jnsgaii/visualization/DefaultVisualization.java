@@ -26,8 +26,6 @@ import org.jppf.client.event.ClientQueueListener;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobListener;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -39,8 +37,23 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
+
 /**
- * Created by Mitchell on 3/30/2016.
+ * Created by Mitchell Skaggs on 3/30/2016.
  *
  * @deprecated Soon to be completely replicated modularly by {@link TabbedVisualizationWindow}
  */

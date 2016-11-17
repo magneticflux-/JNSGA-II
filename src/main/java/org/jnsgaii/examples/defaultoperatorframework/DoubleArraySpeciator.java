@@ -11,7 +11,7 @@ import org.jnsgaii.util.Utils;
 import java.util.Random;
 
 /**
- * Created by skaggsm on 2/11/16.
+ * Created by Mitchell Skaggs on 2/11/16.
  */
 public class DoubleArraySpeciator extends Speciator<double[]> {
     private int doubleArrayGenerationLength;

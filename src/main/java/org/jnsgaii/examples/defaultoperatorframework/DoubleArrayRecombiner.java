@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by skaggsm on 2/11/16.
+ * Created by Mitchell Skaggs on 2/11/16.
  */
 public class DoubleArrayRecombiner extends Recombiner<double[]> {
 

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Mitchell on 11/27/2015.
+ * Created by Mitchell Skaggs on 11/27/2015.
  */
 public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 

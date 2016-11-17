@@ -17,10 +17,15 @@ import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 import org.jnsgaii.properties.Requirement;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * Created by Mitchell on 11/25/2015.
+ * Created by Mitchell Skaggs on 11/25/2015.
  */
 
 public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E> {

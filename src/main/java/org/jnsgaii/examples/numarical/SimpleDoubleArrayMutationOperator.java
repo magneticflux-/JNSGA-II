@@ -17,7 +17,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by skaggsm on 12/27/15.
+ * Created by Mitchell Skaggs on 12/27/15.
  */
 @Deprecated
 public class SimpleDoubleArrayMutationOperator implements Operator<double[]> {

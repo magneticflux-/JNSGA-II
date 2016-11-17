@@ -7,7 +7,7 @@ import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
 /**
- * Created by skaggsm on 12/27/15.
+ * Created by Mitchell Skaggs on 12/27/15.
  */
 public class PolynomialDoubleMutationOperator implements Operator<Double> {
     @Override

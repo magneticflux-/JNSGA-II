@@ -17,11 +17,16 @@ import org.jnsgaii.properties.Properties;
 import org.jnsgaii.visualization.DefaultVisualization;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by skaggsm on 12/27/15.
+ * Created by Mitchell Skaggs on 12/27/15.
  */
 public final class POL {
     private POL() {

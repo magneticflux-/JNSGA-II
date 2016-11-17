@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by Mitchell on 11/28/2015.
+ * Created by Mitchell Skaggs on 11/28/2015.
  */
 @SuppressWarnings("AssignmentToSuperclassField")
 public class FrontedPopulation<E> extends EvaluatedPopulation<E> {

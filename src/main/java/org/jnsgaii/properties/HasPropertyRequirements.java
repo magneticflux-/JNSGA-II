@@ -1,7 +1,7 @@
 package org.jnsgaii.properties;
 
 /**
- * Created by skaggsm on 11/26/15.
+ * Created by Mitchell Skaggs on 11/26/15.
  */
 @FunctionalInterface
 public interface HasPropertyRequirements {

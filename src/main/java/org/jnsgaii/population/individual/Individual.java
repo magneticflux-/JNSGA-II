@@ -1,7 +1,7 @@
 package org.jnsgaii.population.individual;
 
 /**
- * Created by Mitchell on 11/28/2015.
+ * Created by Mitchell Skaggs on 11/28/2015.
  */
 public class Individual<E> extends PopulationMember {
 

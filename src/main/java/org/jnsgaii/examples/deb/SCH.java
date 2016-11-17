@@ -21,17 +21,18 @@ import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 /**
- * Created by skaggsm on 12/27/15.
+ * Created by Mitchell Skaggs on 12/27/15.
  */
 public final class SCH {
     private SCH() {

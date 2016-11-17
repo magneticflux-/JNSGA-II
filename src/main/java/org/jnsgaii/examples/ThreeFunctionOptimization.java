@@ -9,14 +9,15 @@ import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 /**
- * Created by Mitchell on 1/4/2016.
+ * Created by Mitchell Skaggs on 1/4/2016.
  */
 public final class ThreeFunctionOptimization {
     private ThreeFunctionOptimization() {

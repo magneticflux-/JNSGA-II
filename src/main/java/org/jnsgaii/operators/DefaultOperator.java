@@ -7,7 +7,12 @@ import org.jnsgaii.operators.speciation.Speciator;
 import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.*;
+import org.jnsgaii.properties.AspectUser;
+import org.jnsgaii.properties.HasAspectRequirements;
+import org.jnsgaii.properties.HasPropertyRequirements;
+import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.Properties;
+import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
 import java.util.ArrayList;
@@ -18,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
- * Created by skaggsm on 1/22/16.
+ * Created by Mitchell Skaggs on 1/22/16.
  */
 public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 

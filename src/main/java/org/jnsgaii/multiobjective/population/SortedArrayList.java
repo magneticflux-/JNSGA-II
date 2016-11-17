@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Created by Mitchell on 6/9/2016.
+ * Created by Mitchell Skaggs on 6/9/2016.
  */
 public class SortedArrayList<E extends Comparable<? super E>> extends ArrayList<E> {
     @Override

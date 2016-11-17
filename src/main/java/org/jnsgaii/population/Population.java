@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Mitchell on 11/28/2015.
+ * Created by Mitchell Skaggs on 11/28/2015.
  */
 public class Population<E> {
 

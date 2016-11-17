@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * Created by Mitchell on 2/21/2016.
+ * Created by Mitchell Skaggs on 2/21/2016.
  */
 public abstract class DefaultOptimizationFunction<E> implements OptimizationFunction<E> {
     public abstract double evaluateIndividual(E object, HashMap<String, Object> computationResults, Properties properties);

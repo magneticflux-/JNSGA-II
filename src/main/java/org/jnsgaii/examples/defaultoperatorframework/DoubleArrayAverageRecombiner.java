@@ -6,7 +6,7 @@ import org.jnsgaii.properties.Properties;
 import org.jnsgaii.util.Utils;
 
 /**
- * Created by Mitchell on 2/11/2016.
+ * Created by Mitchell Skaggs on 2/11/2016.
  */
 public class DoubleArrayAverageRecombiner extends Recombiner<double[]> {
 

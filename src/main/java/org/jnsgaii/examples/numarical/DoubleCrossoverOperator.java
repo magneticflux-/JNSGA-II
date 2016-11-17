@@ -10,7 +10,7 @@ import org.jnsgaii.properties.Properties;
 import java.util.Random;
 
 /**
- * Created by Mitchell on 11/27/2015.
+ * Created by Mitchell Skaggs on 11/27/2015.
  */
 public class DoubleCrossoverOperator implements Operator<Double> {
 

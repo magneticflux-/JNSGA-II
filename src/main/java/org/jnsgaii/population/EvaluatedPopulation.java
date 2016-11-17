@@ -9,12 +9,16 @@ import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Created by Mitchell on 11/29/2015.
+ * Created by Mitchell Skaggs on 11/29/2015.
  */
 public class EvaluatedPopulation<E> extends Population<E> {
 

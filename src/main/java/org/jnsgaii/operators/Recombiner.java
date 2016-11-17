@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
- * Created by skaggsm on 1/22/16.
+ * Created by Mitchell Skaggs on 1/22/16.
  */
 public abstract class Recombiner<E> extends AspectUser implements HasPropertyRequirements, LateUpdatingProperties {
 

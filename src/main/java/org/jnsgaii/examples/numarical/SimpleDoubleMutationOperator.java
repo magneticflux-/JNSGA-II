@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by skaggsm on 12/27/15.
+ * Created by Mitchell Skaggs on 12/27/15.
  *
  * @author Mitchell Skaggs
  * @see Operator

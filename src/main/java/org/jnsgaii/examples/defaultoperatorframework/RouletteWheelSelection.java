@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by Mitchell on 4/22/2016.
+ * Created by Mitchell Skaggs on 4/22/2016.
  */
 public abstract class RouletteWheelSelection<E> extends Selector<E> {
     @Override

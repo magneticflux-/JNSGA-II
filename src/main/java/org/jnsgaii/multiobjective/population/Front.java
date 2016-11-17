@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Mitchell on 11/28/2015.
+ * Created by Mitchell Skaggs on 11/28/2015.
  */
 public class Front<E> implements Comparable<Front<E>> {
     final SortedArrayList<FrontedIndividual<E>> members;

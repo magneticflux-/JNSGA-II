@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Created by Mitchell on 6/18/2016.
+ * Created by Mitchell Skaggs on 6/18/2016.
  */
 public class DummyNSGAII<E> implements EvolutionObservable<E> {
     private final List<EvolutionObserver<E>> observers;

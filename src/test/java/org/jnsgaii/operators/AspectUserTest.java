@@ -11,7 +11,7 @@ import org.junit.Test;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by skaggsm on 11/1/16.
+ * Created by Mitchell Skaggs on 11/1/16.
  */
 public class AspectUserTest {
 
