@@ -13,8 +13,8 @@ public interface Operator<E> extends HasPropertyRequirements {
     /**
      * This method applies the operation to the entire population and returns a new collection of individuals.
      *
-     * @param population the population to be operated on
-     * @return a new population with the changes applied
+     * @param population the population to be operated on, speciated
+     * @return a new population including both the old population and new individuals, speciated
      */
     Population<E> apply(FrontedPopulation<E> population, Properties properties);
 }
