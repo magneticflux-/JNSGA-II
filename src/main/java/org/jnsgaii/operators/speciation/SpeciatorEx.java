@@ -1,5 +1,6 @@
 package org.jnsgaii.operators.speciation;
 
+import org.jnsgaii.population.Population;
 import org.jnsgaii.properties.AspectUser;
 
 import java.util.Set;
@@ -11,6 +12,11 @@ import java.util.Set;
  * Replaces {@link Speciator}.
  */
 public abstract class SpeciatorEx<E> extends AspectUser {
-    public abstract Set<Species> getSpecies();
-
+    /**
+     * @param oldSpecies    species from last generation
+     * @param oldPopulation population from last generation
+     * @param newPopulation the newly created, unspeciated offspring
+     * @return a set of new species that are based on prior species, and including the new population
+     */
+    public abstract Set<Species> getSpecies(Set<Species> oldSpecies, Population<E> oldPopulation, Population<E> newPopulation);
 }
