@@ -17,6 +17,11 @@ public abstract class AspectUser implements HasAspectRequirements, HasPropertyRe
             aspects[index] = Range.clip(min, Mutator.mutate(aspects[index], r, aspectModificationArray[index * 2]), max);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @implNote Subclasses that override this must call super to set the startIndex properly!
+     */
     @Override
     public int requestAspectLocation(int startIndex) {
         this.startIndex = startIndex;
