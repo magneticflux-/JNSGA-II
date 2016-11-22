@@ -69,4 +69,11 @@ public class Population<E> {
     public List<? extends Individual<E>> getPopulation() {
         return this.population;
     }
+
+    public Individual<E> getIndividualByID(long id) {
+        if (idToPopulationIndexMap.containsKey(id))
+            return population.get(idToPopulationIndexMap.get(id));
+        else
+            return null;
+    }
 }
