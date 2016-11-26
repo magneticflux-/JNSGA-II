@@ -3,13 +3,7 @@ package org.jnsgaii.operators.speciation;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,8 +25,8 @@ public abstract class DistanceSpeciatorEx<E> extends SpeciatorEx<E> {
     }
 
     @Override
-    public Set<Species> getSpecies(Set<Species> oldSpecies, Population<E> oldPopulation, List<Individual<E>> newPopulation, long currentSpeciesID) {
-        Set<Species> newSpecies = oldSpecies.stream().map(Species::thaw).collect(Collectors.toSet());
+    public Set<Species> getSpecies(Population<E> oldPopulation, List<Individual<E>> newPopulation, long currentSpeciesID) {
+        Set<Species> newSpecies = oldPopulation.getSpecies().stream().map(Species::thaw).collect(Collectors.toSet());
 
         Map<Long, Integer> idToNewPopulationIndexMap = new HashMap<>(newPopulation.size(), 1f);
         for (int i = 0; i < newPopulation.size(); i++)

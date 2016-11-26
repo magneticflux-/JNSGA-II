@@ -18,10 +18,9 @@ import java.util.Set;
 public abstract class SpeciatorEx<E> extends AspectUser implements LateUpdatingProperties {
 
     /**
-     * @param oldSpecies    species from last generation
      * @param oldPopulation population from last generation
      * @param newPopulation the newly created, unspeciated offspring
      * @return a set of new species that are based on prior species, and including the new population
      */
-    public abstract Set<Species> getSpecies(Set<Species> oldSpecies, Population<E> oldPopulation, List<Individual<E>> newPopulation, long currentSpeciesID);
+    public abstract Set<Species> getSpecies(Population<E> oldPopulation, List<Individual<E>> newPopulation, long currentSpeciesID);
 }
