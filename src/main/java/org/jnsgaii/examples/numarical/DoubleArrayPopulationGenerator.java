@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class DoubleArrayPopulationGenerator implements PopulationGenerator<double[]> {
     @Override
-    public Population<double[]> generatePopulation(int num, Properties properties) {
+    public Population<double[]> generatePopulation(int populationSize, Properties properties) {
         Random r = ThreadLocalRandom.current();
         double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
@@ -25,8 +25,8 @@ public class DoubleArrayPopulationGenerator implements PopulationGenerator<doubl
 
         double[] initialAspects = (double[]) properties.getValue(Key.DoubleKey.DefaultDoubleKey.INITIAL_ASPECT_ARRAY);
 
-        List<Individual<double[]>> individuals = new ArrayList<>(num);
-        for (int i = 0; i < num; i++) {
+        List<Individual<double[]>> individuals = new ArrayList<>(populationSize);
+        for (int i = 0; i < populationSize; i++) {
             individuals.add(new Individual<>(this.getIndividual(r, length, min, max), initialAspects.clone(), -1));
         }
         return new Population<>(individuals, null, -1L, -1L);

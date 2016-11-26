@@ -16,7 +16,7 @@ import java.util.Random;
 public class DoublePopulationGenerator implements PopulationGenerator<Double> {
 
     @Override
-    public Population<Double> generatePopulation(int num, Properties properties) {
+    public Population<Double> generatePopulation(int populationSize, Properties properties) {
         final double min = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MINIMUM);
         final double max = properties.getDouble(Key.DoubleKey.DefaultDoubleKey.RANDOM_DOUBLE_GENERATION_MAXIMUM);
         final double difference = max - min;
@@ -25,8 +25,8 @@ public class DoublePopulationGenerator implements PopulationGenerator<Double> {
             throw new IllegalArgumentException("Maximum must be greater than minimum!");
 
         Random r = new Random();
-        List<Individual<Double>> pop = new ArrayList<>(num);
-        for (int i = 0; i < num; i++) {
+        List<Individual<Double>> pop = new ArrayList<>(populationSize);
+        for (int i = 0; i < populationSize; i++) {
             pop.add(new Individual<>((r.nextDouble() * difference) + min));
         }
         return new Population<>(pop, null, -1L, -1L);

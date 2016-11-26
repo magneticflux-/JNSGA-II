@@ -8,5 +8,5 @@ import org.jnsgaii.properties.Properties;
  */
 public interface PopulationGenerator<E> extends HasPropertyRequirements {
 
-    Population<E> generatePopulation(int num, Properties properties);
+    Population<E> generatePopulation(int populationSize, Properties properties);
 }
