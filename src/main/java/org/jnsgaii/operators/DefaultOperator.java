@@ -1,24 +1,18 @@
 package org.jnsgaii.operators;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
-import org.jnsgaii.operators.speciation.Speciator;
+import org.jnsgaii.operators.speciation.SpeciatorEx;
 import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.Population;
 import org.jnsgaii.population.individual.Individual;
-import org.jnsgaii.properties.AspectUser;
-import org.jnsgaii.properties.HasAspectRequirements;
-import org.jnsgaii.properties.HasPropertyRequirements;
-import org.jnsgaii.properties.Key;
+import org.jnsgaii.properties.*;
 import org.jnsgaii.properties.Properties;
-import org.jnsgaii.properties.Requirement;
 import org.jnsgaii.util.Utils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -31,21 +25,13 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
     private final List<Mutator<E>> mutators;
     private final Recombiner<E> recombiner;
     private final Selector<E> selector;
-    private final Speciator<E> speciator;
+    private final SpeciatorEx<E> speciatorEx;
 
-    public DefaultOperator(List<Mutator<E>> mutators, Recombiner<E> recombiner, Selector<E> selector, Speciator<E> speciator) {
+    public DefaultOperator(List<Mutator<E>> mutators, Recombiner<E> recombiner, Selector<E> selector, SpeciatorEx<E> speciator) {
         this.mutators = new ArrayList<>(mutators);
         this.recombiner = recombiner;
         this.selector = selector;
-        this.speciator = speciator;
-    }
-
-    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
-        int currentIndex = 0;
-        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
-            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
-        }
-        return currentIndex;
+        this.speciatorEx = speciator;
     }
 
     @Override
@@ -57,7 +43,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         stopWatch.start();
         mutators.forEach(mutator -> mutator.updateProperties(properties));
         recombiner.updateProperties(properties);
-        speciator.updateProperties(properties);
+        speciatorEx.updateProperties(properties);
         selector.updateProperties(properties);
 
         setAspectIndices(getHasAspectRequirementses());
@@ -69,6 +55,41 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         List<E> newPopulation = new ArrayList<>(population.getPopulation().size());
         List<double[]> newAspects = new ArrayList<>(population.getPopulation().size());
 
+        Set<Species> species = population.getSpecies();
+        Map<Long, Double> speciesIDToAverageRank = new HashMap<>(species.size(), 1f);
+        for (Species s : species) {
+            speciesIDToAverageRank.put(s.getId(),
+                    s.getIndividualIDs().stream()
+                            .mapToDouble(individualID -> population.getIdToPopulationIndexMap().get(individualID)).average().orElseThrow(Error::new));
+        }
+        double totalAverageSpeciesFitness = speciesIDToAverageRank.entrySet().stream().mapToDouble(Map.Entry::getValue).sum();
+
+        Map<Long, Integer> speciesToAllocatedIndividuals = new HashMap<>(species.size(), 1f);
+        for (Map.Entry<Long, Double> e : speciesIDToAverageRank.entrySet()) {
+            speciesToAllocatedIndividuals.put(e.getKey(), (int) FastMath.round(population.size() * e.getValue() / totalAverageSpeciesFitness));
+        }
+        int allocatedIndividualsSoFar = speciesToAllocatedIndividuals.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
+        int individualsToBeAllocatedStill = population.size() - allocatedIndividualsSoFar;
+        if (individualsToBeAllocatedStill > 0) {
+            @SuppressWarnings("OptionalGetWithoutIsPresent")
+            Map.Entry<Long, Integer> smallestSpecies = speciesToAllocatedIndividuals.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).findFirst().get();
+            smallestSpecies.setValue(smallestSpecies.getValue() + individualsToBeAllocatedStill);
+        }
+
+        for (Species s : species) {
+            int numRequestedIndividuals = speciesToAllocatedIndividuals.get(s.getId());
+            List<FrontedIndividual<E>> speciesMembers = s.getIndividualIDs().stream().map(population::getIndividualByID).sorted().collect(Collectors.toList()); //Sorted for proper selection
+            for (int i = 0; i < numRequestedIndividuals; i++) {
+                FrontedIndividual<E> firstIndividual = selector.apply(speciesMembers);
+                FrontedIndividual<E> secondIndividual = selector.apply(speciesMembers);
+                double[] offspringAspects = recombiner.apply(firstIndividual.aspects, secondIndividual.aspects);
+                E offspring = recombiner.apply(firstIndividual.getIndividual(), secondIndividual.getIndividual(), offspringAspects);
+                newAspects.add(offspringAspects);
+                newPopulation.add(offspring);
+            }
+        }
+
+        /*
         for (int i = 0; i < population.getPopulation().size(); i++) {
             FrontedIndividual<E> individual = selector.apply(castPopulation);
 
@@ -89,6 +110,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
             newAspects.add(recombiner.apply(individual.aspects, otherIndividual.aspects));
             newPopulation.add(recombiner.apply(individual.getIndividual(), otherIndividual.getIndividual(), newAspects.get(i)));
         }
+        */
 
         stopWatch.stop();
         System.out.println("Mating Time: " + stopWatch.getTime() + "ms");
@@ -112,24 +134,32 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
         List<Individual<E>> newIndividuals = new ArrayList<>();
         long currentIndividualID = population.getCurrentIndividualID();
-        long currentSpeciesID = population.getCurrentSpeciesID();
 
         for (int i = 0; i < newPopulation.size(); i++) {
             newIndividuals.add(new Individual<>(newPopulation.get(i), newAspects.get(i), currentIndividualID++));
         }
 
-        Set<Species> species = new HashSet<>();
+        Set<Species> newSpecies = speciatorEx.getSpecies(population, newIndividuals, population.getCurrentSpeciesID());
+        long currentSpeciesID = newSpecies.stream().mapToLong(Species::getId).max().orElseThrow(Error::new);
 
         return new Population<>(newIndividuals, species, currentSpeciesID, currentIndividualID);
     }
 
+    private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {
+        int currentIndex = 0;
+        for (HasAspectRequirements hasAspectRequirements : hasAspectRequirementses) {
+            currentIndex += hasAspectRequirements.requestAspectLocation(currentIndex);
+        }
+        return currentIndex;
+    }
+
     private HasAspectRequirements[] getHasAspectRequirementses() {
-        return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciator}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
+        return Utils.concat(new HasAspectRequirements[]{recombiner, selector, speciatorEx}, mutators.toArray(new HasAspectRequirements[mutators.size()]));
     }
 
     private AspectUser[] getAspectUsers() {
         //noinspection unchecked
-        return Utils.concat(new AspectUser[]{recombiner, selector, speciator}, mutators.toArray(new AspectUser[mutators.size()]));
+        return Utils.concat(new AspectUser[]{recombiner, selector, speciatorEx}, mutators.toArray(new AspectUser[mutators.size()]));
     }
 
     @Override
@@ -138,7 +168,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 Utils.concat(mutators.stream().map(HasPropertyRequirements::requestProperties).toArray(Key[][]::new)),
                 recombiner.requestProperties(),
                 selector.requestProperties(),
-                speciator.requestProperties(),
+                speciatorEx.requestProperties(),
                 new Key[]{
                         Key.BooleanKey.DefaultBooleanKey.THREADED
                 });
@@ -150,7 +180,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 Utils.concat(mutators.stream().map(HasPropertyRequirements::requestDetailedRequirements).toArray(Requirement[][]::new)),
                 recombiner.requestDetailedRequirements(),
                 selector.requestDetailedRequirements(),
-                speciator.requestDetailedRequirements(),
+                speciatorEx.requestDetailedRequirements(),
                 new Requirement[]{
                         new Requirement() {
                             int size = setAspectIndices(getHasAspectRequirementses());
@@ -175,6 +205,6 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
 
     @Override
     public String[] getAspectDescriptions() {
-        return Utils.concat(recombiner.getAspectDescriptions(), selector.getAspectDescriptions(), speciator.getAspectDescriptions(), mutators.stream().map(Mutator<E>::getAspectDescriptions).reduce(new String[0], Utils::concat));
+        return Utils.concat(recombiner.getAspectDescriptions(), selector.getAspectDescriptions(), speciatorEx.getAspectDescriptions(), mutators.stream().map(Mutator<E>::getAspectDescriptions).reduce(new String[0], Utils::concat));
     }
 }

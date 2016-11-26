@@ -11,18 +11,14 @@ import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.multiobjective.NSGAII;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.operators.Mutator;
+import org.jnsgaii.operators.speciation.SpeciatorExWrappedSpeciator;
 import org.jnsgaii.population.PopulationGenerator;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 import org.jnsgaii.visualization.DefaultVisualization;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -86,7 +82,7 @@ public final class POL {
                         return newObject;
                     }
                 }
-        ), new DoubleArrayAverageRecombiner(), new RouletteWheelLinearSelection<>(), new DoubleArraySpeciator());
+        ), new DoubleArrayAverageRecombiner(), new RouletteWheelLinearSelection<>(), new SpeciatorExWrappedSpeciator<>(new DoubleArraySpeciator()));
         OptimizationFunction<double[]> function1 = new Function1();
         OptimizationFunction<double[]> function2 = new Function2();
         OptimizationFunction<double[]> function3 = new Function3();
@@ -128,6 +124,11 @@ public final class POL {
         }
 
         @Override
+        public Comparator<Double> getComparator() {
+            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
+        }
+
+        @Override
         public Key[] requestProperties() {
             return new Key[0];
         }
@@ -144,10 +145,7 @@ public final class POL {
             return true;
         }
 
-        @Override
-        public Comparator<Double> getComparator() {
-            return ComparableComparator.<Double>comparableComparator().reversed(); //Lower is better
-        }
+
     }
 
     private static class Function2 extends DefaultOptimizationFunction<double[]> {
