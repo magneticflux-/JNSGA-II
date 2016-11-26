@@ -9,11 +9,7 @@ import org.jnsgaii.population.individual.Individual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -147,5 +143,12 @@ public class EvaluatedPopulation<E> extends Population<E> {
 
     public long[] getOptimizationFunctionTimes() {
         return optimizationFunctionTimes;
+    }
+
+    public EvaluatedIndividual<E> getIndividualByID(long id) {
+        if (idToPopulationIndexMap.containsKey(id))
+            return (EvaluatedIndividual<E>) population.get(idToPopulationIndexMap.get(id));
+        else
+            return null;
     }
 }

@@ -207,4 +207,11 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
         updateIDMap();
     }
+
+    public FrontedIndividual<E> getIndividualByID(long id) {
+        if (idToPopulationIndexMap.containsKey(id))
+            return (FrontedIndividual<E>) population.get(idToPopulationIndexMap.get(id));
+        else
+            return null;
+    }
 }
