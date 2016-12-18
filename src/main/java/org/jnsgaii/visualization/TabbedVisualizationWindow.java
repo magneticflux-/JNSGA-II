@@ -26,6 +26,8 @@ import org.jppf.client.event.ClientQueueListener;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobListener;
 
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -37,19 +39,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-
 /**
  * Created by Mitchell Skaggs on 10/7/2016.
  */
@@ -60,14 +49,6 @@ public class TabbedVisualizationWindow extends JFrame {
         super("Evolutionary Algorithm Visualization");
         jTabbedPane = new JTabbedPane();
         add(jTabbedPane);
-    }
-
-    public void addTab(String title, Component component) {
-        try {
-            EventQueue.invokeAndWait(() -> jTabbedPane.addTab(title, component));
-        } catch (InterruptedException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
     }
 
     @SuppressWarnings("Duplicates")
@@ -99,6 +80,14 @@ public class TabbedVisualizationWindow extends JFrame {
         addTab("Current Score Distributions", histogramScrollPane);
 
         return this;
+    }
+
+    public void addTab(String title, Component component) {
+        try {
+            EventQueue.invokeAndWait(() -> jTabbedPane.addTab(title, component));
+        } catch (InterruptedException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("Duplicates")
@@ -323,6 +312,26 @@ public class TabbedVisualizationWindow extends JFrame {
         });
 
         addTab("Statistics", priorStatisticsPanel);
+
+        return this;
+    }
+
+    public <E> TabbedVisualizationWindow addSpeciesTab(EvolutionObservable<E> evolutionObservable) {
+        CategoryTableXYDataset speciesDataset = new CategoryTableXYDataset();
+        JFreeChart speciesChart = ChartFactory.createStackedXYAreaChart("Species", "Generation", "Population", speciesDataset, PlotOrientation.VERTICAL, false, false, false);
+        ChartPanel speciesPanel = new ChartPanel(speciesChart);
+        addTab("Species", speciesPanel);
+
+        evolutionObservable.addObserver(populationData -> {
+            try {
+                EventQueue.invokeAndWait(() ->
+                        populationData.getTruncatedPopulation().getSpecies()
+                                .forEach(species ->
+                                        speciesDataset.add(populationData.getCurrentGeneration(), species.getIndividualIDs().size(), "Species " + species.getId())));
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
 
         return this;
     }

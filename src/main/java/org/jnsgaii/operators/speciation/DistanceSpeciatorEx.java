@@ -12,27 +12,17 @@ import java.util.stream.Collectors;
 
 public abstract class DistanceSpeciatorEx<E> extends SpeciatorEx<E> {
 
-    protected abstract double getDistance(Individual<E> first, Individual<E> second);
-
-    protected abstract double getMaxDistance(Individual<E> first, Individual<E> second);
-
-    protected double getAverageDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
-        return individuals.stream().mapToDouble(individual -> getDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
-    }
-
-    protected double getAverageMaxDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
-        return individuals.stream().mapToDouble(individual -> getMaxDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
-    }
-
     @Override
     public Set<Species> getSpecies(Population<E> oldPopulation, List<Individual<E>> newPopulation, long currentSpeciesID) {
-        Set<Species> newSpecies = oldPopulation.getSpecies().stream().map(Species::thaw).collect(Collectors.toSet());
+        Set<Species> newSpecies = oldPopulation.getSpecies().stream().map(species -> new Species(species).thaw()).collect(Collectors.toSet());
+        //Set<Long> allUsedIndividualIDs = new HashSet<>();
 
         Map<Long, Integer> idToNewPopulationIndexMap = new HashMap<>(newPopulation.size(), 1f);
         for (int i = 0; i < newPopulation.size(); i++)
             idToNewPopulationIndexMap.put(newPopulation.get(i).id, i);
 
         for (Individual<E> individual : newPopulation) {
+            //allUsedIndividualIDs.add(individual.id);
             double smallestDistance = Double.MAX_VALUE;
             Species smallestDistanceSpecies = null;
             for (Species species : newSpecies) {
@@ -61,9 +51,31 @@ public abstract class DistanceSpeciatorEx<E> extends SpeciatorEx<E> {
             } else {
                 Species uniqueSpecies = new Species(new HashSet<>(Collections.singleton(individual.id)), currentSpeciesID++, false);
                 newSpecies.add(uniqueSpecies);
+                //System.out.println("Created new species " + uniqueSpecies);
             }
         }
 
-        return newSpecies.stream().map(Species::freeze).collect(Collectors.toSet());
+        newSpecies.forEach(Species::freeze);
+
+        //System.out.println("Included " + newSpecies.stream().mapToInt(s -> s.getIndividualIDs().size()).sum() + " individuals in " + newSpecies.size() + " species");
+
+        //HashSet<Long> allIncludedIDs = new HashSet<>();
+        //newSpecies.stream().map(Species::getIndividualIDs).forEach(allIncludedIDs::addAll);
+        //System.out.println("Included: " + allIncludedIDs.size() + " " + allIncludedIDs);
+        //System.out.println("Possible: " + allUsedIndividualIDs.size() + " " + allUsedIndividualIDs);
+
+        return newSpecies;
     }
+
+    protected double getAverageDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
+        return individuals.stream().mapToDouble(individual -> getDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
+    }
+
+    protected double getAverageMaxDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
+        return individuals.stream().mapToDouble(individual -> getMaxDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
+    }
+
+    protected abstract double getDistance(Individual<E> first, Individual<E> second);
+
+    protected abstract double getMaxDistance(Individual<E> first, Individual<E> second);
 }

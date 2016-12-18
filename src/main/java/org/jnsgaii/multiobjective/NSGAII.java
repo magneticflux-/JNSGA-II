@@ -17,12 +17,7 @@ import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 import org.jnsgaii.properties.Requirement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mitchell Skaggs on 11/25/2015.
@@ -39,19 +34,11 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
     private FrontedPopulation<E> population;
     private int currentGeneration;
     private long previousObservationTime;
-    private boolean initialGeneration;
+    private boolean firstGeneration;
     private Population<E> initialPopulation;
 
     public NSGAII(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator) {
         this(properties, operator, optimizationFunctions, populationGenerator, 1, new ArrayList<>());
-    }
-
-    public NSGAII(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration) {
-        this(properties, operator, optimizationFunctions, populationGenerator, startGeneration, new ArrayList<>());
-    }
-
-    public NSGAII(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, List<Computation<E, ?>> computations) {
-        this(properties, operator, optimizationFunctions, populationGenerator, 1, computations);
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -72,7 +59,7 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
 
         this.checkKeyAvailability();
 
-        initialGeneration = true;
+        firstGeneration = true;
     }
 
     private void checkKeyAvailability() {
@@ -121,6 +108,13 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
             throw new NoValueSetException("Invalid properties!");
     }
 
+    public NSGAII(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, int startGeneration) {
+        this(properties, operator, optimizationFunctions, populationGenerator, startGeneration, new ArrayList<>());
+    }
+
+    public NSGAII(Properties properties, Operator<E> operator, List<OptimizationFunction<E>> optimizationFunctions, PopulationGenerator<E> populationGenerator, List<Computation<E, ?>> computations) {
+        this(properties, operator, optimizationFunctions, populationGenerator, 1, computations);
+    }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     public void runGeneration() {
@@ -153,10 +147,10 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
 
         stopWatch.start();
         //System.err.println("Parent size: " + this.population.size());
-        if (initialGeneration)
+        if (firstGeneration)
             initialPopulation = this.populationGenerator.generatePopulation(2 * this.properties.getInt(Key.IntKey.DefaultIntKey.POPULATION_SIZE), this.properties);
 
-        Population<E> newPopulation = initialGeneration ?
+        Population<E> newPopulation = firstGeneration ?
                 initialPopulation :
                 this.operator.apply(this.population, this.properties);
         stopWatch.stop();
@@ -192,8 +186,8 @@ public class NSGAII<E> implements HasPropertyRequirements, EvolutionObservable<E
         this.population = truncatedPopulation;
         this.currentGeneration++;
 
-        if (initialGeneration) {
-            initialGeneration = false;
+        if (firstGeneration) {
+            firstGeneration = false;
             initialPopulation = null;
         }
 

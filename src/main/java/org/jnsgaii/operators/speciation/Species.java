@@ -12,6 +12,10 @@ public class Species {
     private Set<Long> individualIDs, unmodifiableIndividualIDs;
     private boolean frozen;
 
+    public Species(Set<Long> individualIDs, long id) {
+        this(individualIDs, id, true);
+    }
+
     public Species(Set<Long> individualIDs, long id, boolean frozen) {
         this.individualIDs = new HashSet<>(individualIDs);
         this.unmodifiableIndividualIDs = Collections.unmodifiableSet(this.individualIDs);
@@ -19,8 +23,8 @@ public class Species {
         this.frozen = frozen;
     }
 
-    public Species(Set<Long> individualIDs, long id) {
-        this(individualIDs, id, true);
+    public Species(Species s) {
+        this(s.individualIDs, s.id, s.frozen);
     }
 
     public Set<Long> getIndividualIDs() {
@@ -49,6 +53,15 @@ public class Species {
     }
 
     @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + individualIDs.hashCode();
+        result = 31 * result + unmodifiableIndividualIDs.hashCode();
+        result = 31 * result + (frozen ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -63,11 +76,11 @@ public class Species {
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + individualIDs.hashCode();
-        result = 31 * result + unmodifiableIndividualIDs.hashCode();
-        result = 31 * result + (frozen ? 1 : 0);
-        return result;
+    public String toString() {
+        return "Species{" +
+                "id=" + id +
+                ", individualIDs=" + individualIDs +
+                ", frozen=" + frozen +
+                '}';
     }
 }

@@ -1,7 +1,6 @@
 package org.jnsgaii.operators;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.commons.math3.util.FastMath;
 import org.jnsgaii.multiobjective.population.FrontedIndividual;
 import org.jnsgaii.multiobjective.population.FrontedPopulation;
 import org.jnsgaii.operators.speciation.SpeciatorEx;
@@ -60,19 +59,18 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         for (Species s : species) {
             speciesIDToAverageRank.put(s.getId(),
                     s.getIndividualIDs().stream()
-                            .mapToDouble(individualID -> population.getIdToPopulationIndexMap().get(individualID)).average().orElseThrow(Error::new));
+                            .mapToDouble(individualID -> population.size() - population.getIdToPopulationIndexMap().get(individualID)).average().orElseThrow(Error::new));
         }
         double totalAverageSpeciesFitness = speciesIDToAverageRank.entrySet().stream().mapToDouble(Map.Entry::getValue).sum();
 
         Map<Long, Integer> speciesToAllocatedIndividuals = new HashMap<>(species.size(), 1f);
         for (Map.Entry<Long, Double> e : speciesIDToAverageRank.entrySet()) {
-            speciesToAllocatedIndividuals.put(e.getKey(), (int) FastMath.round(population.size() * e.getValue() / totalAverageSpeciesFitness));
+            speciesToAllocatedIndividuals.put(e.getKey(), (int) (population.size() * e.getValue() / totalAverageSpeciesFitness));
         }
         int allocatedIndividualsSoFar = speciesToAllocatedIndividuals.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
         int individualsToBeAllocatedStill = population.size() - allocatedIndividualsSoFar;
         if (individualsToBeAllocatedStill > 0) {
-            @SuppressWarnings("OptionalGetWithoutIsPresent")
-            Map.Entry<Long, Integer> smallestSpecies = speciesToAllocatedIndividuals.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).findFirst().get();
+            Map.Entry<Long, Integer> smallestSpecies = speciesToAllocatedIndividuals.entrySet().stream().sorted((o1, o2) -> -Integer.compare(o1.getValue(), o2.getValue())).findFirst().orElseThrow(Error::new);
             smallestSpecies.setValue(smallestSpecies.getValue() + individualsToBeAllocatedStill);
         }
 
@@ -88,6 +86,8 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
                 newPopulation.add(offspring);
             }
         }
+
+        System.out.println("Mating produced " + newPopulation.size() + " individuals from " + species.size() + " species");
 
         /*
         for (int i = 0; i < population.getPopulation().size(); i++) {
@@ -132,7 +132,7 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         System.out.println("Aspect Modification Time: " + stopWatch.getTime());
         stopWatch.reset();
 
-        List<Individual<E>> newIndividuals = new ArrayList<>();
+        List<Individual<E>> newIndividuals = new ArrayList<>(population.getPopulation().size() * 2);
         long currentIndividualID = population.getCurrentIndividualID();
 
         for (int i = 0; i < newPopulation.size(); i++) {
@@ -140,9 +140,11 @@ public class DefaultOperator<E> implements Operator<E>, HasAspectRequirements {
         }
 
         Set<Species> newSpecies = speciatorEx.getSpecies(population, newIndividuals, population.getCurrentSpeciesID());
-        long currentSpeciesID = newSpecies.stream().mapToLong(Species::getId).max().orElseThrow(Error::new);
+        long currentSpeciesID = newSpecies.stream().mapToLong(Species::getId).max().orElseThrow(Error::new) + 1;
 
-        return new Population<>(newIndividuals, species, currentSpeciesID, currentIndividualID);
+        newIndividuals.addAll(castPopulation);
+
+        return new Population<>(newIndividuals, newSpecies, currentSpeciesID, currentIndividualID);
     }
 
     private static int setAspectIndices(HasAspectRequirements... hasAspectRequirementses) {

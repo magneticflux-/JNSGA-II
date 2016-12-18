@@ -3,13 +3,7 @@ package org.jnsgaii.population;
 import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.individual.Individual;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Mitchell Skaggs on 11/28/2015.
@@ -17,7 +11,7 @@ import java.util.Set;
 public class Population<E> {
 
     protected List<? extends Individual<E>> population;
-    protected Map<Long, Integer> idToPopulationIndexMap = new IdentityHashMap<>();
+    protected Map<Long, Integer> idToPopulationIndexMap = new HashMap<>();
     protected long currentIndividualID, currentSpeciesID;
     protected Set<Species> species;
 
@@ -40,6 +34,12 @@ public class Population<E> {
         updateIDMap();
     }
 
+    protected void updateIDMap() {
+        idToPopulationIndexMap.clear();
+        for (int i = 0; i < population.size(); i++)
+            idToPopulationIndexMap.put(population.get(i).id, i);
+    }
+
     public Set<Species> getSpecies() {
         return species;
     }
@@ -48,14 +48,13 @@ public class Population<E> {
         return currentSpeciesID;
     }
 
+    /**
+     * Gets a map that is updated to map ID numbers to indices in the population
+     *
+     * @return a map from individual ID to index in the population
+     */
     public Map<Long, Integer> getIdToPopulationIndexMap() {
         return idToPopulationIndexMap;
-    }
-
-    protected void updateIDMap() {
-        idToPopulationIndexMap.clear();
-        for (int i = 0; i < population.size(); i++)
-            idToPopulationIndexMap.put(population.get(i).id, i);
     }
 
     public long getCurrentIndividualID() {

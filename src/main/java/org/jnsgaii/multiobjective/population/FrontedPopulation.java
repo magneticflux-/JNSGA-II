@@ -1,15 +1,13 @@
 package org.jnsgaii.multiobjective.population;
 
 import org.jnsgaii.functions.OptimizationFunction;
+import org.jnsgaii.operators.speciation.Species;
 import org.jnsgaii.population.EvaluatedPopulation;
 import org.jnsgaii.population.individual.EvaluatedIndividual;
 import org.jnsgaii.properties.Key;
 import org.jnsgaii.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,17 +19,19 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
 
     protected List<Front<E>> fronts;
 
-    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
-    protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts, long currentID) {
-        this.fronts = fronts;
-        this.population = population;
-        this.currentIndividualID = currentID;
-
-        updateIDMap();
+    private FrontedPopulation() {
+        this(null, null, -1, -1, null);
     }
 
-    private FrontedPopulation() {
-        this(null, null, -1);
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
+    protected FrontedPopulation(List<FrontedIndividual<E>> population, List<Front<E>> fronts, long currentIndividualID, long currentSpeciesID, Set<Species> species) {
+        this.fronts = fronts;
+        this.population = population;
+        this.currentIndividualID = currentIndividualID;
+        this.currentSpeciesID = currentSpeciesID;
+        this.species = species;
+
+        updateIDMap();
     }
 
     public FrontedPopulation(EvaluatedPopulation<E> population, List<OptimizationFunction<E>> optimizationFunctions, Properties properties) {
@@ -157,18 +157,25 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         return this.population.toString();
     }
 
-    @Override
-    public List<? extends FrontedIndividual<E>> getPopulation() {
-        // This SHOULD work, since the only constructor fills the List<> with FrontedIndividual<>s
-        //noinspection unchecked
-        return (List<FrontedIndividual<E>>) this.population;
-    }
-
     public FrontedPopulation<E> truncate(int limit) {
-        //System.err.println("Truncating population of " + this.getPopulation().size() + " to " + limit);
+
+        if (species.isEmpty()) {
+            System.err.println("Species is empty beforehand!");
+            throw new Error();
+        }
+        /*
+        if (species.stream().mapToInt(s -> s.getIndividualIDs().size()).sum() != this.getPopulation().size()) {
+            System.err.println("Species do not contain every individual!" + species);
+            throw new Error();
+        }
+        */
+
+        //System.out.println("Truncating population of " + this.getPopulation().size() + " to " + limit);
+        //System.out.println("Truncating " + species.size() + " species " + species);
         this.sort();
         List<Front<E>> newFronts = new ArrayList<>();
         List<FrontedIndividual<E>> newPopulation = new ArrayList<>(limit);
+        Set<Long> usedIndividualIDS = new HashSet<>(limit, 1f);
 
         int currentFront = 0;
         int numIndividuals = 0;
@@ -176,6 +183,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         while (currentFront < this.fronts.size() && (numIndividuals + this.fronts.get(currentFront).members.size()) <= limit) {
             //System.out.println("Adding front " + currentFront + " out of " + this.fronts.size());
             newPopulation.addAll(this.fronts.get(currentFront).members);
+            this.fronts.get(currentFront).members.stream().mapToLong(value -> value.id).forEach(usedIndividualIDS::add);
             newFronts.add(currentFront, this.fronts.get(currentFront));
             numIndividuals += this.fronts.get(currentFront).members.size();
             currentFront++;
@@ -189,6 +197,7 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
                 //System.out.println("Current iterator return: " + individual);
                 individuals.add(individual);
                 newPopulation.add(individual);
+                usedIndividualIDS.add(individual.id);
             }
             newFronts.add(currentFront, new Front<>(individuals, currentFront));
         }
@@ -197,15 +206,37 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
         if (newPopulation.size() != limit) {
             System.err.println("Population: " + newPopulation);
             System.err.println("Fronts: " + newFronts);
-            throw new Error("Unknown truncation error!");
+            throw new Error("Truncation failed!");
         }
-        return new FrontedPopulation<>(newPopulation, newFronts, currentIndividualID);
+
+        Set<Species> species = getSpecies().stream().map(s -> {
+            Species newSpecies = new Species(s);
+            newSpecies.thaw();
+            newSpecies.getIndividualIDs().retainAll(usedIndividualIDS);
+            newSpecies.freeze();
+            return newSpecies;
+        }).filter(s -> !s.getIndividualIDs().isEmpty()).collect(Collectors.toSet());
+        if (species.isEmpty()) {
+            System.err.println("Species is empty after truncation!");
+            throw new Error();
+        }
+
+        //System.out.println("Truncated to " + species.size() + " species " + species);
+
+        return new FrontedPopulation<>(newPopulation, newFronts, currentIndividualID, currentSpeciesID, species);
     }
 
     private void sort() {
         //noinspection unchecked
         Collections.sort(((List<FrontedIndividual<E>>) this.population));
         updateIDMap();
+    }
+
+    @Override
+    public List<? extends FrontedIndividual<E>> getPopulation() {
+        // This SHOULD work, since the only constructor fills the List<> with FrontedIndividual<>s
+        //noinspection unchecked
+        return (List<FrontedIndividual<E>>) this.population;
     }
 
     public FrontedIndividual<E> getIndividualByID(long id) {
