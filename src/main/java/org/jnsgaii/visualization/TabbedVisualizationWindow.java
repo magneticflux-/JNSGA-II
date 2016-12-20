@@ -18,6 +18,7 @@ import org.jnsgaii.UpdatableHistogramDataset;
 import org.jnsgaii.computations.Computation;
 import org.jnsgaii.functions.OptimizationFunction;
 import org.jnsgaii.observation.EvolutionObservable;
+import org.jnsgaii.observation.EvolutionObserver;
 import org.jnsgaii.operators.DefaultOperator;
 import org.jnsgaii.population.PopulationData;
 import org.jppf.client.JPPFClient;
@@ -174,34 +175,68 @@ public class TabbedVisualizationWindow extends JFrame {
         StandardChartTheme.createJFreeTheme().apply(elapsedTimesChart);
         ChartPanel elapsedTimesPanel = new ChartPanel(elapsedTimesChart);
 
-        evolutionObservable.addObserver(populationData -> {
-            try {
-                EventQueue.invokeAndWait(() ->
-                {
-                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME) + " Elapsed time in generation " + populationData.getCurrentGeneration() + ": " +
-                            DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getTotalTime()), true, true) +
-                            ", with " +
-                            DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), true, true) +
-                            " observation time. Population size: " + populationData.getFrontedPopulation().getPopulation().size());
+        evolutionObservable.addObserver(new EvolutionObserver<E>() {
+            private static final String currentGenerationElapsedTimeText = "Current Generation Elapsed Time";
+            private Thread progressThread = null;
 
-                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getOperatorApplyingTime()), "Operator Applying Time (ms)");
-                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getMergingTime()), "Merging Time (ms)");
-                    long[] computationTimes = populationData.getComputationTimes();
-                    for (int i = 0; i < computationTimes.length; i++) {
-                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(computationTimes[i]), "Computation Time of \"" + computations.get(i).getComputationID() + "\" (ms)");
-                    }
-                    long[] optimizationFunctionTimes = populationData.getOptimizationFunctionTimes();
-                    for (int i = 0; i < optimizationFunctionTimes.length; i++) {
-                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(optimizationFunctionTimes[i]), "Optimization Function Time of \"" + optimizationFunctions.get(i).getClass().getSimpleName() + "\" (ms)");
-                    }
-                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getFrontingTime()), "Fronting Time (ms)");
-                    elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getTruncationTime()), "Truncation Time (ms)");
-                    if (populationData.getPreviousObservationTime() > 0) {
-                        elapsedTimesDataset.add(populationData.getCurrentGeneration() - 1, TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), "Previous Observation Time (ms)");
-                    }
-                });
-            } catch (InterruptedException | InvocationTargetException e) {
-                e.printStackTrace();
+            @Override
+            public void update(PopulationData<E> populationData) {
+                try {
+                    if (progressThread != null)
+                        progressThread.interrupt();
+                    progressThread = new Thread(() -> {
+                        long startTime = System.nanoTime();
+                        while (!progressThread.isInterrupted()) {
+                            try {
+                                EventQueue.invokeAndWait(() -> {
+                                    elapsedTimesDataset.remove(populationData.getCurrentGeneration() + 1, currentGenerationElapsedTimeText, false);
+                                    elapsedTimesDataset.add(populationData.getCurrentGeneration() + 1, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime), currentGenerationElapsedTimeText, true);
+                                });
+                                //Thread.sleep(5);
+                            } catch (InterruptedException e) {
+                                return;
+                            } catch (InvocationTargetException e) {
+                                throw new Error(e);
+                            }
+                        }
+                    });
+                    progressThread.setDaemon(true);
+                    progressThread.start();
+
+
+                    EventQueue.invokeAndWait(() ->
+                    {
+                        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME)
+                                + " Elapsed time in generation " + populationData.getCurrentGeneration()
+                                + ": "
+                                + DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getTotalTime()), true, true)
+                                + ", with "
+                                + DurationFormatUtils.formatDurationWords(TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), true, true)
+                                + " observation time. Population size: "
+                                + populationData.getFrontedPopulation().getPopulation().size());
+
+                        elapsedTimesDataset.remove(populationData.getCurrentGeneration(), currentGenerationElapsedTimeText, false);
+
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getOperatorApplyingTime()), "Operator Applying Time (ms)", false);
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getMergingTime()), "Merging Time (ms)", false);
+                        long[] computationTimes = populationData.getComputationTimes();
+                        for (int i = 0; i < computationTimes.length; i++) {
+                            elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(computationTimes[i]), "Computation Time of \"" + computations.get(i).getComputationID() + "\" (ms)", false);
+                        }
+                        long[] optimizationFunctionTimes = populationData.getOptimizationFunctionTimes();
+                        for (int i = 0; i < optimizationFunctionTimes.length; i++) {
+                            elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(optimizationFunctionTimes[i]), "Optimization Function Time of \"" + optimizationFunctions.get(i).getClass().getSimpleName() + "\" (ms)", false);
+                        }
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getFrontingTime()), "Fronting Time (ms)", false);
+                        elapsedTimesDataset.add(populationData.getCurrentGeneration(), TimeUnit.NANOSECONDS.toMillis(populationData.getTruncationTime()), "Truncation Time (ms)", false);
+                        if (populationData.getPreviousObservationTime() > 0) {
+                            elapsedTimesDataset.add(populationData.getCurrentGeneration() - 1, TimeUnit.NANOSECONDS.toMillis(populationData.getPreviousObservationTime()), "Previous Observation Time (ms)", false);
+                        }
+                        elapsedTimesDataset.setNotify(true);
+                    });
+                } catch (InterruptedException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
