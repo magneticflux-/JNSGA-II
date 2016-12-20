@@ -12,6 +12,9 @@ public class Species {
     private Set<Long> individualIDs, unmodifiableIndividualIDs;
     private boolean frozen;
 
+    private Species() {
+    }
+
     public Species(Set<Long> individualIDs, long id) {
         this(individualIDs, id, true);
     }
