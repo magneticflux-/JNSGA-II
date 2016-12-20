@@ -68,11 +68,11 @@ public abstract class DistanceSpeciatorEx<E> extends SpeciatorEx<E> {
     }
 
     protected double getAverageDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
-        return individuals.stream().mapToDouble(individual -> getDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
+        return individuals.parallelStream().mapToDouble(individual -> getDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
     }
 
     protected double getAverageMaxDistance(Collection<Individual<E>> individuals, Individual<E> toCompare) {
-        return individuals.stream().mapToDouble(individual -> getMaxDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
+        return individuals.parallelStream().mapToDouble(individual -> getMaxDistance(individual, toCompare)).average().orElseThrow(() -> new Error("Average not available!"));
     }
 
     protected abstract double getDistance(Individual<E> first, Individual<E> second);
