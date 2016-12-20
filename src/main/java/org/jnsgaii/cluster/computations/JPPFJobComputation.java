@@ -30,6 +30,9 @@ public class JPPFJobComputation<E, F> extends DefaultComputation<E, F> {
 
     @Override
     public F[] compute(List<Individual<E>> individuals, Properties properties) {
+        if (individuals.size() == 0)
+            //noinspection unchecked
+            return (F[]) new Object[0];
         JPPFJob job = new JPPFJob("Computation \"" + wrapped.getComputationID() + "\"");
 
         try {
