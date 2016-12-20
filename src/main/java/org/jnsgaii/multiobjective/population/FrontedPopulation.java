@@ -20,7 +20,6 @@ public class FrontedPopulation<E> extends EvaluatedPopulation<E> {
     protected List<Front<E>> fronts;
 
     private FrontedPopulation() {
-        this(null, null, -1, -1, null);
     }
 
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
